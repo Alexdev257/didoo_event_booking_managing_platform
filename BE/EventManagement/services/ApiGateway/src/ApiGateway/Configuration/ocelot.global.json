@@ -1,0 +1,28 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:5000"
+  }
+  //"SwaggerEndPoints": [
+  //  {
+  //    "Key": "auth",
+  //    "Config": [
+  //      {
+  //        "Name": "Auth Service API",
+  //        "Version": "v1",
+  //        "Url": "https://localhost:6002/swagger/v1/swagger.json"
+  //      }
+  //    ]
+  //  },
+  //  {
+  //    "Key": "events",
+  //    "Config": [
+  //      {
+  //        "Name": "Event Service",
+  //        "Version": "v1",
+  //        "Url": "https://localhost:6100/swagger/v1/swagger.json"
+  //      }
+  //    ]
+  //  }
+  //  // Sau này có Service khác thì thêm tiếp vào đây
+  //]
+}

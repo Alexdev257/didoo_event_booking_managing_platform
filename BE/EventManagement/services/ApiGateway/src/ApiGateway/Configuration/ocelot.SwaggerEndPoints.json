@@ -1,0 +1,44 @@
+{
+  "SwaggerEndPoints": [
+    {
+      "Key": "auth",
+      "Config": [
+        {
+          "Name": "Auth Service APIaaaaaa",
+          "Version": "v1",
+          "Url": "https://localhost:6002/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "events",
+      "Config": [
+        {
+          "Name": "Event Servicebbbbbbb",
+          "Version": "v1",
+          "Url": "https://localhost:6100/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ]
+}
+
+//{
+//  "SwaggerEndPoints": [
+//    {
+//      "Key": "all-services",
+//      "Config": [
+//        {
+//          "Name": "Auth Service API",
+//          "Version": "v1",
+//          "Url": "https://localhost:6002/swagger/v1/swagger.json"
+//        },
+//        {
+//          "Name": "Event Service API",
+//          "Version": "v1",
+//          "Url": "https://localhost:6100/swagger/v1/swagger.json"
+//        }
+//      ]
+//    }
+//  ]
+//}
