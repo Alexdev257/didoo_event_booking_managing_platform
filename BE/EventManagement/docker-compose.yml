@@ -1,0 +1,247 @@
+version: "3.8"
+
+networks:
+  event-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
+
+services:
+  # ====================================================
+  # 1. INFRASTRUCTURE
+  # ====================================================
+
+  mysql:
+    image: mysql:8.0
+    platform: linux/amd64
+    container_name: event_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Password123!
+      MYSQL_DATABASE: AuthDb
+    ports:
+      - "3307:3306"   # tr�nh tr�ng MySQL local
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - event-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:7
+    platform: linux/amd64
+    container_name: event_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - event-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    platform: linux/amd64
+    container_name: event_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - event-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  # ====================================================
+  # 2. MICROSERVICES
+  # ====================================================
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: services/AuthService/src/AuthService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=AuthDb;Uid=root;Pwd=Password123!;
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - Jwt__Key=xynbqiydczvhbcomoewzcldjrqnwrwii
+      - Jwt__Issuer=https://localhost
+      - Jwt__Audience=https://localhost
+    ports:
+      - "6002:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  event-service:
+    container_name: event-service
+    build:
+      context: .
+      dockerfile: services/EventService/src/EventService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=EventDb;Uid=root;Pwd=Password123!;
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    ports:
+      - "6100:80"
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - event-network
+
+  ticket-service:
+    container_name: ticket-service
+    build:
+      context: .
+      dockerfile: services/TicketService/src/TicketService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=TicketDb;Uid=root;Pwd=Password123!;
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    ports:
+      - "6200:80"
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - event-network
+
+  booking-service:
+    container_name: booking-service
+    build:
+      context: .
+      dockerfile: services/BookingService/src/BookingService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=BookingDb;Uid=root;Pwd=Password123!;
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    ports:
+      - "6300:80"
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - event-network
+
+  payment-service:
+    container_name: payment-service
+    build:
+      context: .
+      dockerfile: services/PaymentService/src/PaymentService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=PaymentDb;Uid=root;Pwd=Password123!;
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    ports:
+      - "6400:80"
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - event-network
+
+  operation-service:
+    container_name: operation-service
+    build:
+      context: .
+      dockerfile: services/OperationService/src/OperationService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=OperationDb;Uid=root;Pwd=Password123!;
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    ports:
+      - "6500:80"
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - event-network
+
+  email-service:
+    container_name: email-service
+    build:
+      context: .
+      dockerfile: services/EmailService/src/EmailService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  # ====================================================
+  # 3. API GATEWAY
+  # ====================================================
+
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: services/ApiGatewayYarp/src/ApiGatewayYarp/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ReverseProxy__Clusters__auth-cluster__Destinations__destination1__Address=http://auth-service:80
+      - ReverseProxy__Clusters__event-cluster__Destinations__destination1__Address=http://event-service:80
+      - ReverseProxy__Clusters__ticket-cluster__Destinations__destination1__Address=http://ticket-service:80
+      - ReverseProxy__Clusters__booking-cluster__Destinations__destination1__Address=http://booking-service:80
+      - ReverseProxy__Clusters__payment-cluster__Destinations__destination1__Address=http://payment-service:80
+      - ReverseProxy__Clusters__operation-cluster__Destinations__destination1__Address=http://operation-service:80
+    ports:
+      - "5000:80"
+    depends_on:
+      - auth-service
+      - event-service
+      - ticket-service
+      - booking-service
+      - payment-service
+      - operation-service
+    networks:
+      - event-network
