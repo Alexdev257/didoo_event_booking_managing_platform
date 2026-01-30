@@ -18,10 +18,10 @@ namespace SharedInfrastructure.Bus
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(configuration["MessageBroker:Host"], "/", h =>
+                    cfg.Host(configuration["RabbitMQ:Host"], "/", h =>
                     {
-                        h.Username(configuration["MessageBroker:Username"]!);
-                        h.Password(configuration["MessageBroker:Password"]!);
+                        h.Username(configuration["RabbitMQ:Username"]!);
+                        h.Password(configuration["RabbitMQ:Password"]!);
                     });
 
                     cfg.ConfigureEndpoints(context);

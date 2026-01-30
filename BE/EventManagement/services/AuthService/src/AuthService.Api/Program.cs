@@ -2,6 +2,7 @@ using AuthService.Infrastructure.DependencyInjection;
 using AuthService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using SharedInfrastructure;
+using SharedInfrastructure.Bus;
 using SharedInfrastructure.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //builder.Services.AddSharedSwagger();
+
+//builder.Services.AddMessageBus(builder.Configuration);
 
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddAuthServiceInfrastructure(builder.Configuration);
