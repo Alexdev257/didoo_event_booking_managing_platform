@@ -20,7 +20,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="CQRS\Command\" />
 	  <Folder Include="Interfaces\Helpers\" />
 	</ItemGroup>
 

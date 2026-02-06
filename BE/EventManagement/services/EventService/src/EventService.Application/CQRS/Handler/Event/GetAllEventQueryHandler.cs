@@ -1,5 +1,5 @@
 ﻿using EventService.Application.CQRS.Query.Event;
-using EventService.Application.DTOs.Response;
+using EventService.Application.DTOs.Response.Event;
 using EventService.Application.Interfaces.Repositories;
 using MediatR;
 using System;

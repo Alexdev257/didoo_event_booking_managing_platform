@@ -1,6 +1,7 @@
 ﻿using EmailService.Infrastructure.Services;
 using MassTransit;
 using MassTransit.Internals;
+using MimeKit;
 using SharedContracts.Events;
 using System;
 using System.Collections.Generic;

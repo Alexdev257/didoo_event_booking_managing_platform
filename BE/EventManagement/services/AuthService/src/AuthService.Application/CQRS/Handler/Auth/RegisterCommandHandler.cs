@@ -5,6 +5,7 @@ using AuthService.Application.Interfaces.Helpers;
 using AuthService.Application.Interfaces.Repositories;
 using AuthService.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SharedContracts.Events;
 using SharedContracts.Interfaces;
 using System;
@@ -56,9 +57,11 @@ namespace AuthService.Application.CQRS.Handler.Auth
             }
 
             var hashPassword = _bcryptHelper.HashPassword(request.Password);
-            var user = new User
+            var role = await _unitOfWork.Roles.GetAllAsync()
+                .FirstOrDefaultAsync(r => r.Name == Domain.Enum.RoleNameEnum.User, cancellationToken);
+            var user = new AuthService.Domain.Entities.User
             {
-                //Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 FullName = request.FullName,
                 Email = request.Email,
                 Phone = request.Phone,
@@ -68,37 +71,46 @@ namespace AuthService.Application.CQRS.Handler.Auth
                 DateOfBirth = request.DateOfBirth,
                 Gender = request.Gender,
                 IsVerified = true,
-                RoleId = Guid.Parse("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
+                RoleId = role.Id,
                 Status = Domain.Enum.StatusEnum.Active,
-                
             };
 
-            //await _cacheService.SetAsync<User>($"REG_{user.Email}", user, TimeSpan.FromMinutes(15), cancellationToken);
-            //var otp = OtpHelper.GenerateOtp();
-            //await _cacheService.SetAsync<string>($"OTP_REG_{user.Email}", otp, TimeSpan.FromMinutes(5), cancellationToken);
-            //await _messageProducer.PublishAsync<SendOtpRegisterEvent>(new SendOtpRegisterEvent(request.Email, otp), cancellationToken);
-            //return new RegisterResponse
-            //{
-            //    IsSuccess = true,
-            //    Message = "Register successfully",
-            //};
-            await _unitOfWork.BeginTransactionAsync();
-            try
+            var location = new AuthService.Domain.Entities.UserLocation
             {
-                await _unitOfWork.Users.AddAsync(user);
-                await _unitOfWork.CommitTransactionAsync();
-                return new RegisterResponse
-                {
-                    IsSuccess = true,
-                    Message = "Register successfully",
-                    // UserId = user.Id // Trả về ID nếu cần
-                };
-            }
-            catch (Exception ex)
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                CreatedAt = DateTime.UtcNow,
+                Longitude = request.Location.Longitude,
+                Latitude = request.Location.Latitude,
+            };
+
+            await _cacheService.SetAsync<AuthService.Domain.Entities.User>($"REG_{user.Email}", user, TimeSpan.FromMinutes(5), cancellationToken);
+            await _cacheService.SetAsync<AuthService.Domain.Entities.UserLocation>($"LCT_REG_{user.Email}", location, TimeSpan.FromMinutes(5), cancellationToken);
+            var otp = OtpHelper.GenerateOtp();
+            await _cacheService.SetAsync<string>($"OTP_REG_{user.Email}", otp, TimeSpan.FromMinutes(5), cancellationToken);
+            await _messageProducer.PublishAsync<SendOtpRegisterEvent>(new SendOtpRegisterEvent(request.Email, otp), cancellationToken);
+            return new RegisterResponse
             {
-                await _unitOfWork.RollbackTransactionAsync();
-                throw;
-            }
+               IsSuccess = true,
+               Message = "Send register email successfully",
+            };
+            // await _unitOfWork.BeginTransactionAsync();
+            // try
+            // {
+            //     await _unitOfWork.Users.AddAsync(user);
+            //     await _unitOfWork.CommitTransactionAsync();
+            //     return new RegisterResponse
+            //     {
+            //         IsSuccess = true,
+            //         Message = "Register successfully",
+            //         // UserId = user.Id // Trả về ID nếu cần
+            //     };
+            // }
+            // catch (Exception ex)
+            // {
+            //     await _unitOfWork.RollbackTransactionAsync();
+            //     throw;
+            // }
 
         }
     }

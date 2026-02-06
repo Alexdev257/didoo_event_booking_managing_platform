@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventService.Application.DTOs.Response
+namespace EventService.Application.DTOs.Response.Event
 {
     public class GetAllEventResponse : CommonResponse<List<EventDTO>> { }
 

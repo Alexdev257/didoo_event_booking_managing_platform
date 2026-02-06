@@ -1,5 +1,5 @@
 ﻿using AuthService.Application.CQRS.Query.Role;
-using AuthService.Application.DTOs.Response;
+using AuthService.Application.DTOs.Response.Role;
 using AuthService.Application.Interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

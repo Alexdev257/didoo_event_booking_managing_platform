@@ -54,6 +54,7 @@ namespace AuthService.Infrastructure.DependencyInjection
             service.AddScoped<IAuthUnitOfWork, UnitOfWork>();
             service.AddScoped<IJwtHelper, JwtHelper>();
             service.AddScoped<IBcryptHelper, BcryptHelper>();
+            service.AddScoped<IGoolgeOAuthHelper, GoogleOAuthHelper>();
 
         }
 
