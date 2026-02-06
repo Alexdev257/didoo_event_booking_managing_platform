@@ -23,9 +23,10 @@ namespace AuthService.Application.CQRS.Handler.Auth
         }
         public async Task<VerifyRegisterResponse> Handle(VerifyRegisterCommand request, CancellationToken cancellationToken)
         {
-            var user = await _cacheService.GetAsync<User>($"REG_{request.Email}");
+            var user = await _cacheService.GetAsync<AuthService.Domain.Entities.User>($"REG_{request.Email}");
+            var location = await _cacheService.GetAsync<AuthService.Domain.Entities.UserLocation>($"REG_LOC_{request.Email}");
             var otp = await _cacheService.GetAsync<string>($"OTP_REG_{request.Email}");
-            if(user == null ||  otp == null)
+            if(user == null ||  otp == null || location == null)
             {
                 return new VerifyRegisterResponse
                 {
@@ -46,7 +47,11 @@ namespace AuthService.Application.CQRS.Handler.Auth
             try
             {
                 await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.UserLocations.AddAsync(location); 
                 await _unitOfWork.CommitTransactionAsync();
+                await _cacheService.RemoveAsync($"REG_{request.Email}");
+                await _cacheService.RemoveAsync($"REG_LOC_{request.Email}");
+                await _cacheService.RemoveAsync($"OTP_REG_{request.Email}");
                 return new VerifyRegisterResponse
                 {
                     IsSuccess = true,

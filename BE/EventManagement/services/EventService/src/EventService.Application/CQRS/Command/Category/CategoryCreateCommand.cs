@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AuthService.Application.CQRS.Command.Role
+namespace EventService.Application.CQRS.Command.Category
 {
-    public class DumbRoleCommand
+    public class CategoryCreateCommand
     {
     }
 }

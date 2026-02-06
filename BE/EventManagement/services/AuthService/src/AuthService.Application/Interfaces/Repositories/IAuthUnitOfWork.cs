@@ -11,6 +11,7 @@ namespace AuthService.Application.Interfaces.Repositories
     public interface IAuthUnitOfWork : IUnitOfWork
     {
         IGenericRepository<User> Users { get; }
+        IGenericRepository<UserLocation> UserLocations { get; }
         IGenericRepository<Role> Roles { get; }
     }
 }

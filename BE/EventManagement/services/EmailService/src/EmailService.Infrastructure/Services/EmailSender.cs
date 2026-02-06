@@ -29,6 +29,8 @@ namespace EmailService.Infrastructure.Services
                 HtmlBody = body
             };
 
+            email.Body = builder.ToMessageBody();
+
             using var smtp = new SmtpClient();
             await smtp.ConnectAsync(_configuration["Email:Host"], int.Parse(_configuration["Email:Port"]!), false);
             await smtp.AuthenticateAsync(_configuration["Email:Username"], _configuration["Email:Password"]);

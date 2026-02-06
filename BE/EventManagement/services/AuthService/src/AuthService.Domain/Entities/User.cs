@@ -13,7 +13,7 @@ namespace AuthService.Domain.Entities
         public string FullName { get; set; }
         public string Email { get; set; }
         public string? Phone { get; set; }
-        public bool IsVerified { get; set; } = false!;
+        public bool IsVerified { get; set; } = true!;
         public string Password { get; set; }
 
         public string? AvatarUrl { get; set; }
