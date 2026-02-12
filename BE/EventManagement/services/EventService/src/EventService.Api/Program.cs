@@ -1,10 +1,71 @@
 using EventService.Infrastructure.DependencyInjection;
 using EventService.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using SharedContracts.Protos;
 using SharedInfrastructure;
 using SharedInfrastructure.Swagger;
 
+
+//AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
+//var builder = WebApplication.CreateBuilder(args);
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ConfigureEndpointDefaults(listenOptions =>
+//    {
+//        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+//    });
+//});
+
+
+//builder.Services.AddGrpcClient<AuthGrpc.AuthGrpcClient>(o =>
+//{
+//    var url = builder.Configuration["GrpcSettings:AuthServiceUrl"];
+//    if (string.IsNullOrEmpty(url))
+//    {
+//        url = "http://auth-service:81";
+//    }
+
+//    // 3. G�n ??a ch? v�o
+//    o.Address = new Uri(url);
+//});
+
+//builder.Services.AddGrpcClient<AuthGrpc.AuthGrpcClient>(o =>
+//{
+//    // 1. ?u ti�n l?y t? bi?n m�i tr??ng (Docker Compose set c�i n�y)
+//    var url = Environment.GetEnvironmentVariable("GrpcSettings__AuthServiceUrl");
+
+//    // 2. N?u kh�ng c�, l?y t? appsettings.json (Ch?y Local)
+//    if (string.IsNullOrEmpty(url))
+//    {
+//        url = builder.Configuration["GrpcSettings:AuthServiceUrl"];
+//    }
+
+//    // 3. Fallback c?ng n?u null (ph�ng h?)
+//    if (string.IsNullOrEmpty(url))
+//    {
+//        // Trong Docker, auth-service ch?y port 80 (do ta ?� config Kestrel Http1AndHttp2 ? port 80)
+//        url = "http://auth-service:80";
+//    }
+
+//    Console.WriteLine($"--> Connecting to AuthGrpc at: {url}");
+//    o.Address = new Uri(url);
+//});
+
+// 1. B?T BU?C: Cho ph�p gRPC qua HTTP th??ng (kh�ng b?o m?t)
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    bool isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    if (isRunningInDocker)
+    {
+        options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1AndHttp2);
+    }
+});
 
 // Add services to the container.
 
@@ -16,6 +77,45 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddEventServiceInfrastructure(builder.Configuration);
+
+//builder.Services.AddGrpcClient<AuthGrpc.AuthGrpcClient>(o =>
+//{
+//    var url = builder.Configuration["GrpcSettings:AuthServiceUrl"];
+//    if (string.IsNullOrEmpty(url))
+//    {
+//        url = "http://auth-service:81";
+//    }
+
+//    // 3. G�n ??a ch? v�o
+//    o.Address = new Uri(url);
+//});
+
+// 3. S?a logic l?y URL k?t n?i gRPC
+builder.Services.AddGrpcClient<AuthGrpc.AuthGrpcClient>(o =>
+{
+    // ?u ti�n l?y t? bi?n m�i tr??ng Docker tr??c (GrpcSettings__AuthServiceUrl)
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__AuthServiceUrl");
+
+    // N?u kh�ng c� (ch?y local), l?y t? appsettings.json
+    if (string.IsNullOrEmpty(url))
+    {
+        url = builder.Configuration["GrpcSettings:AuthServiceUrl"];
+    }
+
+    // Fallback cu?i c�ng n?u v?n null
+    if (string.IsNullOrEmpty(url))
+    {
+        // M?c ??nh trong Docker n?u kh�ng config g� c?
+        url = "http://auth-service:80";
+    }
+
+    Console.WriteLine($"--> EventService connecting to AuthGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
+
+
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -49,7 +149,7 @@ if (app.Environment.IsDevelopment())
 
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 

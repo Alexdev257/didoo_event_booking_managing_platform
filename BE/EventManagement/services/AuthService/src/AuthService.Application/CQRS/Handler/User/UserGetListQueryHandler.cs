@@ -26,7 +26,21 @@ namespace AuthService.Application.CQRS.Handler.User
         {
             try
             {
-                var users = _unitOfWork.Users.GetAllAsync().Include(x => x.Role).Include(x => x.Locations).Where(x => !x.IsDeleted);
+                var users = _unitOfWork.Users.GetAllAsync().Include(x => x.Role).Include(x => x.Locations).AsQueryable();
+
+                if (request.IsDeleted.HasValue)
+                {
+                    if (request.IsDeleted.Value == true)
+                    {
+                        users = users.Where(x => x.IsDeleted);
+                    }
+                    else if (request.IsDeleted.Value == false)
+                    {
+                        {
+                            users = users.Where(x => !x.IsDeleted);
+                        }
+                    }
+                }
                 if (!string.IsNullOrWhiteSpace(request.FullName))
                 {
                     users = users.Where(x =>

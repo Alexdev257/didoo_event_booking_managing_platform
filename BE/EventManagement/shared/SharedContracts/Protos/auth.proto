@@ -1,0 +1,34 @@
+﻿
+syntax = "proto3";
+
+option csharp_namespace = "SharedContracts.Protos";
+
+package auth;
+
+// Định nghĩa Service
+service AuthGrpc {
+  // Hàm lấy User Profile: Input là UserRequest, Output là UserResponse
+  rpc GetUserProfile (UserRequest) returns (UserResponse);
+  rpc GetUsersByIds (GetUsersRequest) returns (GetUsersResponse);
+}
+
+// Input: Chỉ cần UserId
+message UserRequest {
+  string user_id = 1;
+}
+
+// Output: Object DTO trả về
+message UserResponse {
+  string id = 1;
+  string full_name = 2;
+  string avatar_url = 3;
+  string gender = 4;
+}
+
+message GetUsersRequest{
+	repeated string user_ids = 1;
+}
+
+message GetUsersResponse{
+	repeated UserResponse users = 1;
+}

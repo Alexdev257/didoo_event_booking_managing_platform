@@ -26,5 +26,6 @@ namespace AuthService.Application.CQRS.Query.User
         public string? Fields { get; set; }
         public bool? HasLocation { get; set; } = false!;
         public bool? IsDescending { get; set; } = false!;
+        public bool? IsDeleted { get; set; }
     }
 }

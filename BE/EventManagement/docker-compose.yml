@@ -75,6 +75,7 @@ services:
       dockerfile: services/AuthService/src/AuthService.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_RUNNING_IN_CONTAINER=true
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=AuthDb;Uid=root;Pwd=Password123!;
       - ConnectionStrings__Redis=redis:6379
@@ -107,6 +108,7 @@ services:
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
+      - GrpcSettings__AuthServiceUrl=http://auth-service:80
     ports:
       - "6100:80"
     depends_on:

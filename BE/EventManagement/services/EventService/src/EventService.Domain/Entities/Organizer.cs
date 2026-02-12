@@ -20,6 +20,5 @@ namespace EventService.Domain.Entities
         public bool? IsVerified { get; set; } = false!;
         public OrganizerStatusEnum Status { get; set; } = OrganizerStatusEnum.Pending;
         public virtual ICollection<Event> Events { get; set; }
-
     }
 }

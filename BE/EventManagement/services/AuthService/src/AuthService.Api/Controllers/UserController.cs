@@ -19,9 +19,9 @@ namespace AuthService.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] UserCreateCommand command)
+        public async Task<IActionResult> Create([FromBody] UserCreateCommand request)
         {
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
@@ -44,7 +44,7 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [HttpPatch("{id}/restore")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Restore([FromRoute] Guid id)
         {
             var request = new UserRestoreCommand { Id = id };

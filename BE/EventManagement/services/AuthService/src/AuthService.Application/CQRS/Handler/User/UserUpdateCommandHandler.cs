@@ -78,6 +78,7 @@ namespace AuthService.Application.CQRS.Handler.User
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync();
                 return new UserUpdateResponse
                 {
                     IsSuccess = false,
