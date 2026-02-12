@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventService.Application.CQRS.Query.Category
+namespace EventService.Application.DTOs.Response.Event
 {
-    public class UserGetListQuery
+    public class EventReviewDTO
     {
     }
 }

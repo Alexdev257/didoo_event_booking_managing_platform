@@ -6,9 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventService.Application.CQRS.Query.Event
+namespace EventService.Application.CQRS.Command.Event
 {
-    public class EventGetAllQuery : IRequest<GetAllEventResponse>
+    public class EventDeleteCommand : IRequest<EventDeleteResponse>
     {
+        public Guid Id { get; set; }
     }
 }

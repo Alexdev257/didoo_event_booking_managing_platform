@@ -3,7 +3,7 @@ using SharedKernel.Domain;
 
 namespace EventService.Domain.Entities
 {
-    public class UserEventInteraction : AuditableEntity
+    public class UserEventInteraction : AuditableEntity, IHardDelete
     {
         public InteractionTypeEnum Type { get; set; }
         public Guid EventId { get; set; }

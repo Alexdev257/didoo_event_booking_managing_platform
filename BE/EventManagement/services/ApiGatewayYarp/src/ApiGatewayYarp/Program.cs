@@ -75,7 +75,7 @@ if (app.Environment.IsDevelopment())
         options.ConfigObject.AdditionalItems["syntaxHighlight"] = false;
     });
 }
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 // 2. Kích ho?t YARP Middleware

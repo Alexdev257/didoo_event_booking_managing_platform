@@ -54,6 +54,10 @@ namespace SharedInfrastructure.Persistence.Interceptors
 
                 if(entry.State == EntityState.Deleted)
                 {
+                    if (entry.Entity is IHardDelete)
+                    {
+                        return;
+                    }
                     entry.State = EntityState.Modified;
                     entry.Entity.IsDeleted = true;
                     entry.Entity.DeletedAt = DateTime.UtcNow;
