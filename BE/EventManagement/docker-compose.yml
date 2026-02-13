@@ -201,6 +201,27 @@ services:
     networks:
       - event-network
 
+  resale-service:
+    container_name: resale-service
+    build:
+      context: .
+      dockerfile: services/ResaleService/src/ResaleService.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=ResaleDb;Uid=root;Pwd=Password123!;
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    ports:
+      - "6600:80"
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - event-network
+      
   email-service:
     container_name: email-service
     build:
@@ -236,6 +257,7 @@ services:
       - ReverseProxy__Clusters__booking-cluster__Destinations__destination1__Address=http://booking-service:80
       - ReverseProxy__Clusters__payment-cluster__Destinations__destination1__Address=http://payment-service:80
       - ReverseProxy__Clusters__operation-cluster__Destinations__destination1__Address=http://operation-service:80
+      - ReverseProxy__Clusters__resale-cluster__Destinations__destination1__Address=http://resale-service:80
     ports:
       - "5000:80"
     depends_on:
