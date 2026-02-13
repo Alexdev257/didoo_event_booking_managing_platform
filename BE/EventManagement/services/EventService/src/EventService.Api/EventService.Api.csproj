@@ -15,6 +15,7 @@
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	  
 	  <PackageReference Include="Grpc.Net.ClientFactory" Version="2.60.0" />
+	  <PackageReference Include="Grpc.AspNetCore" Version="2.60.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,8 @@
     <ProjectReference Include="..\EventService.Infrastructure\EventService.Infrastructure.csproj" />
   </ItemGroup>
 
-	
+	<ItemGroup>
+		<Protobuf Include="..\..\..\..\shared\SharedContracts\Protos\event.proto" GrpcServices="Server" Link="Protos\event.proto" />
+	</ItemGroup>
 
 </Project>

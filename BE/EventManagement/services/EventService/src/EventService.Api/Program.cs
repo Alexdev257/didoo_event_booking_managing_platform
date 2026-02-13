@@ -1,3 +1,4 @@
+using EventService.Api.Grpc;
 using EventService.Infrastructure.DependencyInjection;
 using EventService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -65,6 +66,15 @@ builder.WebHost.ConfigureKestrel(options =>
     {
         options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1AndHttp2);
     }
+    else
+    {
+        // === THÊM ĐOẠN NÀY CHO LOCALHOST ===
+        // Port 6101: REST API / Swagger
+        options.ListenLocalhost(6101, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 6102: gRPC Server (Để TicketService gọi vào)
+        options.ListenLocalhost(6102, o => o.Protocols = HttpProtocols.Http2);
+    }
 });
 
 // Add services to the container.
@@ -114,6 +124,9 @@ builder.Services.AddGrpcClient<AuthGrpc.AuthGrpcClient>(o =>
 });
 
 
+builder.Services.AddGrpc();
+
+
 
 
 var app = builder.Build();
@@ -155,6 +168,7 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapGrpcService<EventGrpcService>();
 
 app.MapControllers();
 

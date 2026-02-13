@@ -6,9 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TicketService.Application.DTOs.Response.TicketType;
 
-namespace TicketService.Application.CQRS.Query.TicketType
+namespace TicketService.Application.CQRS.Command.TicketType
 {
-    public class TicketTypeGetAllQuery : IRequest<GetAllTicketTypeResponse>
+    public class TicketTypeRestoreCommand : IRequest<TicketTypeRestoreResponse>
     {
+        public Guid Id { get; set; }
     }
 }
