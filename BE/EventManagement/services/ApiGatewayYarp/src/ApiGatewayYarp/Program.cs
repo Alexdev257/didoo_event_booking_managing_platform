@@ -1,6 +1,16 @@
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Thay b?ng URL Frontend React c?a b?n
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // B?T BU?C có dòng này ?? SignalR ch?y qua Gateway
+    });
+});
 
 // Add services to the container.
 
@@ -76,6 +86,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 //app.UseHttpsRedirection();
+app.UseWebSockets();
+
 app.UseCors("AllowAll");
 
 // 2. Kích ho?t YARP Middleware

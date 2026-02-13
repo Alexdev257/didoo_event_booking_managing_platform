@@ -1,0 +1,39 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "SharedContracts.Protos";
+
+package event;
+
+import "google/protobuf/timestamp.proto";
+
+service EventGrpc {
+  rpc GetEventDetail (EventRequest) returns (EventResponse);
+}
+
+message EventRequest {
+  string event_id = 1;
+}
+
+enum EventStatus {
+  EVENT_STATUS_UNSPECIFIED = 0;
+  DRAFT = 1;
+  PUBLISHED = 2;
+  CANCELLED = 3;
+  COMPLETED = 4;
+}
+
+message EventResponse {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string tags = 5;
+  google.protobuf.Timestamp start_time = 6;
+  google.protobuf.Timestamp end_time = 7;
+  string open_time = 8;
+  string closed_time = 9;
+  EventStatus status = 11;
+  string thumbnail_url = 12;
+  string banner_url = 13;
+  int32 age_restriction = 14;
+}

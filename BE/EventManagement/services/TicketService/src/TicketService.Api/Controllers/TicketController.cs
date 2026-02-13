@@ -1,23 +1,23 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TicketService.Application.CQRS.Command.TicketType;
-using TicketService.Application.CQRS.Query.TicketType;
+using TicketService.Application.CQRS.Command.Ticket;
+using TicketService.Application.CQRS.Query.Ticket;
 
 namespace TicketService.Api.Controllers
 {
-    [Route("api/tickettypes")]
+    [Route("api/tickets")]
     [ApiController]
-    public class TicketTypeController : ControllerBase
+    public class TicketController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public TicketTypeController(IMediator mediator)
+        public TicketController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetListTicketTypesAsync([FromQuery] TicketTypeGetListQuery request)
+        public async Task<IActionResult> GetListTicketsAsync([FromQuery] TicketGetListQuery request)
         {
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
@@ -25,7 +25,7 @@ namespace TicketService.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTicketTypeByIdAsync([FromRoute] Guid id, [FromQuery] TicketTypeGetByIdQuery request)
+        public async Task<IActionResult> GetTicketByIdAsync([FromRoute] Guid id, [FromQuery] TicketGetByIdQuery request)
         {
             request.Id = id;
             var result = await _mediator.Send(request);
@@ -34,7 +34,7 @@ namespace TicketService.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTicketTypeAsync([FromBody] TicketTypeCreateCommand request)
+        public async Task<IActionResult> CreateTicketAsync([FromBody] TicketCreateCommand request)
         {
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
@@ -42,7 +42,7 @@ namespace TicketService.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTicketTypeAsync([FromRoute] Guid id, [FromBody] TicketTypeUpdateCommand request)
+        public async Task<IActionResult> UpdateTicketAsync([FromRoute] Guid id, [FromBody] TicketUpdateCommand request)
         {
             request.Id = id;
             var result = await _mediator.Send(request);
@@ -51,18 +51,18 @@ namespace TicketService.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTicketTypeAsync([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteTicketAsync([FromRoute] Guid id)
         {
-            var request = new TicketTypeDeleteCommand { Id = id };
+            var request = new TicketDeleteCommand { Id = id };
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> RestoreTicketTypeAsync([FromRoute] Guid id)
+        public async Task<IActionResult> RestoreTicketAsync([FromRoute] Guid id)
         {
-            var request = new TicketTypeRestoreCommand { Id = id };
+            var request = new TicketRestoreCommand { Id = id };
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             else return StatusCode(StatusCodes.Status400BadRequest, result);
