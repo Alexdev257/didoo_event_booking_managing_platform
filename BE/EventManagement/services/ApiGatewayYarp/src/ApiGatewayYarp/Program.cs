@@ -82,6 +82,7 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/booking-service/swagger/v1/swagger.json", "Bookings Service API");
         options.SwaggerEndpoint("/payment-service/swagger/v1/swagger.json", "Payments Service API");
         options.SwaggerEndpoint("/operation-service/swagger/v1/swagger.json", "Operations Service API");
+        options.SwaggerEndpoint("/resale-service/swagger/v1/swagger.json", "Resales Service API");
         options.ConfigObject.AdditionalItems["syntaxHighlight"] = false;
     });
 }
