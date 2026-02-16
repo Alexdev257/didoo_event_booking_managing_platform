@@ -75,17 +75,16 @@ namespace AuthService.Application.CQRS.Handler.Auth
                 Status = Domain.Enum.StatusEnum.Active,
             };
 
-            var location = new AuthService.Domain.Entities.UserLocation
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                CreatedAt = DateTime.UtcNow,
-                Longitude = request.Location.Longitude,
-                Latitude = request.Location.Latitude,
-            };
+            //var location = new AuthService.Domain.Entities.UserLocation
+            //{
+            //    Id = Guid.NewGuid(),
+            //    UserId = user.Id,
+            //    CreatedAt = DateTime.UtcNow,
+            //    Longitude = request.Location.Longitude,
+            //    Latitude = request.Location.Latitude,
+            //};
 
             await _cacheService.SetAsync<AuthService.Domain.Entities.User>($"REG_{user.Email}", user, TimeSpan.FromMinutes(5), cancellationToken);
-            await _cacheService.SetAsync<AuthService.Domain.Entities.UserLocation>($"LCT_REG_{user.Email}", location, TimeSpan.FromMinutes(5), cancellationToken);
             var otp = OtpHelper.GenerateOtp();
             await _cacheService.SetAsync<string>($"OTP_REG_{user.Email}", otp, TimeSpan.FromMinutes(5), cancellationToken);
             await _messageProducer.PublishAsync<SendOtpRegisterEvent>(new SendOtpRegisterEvent(request.Email, otp), cancellationToken);

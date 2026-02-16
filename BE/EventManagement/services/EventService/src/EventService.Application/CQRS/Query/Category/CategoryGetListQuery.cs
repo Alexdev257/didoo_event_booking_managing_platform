@@ -16,7 +16,7 @@ namespace EventService.Application.CQRS.Query.Category
         public string? Slug { get; set; }
         public string? Description { get; set; }
         public string? IconUrl { get; set; }
-        public StatusEnum? Status { get; set; } = StatusEnum.Active;
+        public StatusEnum? Status { get; set; }
         public Guid? ParentCategoryId { get; set; }
         public string? Fields { get; set; }
         public bool? HasParent { get; set; } = false!;

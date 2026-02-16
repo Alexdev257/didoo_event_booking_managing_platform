@@ -1,6 +1,7 @@
 ﻿using EventService.Application.CQRS.Command.Category;
 using EventService.Application.CQRS.Query.Category;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -17,6 +18,7 @@ namespace EventService.Api.Controllers
             _mediator = mediator;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetListCategoryAsync([FromQuery] CategoryGetListQuery request)
         {

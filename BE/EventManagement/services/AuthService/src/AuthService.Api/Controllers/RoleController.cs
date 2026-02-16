@@ -1,6 +1,7 @@
 ﻿using AuthService.Application.CQRS.Command.Role;
 using AuthService.Application.CQRS.Query.Role;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace AuthService.Api.Controllers
             _mediator = mediator;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllRoleAsync()
         {
