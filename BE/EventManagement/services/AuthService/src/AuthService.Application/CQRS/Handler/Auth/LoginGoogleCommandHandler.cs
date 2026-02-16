@@ -74,10 +74,20 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     CreatedAt = DateTime.UtcNow
                 };
 
+                var location = new AuthService.Domain.Entities.UserLocation
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    Longitude = request.Location.Longitude,
+                    Latitude = request.Location.Latitude,
+                };
+
                 await _unitOfWork.BeginTransactionAsync();
                 try
                 {
                     await _unitOfWork.Users.AddAsync(user);
+                    await _unitOfWork.UserLocations.AddAsync(location);
                     await _unitOfWork.CommitTransactionAsync();
                     await _messageProducer.PublishAsync<SendFirstLoginGoogleEmailEvent>(new SendFirstLoginGoogleEmailEvent(validatedResult.Email, basePassword, validatedResult.Name, DateTime.UtcNow), cancellationToken);
                     var accessToken = _jwtHelper.GenerateAccessToken(user);
@@ -100,25 +110,49 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     return new LoginGoogleResponse
                     {
                         IsSuccess = false,
-                        Message = "An error occurred while verifying email change"
+                        Message = "An error occurred while logging in by google"
                     };
                 }
             }
             else
             {
-                var accessToken = _jwtHelper.GenerateAccessToken(user);
-                var refreshToken = _jwtHelper.GenerateRefreshToken();
-                await _cacheService.SetAsync<string>($"RT_{user.Id}", refreshToken, TimeSpan.FromDays(7), cancellationToken);
-                return new LoginGoogleResponse
+                
+                var location = new AuthService.Domain.Entities.UserLocation
                 {
-                    IsSuccess = true,
-                    Message = "Login with Google successfully! Please check your email to get your password.",
-                    Data = new TokenDTO
-                    {
-                        AccessToken = accessToken,
-                        RefreshToken = refreshToken
-                    }
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    Longitude = request.Location.Longitude,
+                    Latitude = request.Location.Latitude,
                 };
+                try
+                {
+                    await _unitOfWork.UserLocations.AddAsync(location);
+                    await _unitOfWork.CommitTransactionAsync();
+                    var accessToken = _jwtHelper.GenerateAccessToken(user);
+                    var refreshToken = _jwtHelper.GenerateRefreshToken();
+                    await _cacheService.SetAsync<string>($"RT_{user.Id}", refreshToken, TimeSpan.FromDays(7), cancellationToken);
+                    return new LoginGoogleResponse
+                    {
+                        IsSuccess = true,
+                        Message = "Login with Google successfully! Please check your email to get your password.",
+                        Data = new TokenDTO
+                        {
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
+                        }
+                    };
+                }
+                catch(Exception ex)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return new LoginGoogleResponse
+                    {
+                        IsSuccess = false,
+                        Message = "An error occurred while logging in by google"
+                    };
+                }
+                
             }
                
         }

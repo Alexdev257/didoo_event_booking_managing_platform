@@ -13,6 +13,7 @@ namespace AuthService.Application.CQRS.Command.Auth
     public class LoginGoogleCommand : IRequest<LoginGoogleResponse>, IValidatable<LoginGoogleResponse>
     {
         public string GoogleToken { get; set; } = null!;
+        public LocationRequest? Location { get; set; }
 
         public Task<LoginGoogleResponse> ValidateAsync()
         {

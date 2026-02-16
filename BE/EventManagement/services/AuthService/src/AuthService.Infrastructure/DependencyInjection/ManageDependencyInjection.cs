@@ -9,8 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SharedContracts.Common.Wrappers;
 using SharedInfrastructure.Bus;
 using SharedInfrastructure.Persistence.Repositories;
+using SharedInfrastructure.Swagger;
 using SharedKernel.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AuthService.Infrastructure.DependencyInjection
@@ -33,6 +36,7 @@ namespace AuthService.Infrastructure.DependencyInjection
             services.AddCorsExtentions();
             services.AddJwtAuthentication(configuration);
             services.AddAuthorizationRole();
+            services.AddSharedSwaggerGen("Auth Service API");
 
             services.AddMessageBus(configuration);
             return services;
@@ -101,7 +105,6 @@ namespace AuthService.Infrastructure.DependencyInjection
                         ClockSkew = TimeSpan.Zero,
                         
                     };
-
                     options.Events = new JwtBearerEvents
                     {
                         OnAuthenticationFailed = context =>
@@ -109,6 +112,40 @@ namespace AuthService.Infrastructure.DependencyInjection
                             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                                 context.Response.Headers.Add("Token-Expired", "true");
                             return Task.CompletedTask;
+                        },
+                        // 1. Xử lý khi chưa đăng nhập hoặc Token sai (401 Unauthorized)
+                        OnChallenge = context =>
+                        {
+                            // Ngăn chặn hành vi mặc định (trả về rỗng)
+                            context.HandleResponse();
+
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+
+                            var response = new CommonResponse<object>
+                            {
+                                IsSuccess = false,
+                                Message = "You are not logged in or your token is expired.",
+                                Data = null,
+                            };
+
+                            return context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                        },
+
+                        // 2. Xử lý khi đã đăng nhập nhưng không đủ quyền (403 Forbidden)
+                        OnForbidden = context =>
+                        {
+                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            context.Response.ContentType = "application/json";
+
+                            var response = new CommonResponse<object>
+                            {
+                                IsSuccess = false,
+                                Message = "You are not allowed to access this endpoint.",
+                                Data = null,
+                            };
+
+                            return context.Response.WriteAsync(JsonSerializer.Serialize(response));
                         }
                     };
                 });

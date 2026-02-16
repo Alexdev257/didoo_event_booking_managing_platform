@@ -15,7 +15,6 @@ namespace BookingService.Domain.Entities
         public int Quantity { get; set; }
         public decimal PricePerTicket { get; set; }
         public decimal TotalPrice { get; set; }
-
         public virtual Booking Booking { get; set; }
     }
 }
