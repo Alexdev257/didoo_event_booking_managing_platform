@@ -1,12 +1,6 @@
 ﻿using BookingService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SharedInfrastructure.Persistence.Interceptors;
-using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BookingService.Infrastructure.Persistence
 {
@@ -23,8 +17,18 @@ namespace BookingService.Infrastructure.Persistence
             _auditableEntityInterceptor = auditableEntityInterceptor;
         }
 
+        // Booking
         public virtual DbSet<Booking> Bookings { get; set; }
         public virtual DbSet<BookingDetail> BookingDetails { get; set; }
+
+        // Payment
+        public virtual DbSet<Payment> Payments { get; set; }
+        public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
+
+        // Resale
+        public virtual DbSet<Resale> Resales { get; set; }
+        public virtual DbSet<ResaleTransaction> ResaleTransactions { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.AddInterceptors(_auditableEntityInterceptor);
