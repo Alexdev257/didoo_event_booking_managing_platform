@@ -16,9 +16,17 @@ namespace BookingService.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPaymentMethodAsync()
+        public async Task<IActionResult> GetListPaymentMethodsAsync([FromQuery] PaymentMethodGetListQuery request)
         {
-            var request = new PaymentMethodGetAllQuery();
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPaymentMethodByIdAsync([FromRoute] Guid id, [FromQuery] PaymentMethodGetByIdQuery request)
+        {
+            request.Id = id;
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             else return StatusCode(StatusCodes.Status400BadRequest, result);

@@ -1,22 +1,22 @@
-using BookingService.Application.CQRS.Query.ResaleTransaction;
+using BookingService.Application.CQRS.Query.BookingDetail;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingService.Api.Controllers
 {
-    [Route("api/resaletransactions")]
+    [Route("api/bookingdetails")]
     [ApiController]
-    public class ResaleTransactionController : ControllerBase
+    public class BookingDetailController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public ResaleTransactionController(IMediator mediator)
+        public BookingDetailController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetListResaleTransactionsAsync([FromQuery] ResaleTransactionGetListQuery request)
+        public async Task<IActionResult> GetListBookingDetailsAsync([FromQuery] BookingDetailGetListQuery request)
         {
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
@@ -24,7 +24,7 @@ namespace BookingService.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetResaleTransactionByIdAsync([FromRoute] Guid id, [FromQuery] ResaleTransactionGetByIdQuery request)
+        public async Task<IActionResult> GetBookingDetailByIdAsync([FromRoute] Guid id, [FromQuery] BookingDetailGetByIdQuery request)
         {
             request.Id = id;
             var result = await _mediator.Send(request);

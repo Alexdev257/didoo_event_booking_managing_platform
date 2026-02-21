@@ -17,9 +17,17 @@ namespace BookingService.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBookingAsync()
+        public async Task<IActionResult> GetListBookingsAsync([FromQuery] BookingGetListQuery request)
         {
-            BookingGetAllQuery request = new BookingGetAllQuery();
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBookingByIdAsync([FromRoute] Guid id, [FromQuery] BookingGetByIdQuery request)
+        {
+            request.Id = id;
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             else return StatusCode(StatusCodes.Status400BadRequest, result);

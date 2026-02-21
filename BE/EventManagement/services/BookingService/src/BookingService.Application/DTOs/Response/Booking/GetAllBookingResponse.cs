@@ -26,5 +26,16 @@ namespace BookingService.Application.DTOs.Response.Booking
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string PaymentUrl { get; set; } = string.Empty;
+        public List<BookingDetailSubDTO> BookingDetails { get; set; } = new List<BookingDetailSubDTO>();
+    }
+
+    public class BookingDetailSubDTO
+    {
+        public string Id { get; set; } = default!;
+        public string? SeatId { get; set; }
+        public string? TicketId { get; set; }
+        public int Quantity { get; set; }
+        public decimal PricePerTicket { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }
