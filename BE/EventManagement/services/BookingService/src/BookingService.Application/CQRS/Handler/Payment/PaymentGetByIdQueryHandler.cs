@@ -9,8 +9,8 @@ namespace BookingService.Application.CQRS.Handler.Payment
 {
     public class PaymentGetByIdQueryHandler : IRequestHandler<PaymentGetByIdQuery, PaymentGetByIdResponse>
     {
-        private readonly IPaymentUnitOfWork _unitOfWork;
-        public PaymentGetByIdQueryHandler(IPaymentUnitOfWork unitOfWork)
+        private readonly IManageUnitOfWork _unitOfWork;
+        public PaymentGetByIdQueryHandler(IManageUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

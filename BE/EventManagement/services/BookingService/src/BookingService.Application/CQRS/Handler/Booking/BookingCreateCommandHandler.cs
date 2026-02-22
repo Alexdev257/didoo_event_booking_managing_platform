@@ -12,11 +12,11 @@ namespace BookingService.Application.CQRS.Handler.Booking
 {
     public class BookingCreateCommandHandler : IRequestHandler<BookingCreateCommand, CreateBookingResponse>
     {
-        private readonly IBookingUnitOfWork _unitOfWork;
+        private readonly IManageUnitOfWork _unitOfWork;
         private readonly ITicketServiceClient _ticketServiceClient;
         private readonly IMomoService _momoService;
 
-        public BookingCreateCommandHandler(IBookingUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMomoService momoService)
+        public BookingCreateCommandHandler(IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMomoService momoService)
         {
             _unitOfWork = unitOfWork;
             _ticketServiceClient = ticketServiceClient;
@@ -105,6 +105,17 @@ namespace BookingService.Application.CQRS.Handler.Booking
                     Message = $"Failed to connect to MomoService: {ex.Message}"
                 };
             }
+
+            // 4. Add payment data to database
+            var payment = new Domain.Entities.Payment
+            {
+                BookingId = booking.Id,
+                Cost = totalPrice,
+                Currency = "VND",
+            };
+
+            await _unitOfWork.Payments.AddAsync(payment);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
 
             BookingDTO dto = new BookingDTO

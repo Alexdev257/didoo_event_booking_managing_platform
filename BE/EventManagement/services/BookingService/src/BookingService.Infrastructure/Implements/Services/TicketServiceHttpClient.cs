@@ -1,5 +1,6 @@
 using BookingService.Application.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -32,10 +33,15 @@ namespace BookingService.Infrastructure.Implements.Services
 
             if (!response.IsSuccessStatusCode)
             {
+                string jsonString = response.Content.ToString()!;
+                JObject json = JObject.Parse(jsonString);
+                string message = json["message"]?.ToString()!;
+
+
                 return new TicketDecrementResult
                 {
                     IsAvailable = false,
-                    Message = $"TicketService returned {(int)response.StatusCode}"
+                    Message = $"TicketService returned {(int)response.StatusCode} with Message : {message}"
                 };
             }
 

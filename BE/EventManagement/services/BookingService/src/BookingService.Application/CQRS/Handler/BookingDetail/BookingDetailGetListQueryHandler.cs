@@ -8,8 +8,8 @@ namespace BookingService.Application.CQRS.Handler.BookingDetail
 {
     public class BookingDetailGetListQueryHandler : IRequestHandler<BookingDetailGetListQuery, BookingDetailGetListResponse>
     {
-        private readonly IBookingUnitOfWork _unitOfWork;
-        public BookingDetailGetListQueryHandler(IBookingUnitOfWork unitOfWork)
+        private readonly IManageUnitOfWork _unitOfWork;
+        public BookingDetailGetListQueryHandler(IManageUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

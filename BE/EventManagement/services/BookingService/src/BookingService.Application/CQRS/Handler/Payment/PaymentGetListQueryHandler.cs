@@ -8,8 +8,8 @@ namespace BookingService.Application.CQRS.Handler.Payment
 {
     public class PaymentGetListQueryHandler : IRequestHandler<PaymentGetListQuery, PaymentGetListResponse>
     {
-        private readonly IPaymentUnitOfWork _unitOfWork;
-        public PaymentGetListQueryHandler(IPaymentUnitOfWork unitOfWork)
+        private readonly IManageUnitOfWork _unitOfWork;
+        public PaymentGetListQueryHandler(IManageUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

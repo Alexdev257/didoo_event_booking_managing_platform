@@ -8,8 +8,8 @@ namespace BookingService.Application.CQRS.Handler.ResaleTransaction
 {
     public class ResaleTransactionGetAllQueryHandler : IRequestHandler<ResaleTransactionGetAllQuery, GetAllResaleTransactionResponse>
     {
-        private readonly IResaleUnitOfWork _unitOfWork;
-        public ResaleTransactionGetAllQueryHandler(IResaleUnitOfWork unitOfWork)
+        private readonly IManageUnitOfWork _unitOfWork;
+        public ResaleTransactionGetAllQueryHandler(IManageUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

@@ -9,8 +9,8 @@ namespace BookingService.Application.CQRS.Handler.BookingDetail
 {
     public class BookingDetailGetByIdQueryHandler : IRequestHandler<BookingDetailGetByIdQuery, BookingDetailGetByIdResponse>
     {
-        private readonly IBookingUnitOfWork _unitOfWork;
-        public BookingDetailGetByIdQueryHandler(IBookingUnitOfWork unitOfWork)
+        private readonly IManageUnitOfWork _unitOfWork;
+        public BookingDetailGetByIdQueryHandler(IManageUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

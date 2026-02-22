@@ -54,9 +54,7 @@ namespace BookingService.Infrastructure.DependencyInjection
 
         private static void AddScopedInterface(this IServiceCollection service)
         {
-            service.AddScoped<IBookingUnitOfWork, UnitOfWork>();
-            service.AddScoped<IPaymentUnitOfWork, PaymentUnitOfWork>();
-            service.AddScoped<IResaleUnitOfWork, ResaleUnitOfWork>();
+            service.AddScoped<IManageUnitOfWork, ManageUnitOfWork>();
             service.AddScoped<IMomoService, MomoServices>();
         }
 

@@ -8,9 +8,15 @@ using System.Threading.Tasks;
 
 namespace BookingService.Application.Interfaces.Repositories
 {
-    public interface IBookingUnitOfWork : IUnitOfWork
+    public interface IManageUnitOfWork : IUnitOfWork
     {
         IGenericRepository<Booking> Bookings { get; }
         IGenericRepository<BookingDetail> BookingDetails { get; }
+
+        IGenericRepository<Payment> Payments { get; }
+        IGenericRepository<PaymentMethod> PaymentMethods { get; }
+
+        IGenericRepository<Resale> Resales { get; }
+        IGenericRepository<ResaleTransaction> ResaleTransactions { get; }
     }
 }

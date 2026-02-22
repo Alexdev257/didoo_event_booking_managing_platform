@@ -9,8 +9,8 @@ namespace BookingService.Application.CQRS.Handler.Resale
 {
     public class ResaleGetByIdQueryHandler : IRequestHandler<ResaleGetByIdQuery, ResaleGetByIdResponse>
     {
-        private readonly IResaleUnitOfWork _unitOfWork;
-        public ResaleGetByIdQueryHandler(IResaleUnitOfWork unitOfWork)
+        private readonly IManageUnitOfWork _unitOfWork;
+        public ResaleGetByIdQueryHandler(IManageUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
