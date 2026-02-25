@@ -36,11 +36,20 @@ namespace BookingService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [HttpPost("callback")]
-        public async Task<IActionResult> Callback([FromRoute] string payment_name)
+        [HttpGet("callback")]
+        public async Task<IActionResult> Callback()
         {
             var response = await _momoService.GetPaymentStatus(Request.Query);
-            return Ok(response);
+
+            //if ( response.Message == "Payment successful")
+            //{
+            //    //UriBuilder uriBuilder = new UriBuilder($"http://localhost:5173/confirm/{(response.Message.ToLower() == "success" ? "success" : "failed")}");
+            //}
+
+            var successUrl = "https://www.google.com/?hl=vi";
+            var failedUrl = "https://github.com/";
+             UriBuilder uriBuilder = new UriBuilder(response.Message.ToLower() == "success" ? successUrl : failedUrl);
+             return Redirect(uriBuilder.ToString());
         }
     }
 }

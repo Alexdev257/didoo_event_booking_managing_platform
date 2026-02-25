@@ -81,8 +81,8 @@ namespace BookingService.Infrastructure.Implements.Services
             var trancasionID = collection.FirstOrDefault(s => s.Key == "transId").Value;
             //var BookingID = collection.FirstOrDefault(s => s.Key == "BookingID").Value;
 
-            var booking = await _unitOfWork.Bookings.GetByIdAsync(orderId);
-            var payment =  _unitOfWork.Payments.FindAsync(x => x.BookingId == orderId).FirstOrDefault();
+            var booking = await _unitOfWork.Bookings.GetByIdAsync(Guid.Parse(orderId!));
+            var payment =  _unitOfWork.Payments.FindAsync(x => x.BookingId == Guid.Parse(orderId!)).FirstOrDefault();
 
             if( message.ToString().ToLower() != "success")
             {
@@ -96,7 +96,7 @@ namespace BookingService.Infrastructure.Implements.Services
             {
                 if (booking != null)
                 {
-                    booking.Status = BookingStatusEnum.Canceled;
+                    booking.Status = BookingStatusEnum.Paid;
                     _unitOfWork.Bookings.UpdateAsync(booking);
                 }
                 if (payment != null)

@@ -175,7 +175,7 @@ services:
       - JwtSettings__Issuer=https://localhost
       - JwtSettings__Audience=https://localhost
       - HttpClientSettings_TicketServiceUrl =http://ticket-service:80
-      - MomoAPI_ReturnUrl = https://booking-service:80/payments/callback
+      - MomoAPI_ReturnUrl = https://booking-service:80/api/payments/callback/
     ports:
       - "6300:80"
     depends_on:
