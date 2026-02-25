@@ -82,5 +82,25 @@ namespace AuthService.Api.Grpc
 
             return response;
         }
+
+        public override async Task<GetAdminEmailsResponse> GetAdminEmails(GetAdminEmailsRequest request, ServerCallContext context)
+        {
+            // Tùy thuộc vào Database của bạn, giả sử Admin có RoleName là "Admin" 
+            // Hoặc nếu bạn dùng RoleId cố định (ví dụ RoleId của Admin là "1"), bạn sửa điều kiện Where lại cho đúng nhé.
+            var adminEmails = await _unitOfWork.Users.GetAllAsync()
+                .Include(u => u.Role) // Nhớ Include bảng Role nếu cần
+                .Where(u => u.Role.Name == Domain.Enum.RoleNameEnum.Admin)
+                .Select(u => u.Email)
+                .ToListAsync();
+
+            var response = new GetAdminEmailsResponse();
+
+            if (adminEmails != null && adminEmails.Any())
+            {
+                response.Emails.AddRange(adminEmails);
+            }
+
+            return response;
+        }
     }
 }

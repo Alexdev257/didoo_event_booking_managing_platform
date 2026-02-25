@@ -27,6 +27,8 @@ namespace EventService.Application.CQRS.Command.Organizer
         public string? TiktokUrl { get; set; } = string.Empty;
         public string? Address { get; set; } = string.Empty;
         public bool? IsVerified { get; set; } = false!;
+        public bool? HasSendEmail { get; set; } = false!;
+        public Guid UserId { get; set; }
         public OrganizerStatusEnum Status { get; set; } = OrganizerStatusEnum.Pending;
 
         public Task<OrganizerCreateResponse> ValidateAsync()

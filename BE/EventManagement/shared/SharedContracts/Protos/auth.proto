@@ -10,6 +10,8 @@ service AuthGrpc {
   // Hàm lấy User Profile: Input là UserRequest, Output là UserResponse
   rpc GetUserProfile (UserRequest) returns (UserResponse);
   rpc GetUsersByIds (GetUsersRequest) returns (GetUsersResponse);
+  rpc GetAdminEmails (GetAdminEmailsRequest) returns (GetAdminEmailsResponse);
+
 }
 
 // Input: Chỉ cần UserId
@@ -31,4 +33,11 @@ message GetUsersRequest{
 
 message GetUsersResponse{
 	repeated UserResponse users = 1;
+}
+
+message GetAdminEmailsRequest {
+}
+
+message GetAdminEmailsResponse {
+  repeated string emails = 1;
 }

@@ -40,12 +40,12 @@ namespace AuthService.Infrastructure.Implements.Helpers
                 new Claim("UserId", user.Id.ToString()),
                 new Claim("FullName", user.FullName),
                 new Claim("Email", user.Email),
-                new Claim("RoleId", user.RoleId.ToString())
+                new Claim("Role", ((int)user.Role.Name).ToString())
                 //new Claim("Role", user.Role.RoleName.ToString().ToLower()),
             }),
 
                 // expire in 1 hours
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddMinutes(1),
                 Issuer = Issuer,
                 Audience = Audience,
                 SigningCredentials =
