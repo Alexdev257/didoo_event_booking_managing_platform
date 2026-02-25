@@ -1,5 +1,8 @@
 ﻿using BookingService.Application.Interfaces.Repositories;
+using BookingService.Application.Interfaces.Services;
+using BookingService.Infrastructure.DependencyInjection.Options;
 using BookingService.Infrastructure.Implements.Repositories;
+using BookingService.Infrastructure.Implements.Services;
 using BookingService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -27,12 +30,13 @@ namespace BookingService.Infrastructure.DependencyInjection
         {
             services.AddDatabase(configuration);
             services.AddScopedInterface();
+            services.AddHttpClients(configuration);
             services.AddMediatRInfrastructure(configuration);
             services.AddCorsExtentions();
             services.AddJwtAuthentication(configuration);
             services.AddAuthorizationRole();
             services.AddSharedSwaggerGen("Booking Service API");
-
+            services.Configure<MomoConfig>(configuration.GetSection("MomoAPI"));
             //services.AddMessageBus(configuration);
             return services;
         }
@@ -50,8 +54,13 @@ namespace BookingService.Infrastructure.DependencyInjection
 
         private static void AddScopedInterface(this IServiceCollection service)
         {
-            service.AddScoped<IBookingUnitOfWork, UnitOfWork>();
+            service.AddScoped<IManageUnitOfWork, ManageUnitOfWork>();
+            service.AddScoped<IMomoService, MomoServices>();
+        }
 
+        private static void AddHttpClients(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHttpClient<ITicketServiceClient, TicketServiceHttpClient>();
         }
 
         private static void AddMediatRInfrastructure(this IServiceCollection service, IConfiguration config)

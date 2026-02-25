@@ -1,9 +1,23 @@
 using BookingService.Infrastructure.DependencyInjection;
 using BookingService.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using SharedInfrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    bool isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    if (isDocker)
+    {
+        options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1);
+    }
+    else
+    {
+        options.ListenLocalhost(6206, o => o.Protocols = HttpProtocols.Http1);
+    }
+});
 
 // Add services to the container.
 

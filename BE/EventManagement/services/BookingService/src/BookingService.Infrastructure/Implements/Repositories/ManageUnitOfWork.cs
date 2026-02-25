@@ -6,18 +6,18 @@ using SharedInfrastructure.Persistence.Repositories;
 using SharedKernel.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BookingService.Infrastructure.Implements.Repositories
 {
-    public class UnitOfWork : IBookingUnitOfWork
+    public class ManageUnitOfWork : IManageUnitOfWork
     {
         private readonly ApplicationDbContext _context;
         private IDbContextTransaction? _currentTransaction;
-        public UnitOfWork(ApplicationDbContext context)
+
+        public ManageUnitOfWork(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -25,6 +25,14 @@ namespace BookingService.Infrastructure.Implements.Repositories
         public IGenericRepository<Booking> Bookings => new GenericRepository<Booking>(_context);
 
         public IGenericRepository<BookingDetail> BookingDetails => new GenericRepository<BookingDetail>(_context);
+
+        public IGenericRepository<Payment> Payments => new GenericRepository<Payment>(_context);
+
+        public IGenericRepository<PaymentMethod> PaymentMethods => new GenericRepository<PaymentMethod>(_context);
+
+        public IGenericRepository<Resale> Resales => new GenericRepository<Resale>(_context);
+
+        public IGenericRepository<ResaleTransaction> ResaleTransactions => new GenericRepository<ResaleTransaction>(_context);
 
         public async Task BeginTransactionAsync()
         {
@@ -91,6 +99,5 @@ namespace BookingService.Infrastructure.Implements.Repositories
         {
             return await _context.SaveChangesAsync(cancellationToken);
         }
-
     }
 }

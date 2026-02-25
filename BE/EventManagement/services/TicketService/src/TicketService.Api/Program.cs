@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using SharedContracts.Protos;
 using SharedInfrastructure;
+using TicketService.Api.Grpc;
 using TicketService.Api.Hubs;
 using TicketService.Api.SignalRServices;
 using TicketService.Application.Interfaces.SignalRServices;
@@ -19,13 +20,16 @@ builder.WebHost.ConfigureKestrel(options =>
     }
     else
     {
-        // === THÊM CHO LOCALHOST (??ng b? v?i launchSettings c?a Ticket) ===
-        // Port 6201: REST
-        options.ListenLocalhost(6201, o => o.Protocols = HttpProtocols.Http1);
+        options.ListenLocalhost(6200, o =>
+        {
+            o.Protocols = HttpProtocols.Http1;
+        });
 
-        // Port 6202: gRPC (D? phòng t??ng lai)
-        // B?n c?n thêm port này vào launchSettings.json c?a TicketService n?a nhé
-        // "applicationUrl": "http://localhost:6201;http://localhost:6202"
+        options.ListenLocalhost(6201, o =>
+        {
+            o.UseHttps();
+            o.Protocols = HttpProtocols.Http2;
+        });
     }
 });
 
@@ -36,13 +40,14 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:3000") // Thay b?ng URL Frontend c?a b?n
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // B?t bu?c ph?i có dòng này cho SignalR
+              .AllowCredentials(); // B?t bu?c ph?i cï¿½ dï¿½ng nï¿½y cho SignalR
     });
 });
 
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
 builder.Services.AddSignalR()
-    .AddStackExchangeRedis(redisConnection, options => {
+    .AddStackExchangeRedis(redisConnection, options =>
+    {
         options.Configuration.ChannelPrefix = "TicketService_SignalR";
     });
 
@@ -53,15 +58,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddGrpc();
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddTicketServiceInfrastructure(builder.Configuration);
 builder.Services.AddScoped<ITicketHubService, TicketHubService>();
 builder.Services.AddGrpcClient<EventGrpc.EventGrpcClient>(o =>
 {
-    // L?y URL t? bi?n môi tr??ng (Docker)
+    // L?y URL t? bi?n mï¿½i tr??ng (Docker)
     var url = Environment.GetEnvironmentVariable("GrpcSettings__EventServiceUrl");
 
-    // N?u không có, l?y t? appsettings.json (Local)
+    // N?u khï¿½ng cï¿½, l?y t? appsettings.json (Local)
     if (string.IsNullOrEmpty(url))
     {
         url = builder.Configuration["GrpcSettings:EventServiceUrl"];
@@ -118,6 +124,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
+app.MapGrpcService<TicketGrpcService>();
 app.MapControllers();
 
 app.Run();

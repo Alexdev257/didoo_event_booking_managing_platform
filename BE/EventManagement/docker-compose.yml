@@ -10,23 +10,26 @@ volumes:
 
 services:
   # ====================================================
-  # 1. INFRASTRUCTURE
+  # 1. INFRASTRUCTURE (Cần nhiều RAM hơn một chút)
   # ====================================================
 
   mysql:
     image: mysql:8.0
-    platform: linux/amd64
     container_name: event_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: Password123!
       MYSQL_DATABASE: AuthDb
     ports:
-      - "3307:3306"   # tr�nh tr�ng MySQL local
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - event-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M  # MySQL cần khoảng này để chạy ổn định
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -35,17 +38,19 @@ services:
 
   redis:
     image: redis:7
-    platform: linux/amd64
     container_name: event_redis
     restart: always
     ports:
       - "6379:6379"
     networks:
       - event-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M  # Redis rất nhẹ
 
   rabbitmq:
     image: rabbitmq:3-management
-    platform: linux/amd64
     container_name: event_rabbitmq
     restart: always
     ports:
@@ -58,6 +63,10 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - event-network
+    deploy:
+      resources:
+        limits:
+          memory: 300M  # RabbitMQ ngốn RAM hơn Redis
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -65,7 +74,7 @@ services:
       retries: 10
 
   # ====================================================
-  # 2. MICROSERVICES
+  # 2. MICROSERVICES (Giới hạn đồng loạt 250MB)
   # ====================================================
 
   auth-service:
@@ -73,9 +82,13 @@ services:
     build:
       context: .
       dockerfile: services/AuthService/src/AuthService.Api/Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'    # Giới hạn 50% CPU
+          memory: 250M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DOTNET_RUNNING_IN_CONTAINER=true
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=AuthDb;Uid=root;Pwd=Password123!;
       - ConnectionStrings__Redis=redis:6379
@@ -88,10 +101,8 @@ services:
     ports:
       - "6002:80"
     depends_on:
-      mysql:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
+      mysql: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
     networks:
       - event-network
 
@@ -100,20 +111,23 @@ services:
     build:
       context: .
       dockerfile: services/EventService/src/EventService.Api/Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 250M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=EventDb;Uid=root;Pwd=Password123!;
       - ConnectionStrings__Redis=redis:6379
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
       - GrpcSettings__AuthServiceUrl=http://auth-service:80
     ports:
       - "6100:80"
     depends_on:
-      - mysql
-      - rabbitmq
+      mysql: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
     networks:
       - event-network
 
@@ -122,19 +136,22 @@ services:
     build:
       context: .
       dockerfile: services/TicketService/src/TicketService.Api/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 250M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=TicketDb;Uid=root;Pwd=Password123!;
       - ConnectionStrings__Redis=redis:6379
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
+      - GrpcSettings__EventServiceUrl=http://event-service:80
     ports:
       - "6200:80"
     depends_on:
-      - mysql
-      - rabbitmq
+      mysql: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
     networks:
       - event-network
 
@@ -143,99 +160,72 @@ services:
     build:
       context: .
       dockerfile: services/BookingService/src/BookingService.Api/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 250M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=BookingDb;Uid=root;Pwd=Password123!;
       - ConnectionStrings__Redis=redis:6379
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
+      - HttpClientSettings__TicketServiceUrl=http://ticket-service:80
+      - JwtSettings__SecretKey=xynbqiydczvhbcomoewzcldjrqnwrwii
+      - JwtSettings__Issuer=https://localhost
+      - JwtSettings__Audience=https://localhost
+      - HttpClientSettings_TicketServiceUrl =http://ticket-service:80
+      - MomoAPI_ReturnUrl = https://booking-service:80/api/payments/callback/
     ports:
       - "6300:80"
     depends_on:
-      - mysql
-      - rabbitmq
+      mysql: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      ticket-service:
+        condition: service_started
     networks:
       - event-network
 
-  payment-service:
-    container_name: payment-service
-    build:
-      context: .
-      dockerfile: services/PaymentService/src/PaymentService.Api/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=PaymentDb;Uid=root;Pwd=Password123!;
-      - ConnectionStrings__Redis=redis:6379
-      - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
-    ports:
-      - "6400:80"
-    depends_on:
-      - mysql
-      - rabbitmq
-    networks:
-      - event-network
+  # payment-service has been merged into booking-service
 
   operation-service:
     container_name: operation-service
     build:
       context: .
       dockerfile: services/OperationService/src/OperationService.Api/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 250M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=OperationDb;Uid=root;Pwd=Password123!;
-      - ConnectionStrings__Redis=redis:6379
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
     ports:
       - "6500:80"
     depends_on:
-      - mysql
-      - rabbitmq
+      mysql: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
     networks:
       - event-network
 
-  resale-service:
-    container_name: resale-service
-    build:
-      context: .
-      dockerfile: services/ResaleService/src/ResaleService.Api/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=ResaleDb;Uid=root;Pwd=Password123!;
-      - ConnectionStrings__Redis=redis:6379
-      - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
-    ports:
-      - "6600:80"
-    depends_on:
-      - mysql
-      - rabbitmq
-    networks:
-      - event-network
-      
+  # resale-service has been merged into booking-service
+
   email-service:
     container_name: email-service
     build:
       context: .
       dockerfile: services/EmailService/src/EmailService.Api/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 150M # Email service thường rất nhẹ
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      rabbitmq: { condition: service_healthy }
     networks:
       - event-network
 
@@ -248,6 +238,10 @@ services:
     build:
       context: .
       dockerfile: services/ApiGatewayYarp/src/ApiGatewayYarp/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 200M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -255,9 +249,7 @@ services:
       - ReverseProxy__Clusters__event-cluster__Destinations__destination1__Address=http://event-service:80
       - ReverseProxy__Clusters__ticket-cluster__Destinations__destination1__Address=http://ticket-service:80
       - ReverseProxy__Clusters__booking-cluster__Destinations__destination1__Address=http://booking-service:80
-      - ReverseProxy__Clusters__payment-cluster__Destinations__destination1__Address=http://payment-service:80
       - ReverseProxy__Clusters__operation-cluster__Destinations__destination1__Address=http://operation-service:80
-      - ReverseProxy__Clusters__resale-cluster__Destinations__destination1__Address=http://resale-service:80
     ports:
       - "5000:80"
     depends_on:
@@ -265,7 +257,6 @@ services:
       - event-service
       - ticket-service
       - booking-service
-      - payment-service
       - operation-service
     networks:
       - event-network

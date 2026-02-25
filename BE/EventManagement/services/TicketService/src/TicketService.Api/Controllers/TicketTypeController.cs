@@ -67,5 +67,14 @@ namespace TicketService.Api.Controllers
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
+
+        [HttpPatch("{id}/decrement")]
+        public async Task<IActionResult> DecrementAvailabilityAsync([FromRoute] Guid id, [FromBody] TicketTypeDecrementCommand request)
+        {
+            request.Id = id;
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
     }
 }

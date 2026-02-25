@@ -38,7 +38,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Implements\Repositories\" />
 		<Folder Include="Persistence\Configurations\" />
 	</ItemGroup>
 
