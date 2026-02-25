@@ -118,7 +118,7 @@ namespace EventService.Application.CQRS.Handler.Event
                                                     ThumbnailUrl = x.ThumbnailUrl,
                                                     BannerUrl = x.BannerUrl,
                                                     AgeRestriction = x.AgeRestriction,
-                                                    Category = (x.Category != null && (request.HasLocations.HasValue && request.HasLocations.Value == true)) ? new EventCategoryDTO
+                                                    Category = (x.Category != null && (request.HasCategory.HasValue && request.HasCategory.Value == true)) ? new EventCategoryDTO
                                                     {
                                                         Id = x.Category.Id,
                                                         IconUrl = x.Category.IconUrl,

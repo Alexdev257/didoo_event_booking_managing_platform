@@ -117,11 +117,40 @@ namespace TicketService.Infrastructure.DependencyInjection
                             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                             context.Response.ContentType = "application/json";
 
+                            string errorMessage = "Bạn chưa đăng nhập. Vui lòng cung cấp Token hợp lệ.";
+                            string errorCode = "UNAUTHORIZED";
+
+                            // 2. Phân tích chi tiết nguyên nhân lỗi
+                            if (context.AuthenticateFailure != null)
+                            {
+                                if (context.AuthenticateFailure is SecurityTokenExpiredException)
+                                {
+                                    errorMessage = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại hoặc làm mới Token.";
+                                    errorCode = "TOKEN_EXPIRED";
+                                }
+                                else if (context.AuthenticateFailure is SecurityTokenInvalidSignatureException)
+                                {
+                                    errorMessage = "Token không hợp lệ (Chữ ký bị sai).";
+                                    errorCode = "INVALID_SIGNATURE";
+                                }
+                                else
+                                {
+                                    errorMessage = "Token không hợp lệ. Vui lòng đăng nhập lại.";
+                                    errorCode = "INVALID_TOKEN";
+                                }
+                            }
+                            // Trường hợp không có header Authorization
+                            else if (!context.Request.Headers.ContainsKey("Authorization"))
+                            {
+                                errorMessage = "Không tìm thấy thông tin xác thực (Missing Authorization Header).";
+                                errorCode = "MISSING_TOKEN";
+                            }
+
                             var response = new CommonResponse<object>
                             {
                                 IsSuccess = false,
-                                Message = "You are not logged in or your token is expired.",
-                                Data = null,
+                                Message = errorMessage,
+                                Data = new { ErrorCode = errorCode } // Gửi kèm mã lỗi để Frontend dễ bắt
                             };
 
                             return context.Response.WriteAsync(JsonSerializer.Serialize(response));

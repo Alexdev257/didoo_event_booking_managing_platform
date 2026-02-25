@@ -1,23 +1,33 @@
 ﻿using EventService.Application.CQRS.Command.Organizer;
+using EventService.Application.DTOs.Response.EventUserInteraction;
 using EventService.Application.DTOs.Response.Organizer;
 using EventService.Application.Interfaces.Repositories;
 using EventService.Domain.Entities;
+using Grpc.Core;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedContracts.Events;
+using SharedContracts.Interfaces;
+using SharedContracts.Protos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace EventService.Application.CQRS.Handler.Organizer
 {
     public class OrganizerCreateCommandHandler : IRequestHandler<OrganizerCreateCommand, OrganizerCreateResponse>
     {
         private readonly IEventUnitOfWork _unitOfWork;
-        public OrganizerCreateCommandHandler(IEventUnitOfWork unitOfWork)
+        private readonly IMessageProducer _messageProducer;
+        private readonly AuthGrpc.AuthGrpcClient _authGrpcClient;
+        public OrganizerCreateCommandHandler(IEventUnitOfWork unitOfWork, IMessageProducer messageProducer, AuthGrpc.AuthGrpcClient authGrpcClient)
         {
             _unitOfWork = unitOfWork;
+            _messageProducer = messageProducer;
+            _authGrpcClient = authGrpcClient;
         }
         public async Task<OrganizerCreateResponse> Handle(OrganizerCreateCommand request, CancellationToken cancellationToken)
         {
@@ -41,9 +51,10 @@ namespace EventService.Application.CQRS.Handler.Organizer
                 };
             }
 
+            var id = Guid.NewGuid();
             var organizer = new EventService.Domain.Entities.Organizer
             {
-                Id = Guid.NewGuid(),
+                Id = id,
                 Name = request.Name,
                 Slug = request.Slug,
                 Description = request.Description,
@@ -65,8 +76,35 @@ namespace EventService.Application.CQRS.Handler.Organizer
             await _unitOfWork.BeginTransactionAsync();
             try
             {
+                var userRequest = new UserRequest { UserId = request.UserId.ToString() };
+
+                var userResponse = await _authGrpcClient.GetUserProfileAsync(userRequest, cancellationToken: cancellationToken);
+
+                if (userResponse == null)
+                {
+                    return new OrganizerCreateResponse
+                    {
+                        IsSuccess = false,
+                        Message = "User is not found"
+                    };
+                }
                 await _unitOfWork.Organizers.AddAsync(organizer);
                 await _unitOfWork.CommitTransactionAsync();
+                await _messageProducer.PublishAsync<OrganizerCreatedEvent>(new OrganizerCreatedEvent(request.UserId, id), cancellationToken);
+                if(request.HasSendEmail.HasValue && request.HasSendEmail.Value == true)
+                {
+                    var adminRequest = new GetAdminEmailsRequest();
+                    var adminResponse = await _authGrpcClient.GetAdminEmailsAsync(adminRequest, cancellationToken: cancellationToken);
+                    if (!adminResponse.Emails.Any())
+                    {
+                        return new OrganizerCreateResponse
+                        {
+                            IsSuccess = false,
+                            Message = "Admins do not exist"
+                        };
+                    }
+                    await _messageProducer.PublishAsync<SendEmailOpenOrganizerToAdminEvent>(new SendEmailOpenOrganizerToAdminEvent(userResponse.FullName, adminResponse.Emails.ToList(), request.Name, id), cancellationToken);
+                }
                 return new OrganizerCreateResponse
                 {
                     IsSuccess = true,
@@ -109,7 +147,16 @@ namespace EventService.Application.CQRS.Handler.Organizer
                     }
                 };
             }
-            catch(Exception ex)
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                return new OrganizerCreateResponse
+                {
+                    IsSuccess = false,
+                    Message = $"User with ID {request.UserId} does not exist.",
+                };
+            }
+            catch (Exception ex)
             {
                 return new OrganizerCreateResponse
                 {

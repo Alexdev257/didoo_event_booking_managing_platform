@@ -13,7 +13,7 @@ namespace EventService.Application.CQRS.Handler.Category
 {
     public class CategoryCreateCommandHandler : IRequestHandler<CategoryCreateCommand, CategoryCreateResponse>
     {
-        private readonly IEventUnitOfWork _unitOfWork;
+        private readonly IEventUnitOfWork _unitOfWork;  
         public CategoryCreateCommandHandler(IEventUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;

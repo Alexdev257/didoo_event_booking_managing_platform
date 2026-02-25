@@ -15,7 +15,7 @@ builder.WebHost.ConfigureKestrel(options =>
     }
     else
     {
-        options.ListenLocalhost(6206, o => o.Protocols = HttpProtocols.Http1);
+        options.ListenLocalhost(6301, o => o.Protocols = HttpProtocols.Http1);
     }
 });
 
