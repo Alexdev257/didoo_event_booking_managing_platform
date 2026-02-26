@@ -45,7 +45,7 @@ namespace AuthService.Infrastructure.Implements.Helpers
             }),
 
                 // expire in 1 hours
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddHours(1),
                 Issuer = Issuer,
                 Audience = Audience,
                 SigningCredentials =
