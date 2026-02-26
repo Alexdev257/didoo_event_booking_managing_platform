@@ -41,6 +41,8 @@ namespace AuthService.Application.CQRS.Handler.Role
             await _unitOfWork.BeginTransactionAsync();
             try
             {
+                role.Status = Domain.Enum.StatusEnum.Inactive;
+                _unitOfWork.Roles.UpdateAsync(role);
                 _unitOfWork.Roles.DeleteAsync(role);
                 await _unitOfWork.CommitTransactionAsync();
                 return new RoleDeleteResponse

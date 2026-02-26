@@ -11,19 +11,19 @@ using System.Threading.Tasks;
 
 namespace EventService.Application.CQRS.Handler.Organizer
 {
-    public class OrganizerDeleteCommandHandler : IRequestHandler<OrganizerDeleteCommand, OrganizerDeleteRepsonse>
+    public class OrganizerVerifyCommandHandler : IRequestHandler<OrganizerVerifyCommand, OrganizerVerifyResponse>
     {
         private readonly IEventUnitOfWork _unitOfWork;
-        public OrganizerDeleteCommandHandler(IEventUnitOfWork unitOfWork)
-        {
+        public OrganizerVerifyCommandHandler(IEventUnitOfWork unitOfWork)
+        { 
             _unitOfWork = unitOfWork;
         }
-        public async Task<OrganizerDeleteRepsonse> Handle(OrganizerDeleteCommand request, CancellationToken cancellationToken)
+        public async Task<OrganizerVerifyResponse> Handle(OrganizerVerifyCommand request, CancellationToken cancellationToken)
         {
             var organizer = await _unitOfWork.Organizers.GetAllAsync().Include(x => x.Events).FirstOrDefaultAsync(x => x.Id == request.Id);
             if (organizer == null)
             {
-                return new OrganizerDeleteRepsonse
+                return new OrganizerVerifyResponse
                 {
                     IsSuccess = false,
                     Message = "Organizer is not found"
@@ -32,31 +32,52 @@ namespace EventService.Application.CQRS.Handler.Organizer
 
             if (organizer.IsDeleted)
             {
-                return new OrganizerDeleteRepsonse
+                return new OrganizerVerifyResponse
                 {
                     IsSuccess = false,
                     Message = "Organizer is deleted"
                 };
             }
 
+            if (organizer.IsVerified.HasValue && organizer.IsVerified.Value == true)
+            {
+                return new OrganizerVerifyResponse
+                {
+                    IsSuccess = false,
+                    Message = "Organizer is already verified"
+                };
+            }
+
+            //var checkEmail = await _unitOfWork.Organizers.GetAllAsync().FirstOrDefaultAsync(x => x.Email == request.Email);
+            //if (checkEmail != null)
+            //{
+            //    return new OrganizerUpdateResponse
+            //    {
+            //        IsSuccess = false,
+            //        Message = "Email is belong to other companies, please check again!"
+            //    };
+            //}
+
+            //var checkPhone = await _unitOfWork.Organizers.GetAllAsync().FirstOrDefaultAsync(x => x.Phone == request.Phone);
+            //if (checkPhone != null)
+            //{
+            //    return new OrganizerUpdateResponse
+            //    {
+            //        IsSuccess = false,
+            //        Message = "This phone number is belong to other companies, please check again"
+            //    };
+            //}
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                //if(organizer.Events != null && organizer.Events.Any())
-                //{
-                //    foreach(var eventt in organizer.Events)
-                //    {
-                //        _unitOfWork.Events.DeleteAsync(eventt);
-                //    }
-                //}
-                organizer.Status = Domain.Enum.OrganizerStatusEnum.Banned;
+                organizer.IsVerified = true;
+                organizer.Status = Domain.Enum.OrganizerStatusEnum.Verified;
                 _unitOfWork.Organizers.UpdateAsync(organizer);
-                _unitOfWork.Organizers.DeleteAsync(organizer);
                 await _unitOfWork.CommitTransactionAsync();
-                return new OrganizerDeleteRepsonse
+                return new OrganizerVerifyResponse
                 {
                     IsSuccess = true,
-                    Message = "Delete Organizer Successfully!",
+                    Message = "Update Organizer Successfully",
                     Data = new OrganizerDTO
                     {
                         Id = organizer.Id.ToString(),
@@ -75,7 +96,6 @@ namespace EventService.Application.CQRS.Handler.Organizer
                         Status = organizer.Status,
                         TiktokUrl = organizer.TiktokUrl,
                         CreatedAt = organizer.CreatedAt,
-                        UpdatedAt = organizer.UpdatedAt,
                         Events = organizer.Events.Any() ? organizer.Events.Select(x => new OrganizerEventDTO
                         {
                             Id = x.Id.ToString(),
@@ -99,14 +119,13 @@ namespace EventService.Application.CQRS.Handler.Organizer
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                return new OrganizerDeleteRepsonse
+                return new OrganizerVerifyResponse
                 {
                     IsSuccess = false,
                     Message = ex.Message,
-                    Data = null
+                    Data = null,
                 };
             }
-
         }
     }
 }

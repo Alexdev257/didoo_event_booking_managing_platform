@@ -45,6 +45,7 @@ namespace EventService.Application.CQRS.Handler.Organizer
             {
                 organizer.IsDeleted = false;
                 organizer.DeletedAt = null;
+                organizer.Status = Domain.Enum.OrganizerStatusEnum.Verified;
                 _unitOfWork.Organizers.UpdateAsync(organizer);
                 await _unitOfWork.CommitTransactionAsync();
                 return new OrganizerRestoreResponse
