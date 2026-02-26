@@ -20,16 +20,17 @@ builder.WebHost.ConfigureKestrel(options =>
     }
     else
     {
-        options.ListenLocalhost(6200, o =>
-        {
-            o.Protocols = HttpProtocols.Http1;
-        });
+        //options.ListenLocalhost(6200, o =>
+        //{
+        //    o.Protocols = HttpProtocols.Http1;
+        //});
 
-        options.ListenLocalhost(6201, o =>
-        {
-            o.UseHttps();
-            o.Protocols = HttpProtocols.Http2;
-        });
+        //options.ListenLocalhost(6201, o =>
+        //{
+        //    o.UseHttps();
+        //    o.Protocols = HttpProtocols.Http2;
+        //});
+        options.ListenLocalhost(6201, o => o.Protocols = HttpProtocols.Http1);
     }
 });
 
