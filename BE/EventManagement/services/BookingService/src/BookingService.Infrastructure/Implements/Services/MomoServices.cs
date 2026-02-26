@@ -40,7 +40,7 @@ namespace BookingService.Infrastructure.Implements.Services
                 $"&orderInfo={orderInfo.OrderDescription}" +
                 $"&returnUrl={_momoConfig.Value.ReturnUrl}" +
                 $"&notifyUrl={_momoConfig.Value.NotifyUrl}" +
-                $"&extraData=";
+                $"&extraData={orderInfo.EventId}";
             var signature = ComputeHmacSha256(rawData, _momoConfig.Value.SecretKey);
 
             var client = new RestClient(_momoConfig.Value.MomoApiUrl);
@@ -57,7 +57,7 @@ namespace BookingService.Infrastructure.Implements.Services
                 amount = orderInfo.Amount.ToString("0.##"),
                 orderInfo = orderInfo.OrderDescription,
                 requestId = orderInfo.OrderId,
-                extraData = "",
+                extraData = orderInfo.EventId,
                 signature = signature
             };
 

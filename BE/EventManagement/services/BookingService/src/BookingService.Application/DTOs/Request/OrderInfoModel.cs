@@ -14,5 +14,6 @@ namespace BookingService.Application.DTOs.Request
         public string OrderId { get; set; } = string.Empty;
         public string OrderDescription { get; set; } = string.Empty;
         public decimal Amount { get; set; } = 0;
+        public string EventId { get; set; } = string.Empty;
     }
 }

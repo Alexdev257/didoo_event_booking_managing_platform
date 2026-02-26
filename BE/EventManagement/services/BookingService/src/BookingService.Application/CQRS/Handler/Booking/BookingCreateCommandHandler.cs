@@ -85,7 +85,8 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 GuestName = request.Fullname!,
                 GuestPhone = request.Phone!,
                 OrderDescription = $"",
-                OrderId = booking.Id.ToString()
+                OrderId = booking.Id.ToString(),
+                EventId = request.EventId.ToString(),
             };
 
             // 3. Create payment URL

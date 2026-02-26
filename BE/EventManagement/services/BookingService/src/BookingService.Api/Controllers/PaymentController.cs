@@ -45,8 +45,9 @@ namespace BookingService.Api.Controllers
             //{
             //    //UriBuilder uriBuilder = new UriBuilder($"http://localhost:5173/confirm/{(response.Message.ToLower() == "success" ? "success" : "failed")}");
             //}
-
-            var successUrl = "https://www.google.com/?hl=vi";
+            var bookingId = Request.Query.FirstOrDefault(s => s.Key == "orderId").Value;
+            var eventId = Request.Query.FirstOrDefault(s => s.Key == "extraData").Value;
+            var successUrl = $"http://localhost:3000/events/{eventId}/booking/confirm?bookingId={bookingId}";
             var failedUrl = "https://github.com/";
              UriBuilder uriBuilder = new UriBuilder(response.Message.ToLower() == "success" ? successUrl : failedUrl);
              return Redirect(uriBuilder.ToString());
