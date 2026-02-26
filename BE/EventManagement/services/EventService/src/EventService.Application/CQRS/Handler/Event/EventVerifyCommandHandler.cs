@@ -12,25 +12,19 @@ using System.Threading.Tasks;
 
 namespace EventService.Application.CQRS.Handler.Event
 {
-    public class EventDeleteCommandHandler : IRequestHandler<EventDeleteCommand, EventDeleteResponse>
+    public class EventVerifyCommandHandler : IRequestHandler<EventVerifyCommand, EventVerfiyResponse>
     {
         private readonly IEventUnitOfWork _unitOfWork;
-        public EventDeleteCommandHandler(IEventUnitOfWork unitOfWork)
+        public EventVerifyCommandHandler(IEventUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<EventDeleteResponse> Handle(EventDeleteCommand request, CancellationToken cancellationToken)
+        public async Task<EventVerfiyResponse> Handle(EventVerifyCommand request, CancellationToken cancellationToken)
         {
-            var currentEvent = await _unitOfWork.Events.GetAllAsync()
-                                                .Include(x => x.Category)
-                                                .Include(x => x.Organizer)
-                                                .Include(x => x.EventLocations)
-                                                .Include(x => x.EventReviews)
-                                                .Include(x => x.UserEventInteractions)
-                                                .FirstOrDefaultAsync(x => x.Id == request.Id);
+            var currentEvent = await _unitOfWork.Events.GetAllAsync().Include(x => x.Category).Include(x => x.Organizer).Include(x => x.EventLocations).FirstOrDefaultAsync(x => x.Id == request.Id);
             if (currentEvent == null)
             {
-                return new EventDeleteResponse
+                return new EventVerfiyResponse
                 {
                     IsSuccess = false,
                     Message = "Event is not found"
@@ -39,54 +33,25 @@ namespace EventService.Application.CQRS.Handler.Event
 
             if (currentEvent.IsDeleted)
             {
-                return new EventDeleteResponse
+                return new EventVerfiyResponse
                 {
                     IsSuccess = false,
                     Message = "Evwnt is deleted"
                 };
             }
 
+            
+
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                if(currentEvent.EventLocations != null && currentEvent.EventLocations.Any())
-                {
-                    foreach(var location in currentEvent.EventLocations)
-                    {
-                        if(!location.IsDeleted)
-                        {
-                            _unitOfWork.EventLocaltions.DeleteAsync(location);
-                        }
-                    }
-                }
-                if (currentEvent.EventReviews != null && currentEvent.EventReviews.Any())
-                {
-                    foreach (var review in currentEvent.EventReviews)
-                    {
-                        if (!review.IsDeleted)
-                        {
-                            _unitOfWork.EventReviews.DeleteAsync(review);
-                        }
-                    }
-                }
-                if (currentEvent.UserEventInteractions != null && currentEvent.UserEventInteractions.Any())
-                {
-                    foreach(var interaction in currentEvent.UserEventInteractions)
-                    {
-                        if (!interaction.IsDeleted)
-                        {
-                            _unitOfWork.UserEventInteractions.DeleteAsync(interaction);
-                        }
-                    }
-                }
-                currentEvent.Status = Domain.Enum.EventStatusEnum.Cancelled;
+                currentEvent.Status = request.Status;
                 _unitOfWork.Events.UpdateAsync(currentEvent);
-                _unitOfWork.Events.DeleteAsync(currentEvent);
                 await _unitOfWork.CommitTransactionAsync();
-                return new EventDeleteResponse
+                return new EventVerfiyResponse
                 {
                     IsSuccess = true,
-                    Message = "Delete Event Successfully",
+                    Message = "Update Event Successfully",
                     Data = new EventDTO
                     {
                         Id = currentEvent.Id.ToString(),
@@ -118,20 +83,17 @@ namespace EventService.Application.CQRS.Handler.Event
                         } : null,
                     }
                 };
-                
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                return new EventDeleteResponse
+                return new EventVerfiyResponse
                 {
                     IsSuccess = false,
                     Message = ex.Message,
-                    Data = null,
+                    Data = null
                 };
             }
-
-            
         }
     }
 }

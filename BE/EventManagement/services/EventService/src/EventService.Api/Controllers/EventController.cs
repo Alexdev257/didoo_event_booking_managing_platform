@@ -68,5 +68,15 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> VerifyEventAsync([FromRoute] Guid id, [FromBody] EventVerifyCommand request)
+        {
+            request.Id = id;
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+
     }
 }

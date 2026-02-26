@@ -45,7 +45,7 @@ namespace AuthService.Application.CQRS.Handler.User
                         Data = null
                     };
                 }
-
+                user.Status = Domain.Enum.StatusEnum.Inactive;
                 _unitOfWork.Users.DeleteAsync(user);
                 await _unitOfWork.CommitTransactionAsync();
 

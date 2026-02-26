@@ -46,11 +46,28 @@ namespace EventService.Application.CQRS.Handler.Event
                 };
             }
 
+            if (currentEvent.Status != Domain.Enum.EventStatusEnum.Cancelled)
+            {
+                return new EventRestoreResponse
+                {
+                    IsSuccess = false,
+                    Message = "Evwnt is not deleted"
+                };
+            }
+
             await _unitOfWork.BeginTransactionAsync();
             try
             {
                 currentEvent.IsDeleted = false;
                 currentEvent.DeletedAt = null;
+                if(currentEvent.StartTime <= DateTime.UtcNow)
+                {
+                    currentEvent.Status = Domain.Enum.EventStatusEnum.Published;
+                }
+                else
+                {
+                    currentEvent.Status = Domain.Enum.EventStatusEnum.Draft;
+                }
                 _unitOfWork.Events.UpdateAsync(currentEvent);
                 if (currentEvent.EventLocations != null && currentEvent.EventLocations.Any())
                 {

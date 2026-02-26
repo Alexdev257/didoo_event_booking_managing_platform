@@ -53,6 +53,7 @@ namespace AuthService.Application.CQRS.Handler.Role
             {
                 role.IsDeleted = false;
                 role.DeletedAt = null;
+                role.Status = Domain.Enum.StatusEnum.Active;
                 _unitOfWork.Roles.UpdateAsync(role);
                 await _unitOfWork.CommitTransactionAsync();
                 return new RoleRestoreResponse
