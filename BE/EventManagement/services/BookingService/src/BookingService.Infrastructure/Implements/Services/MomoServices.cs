@@ -94,14 +94,16 @@ namespace BookingService.Infrastructure.Implements.Services
             }
             else
             {
+                var timeNow = DateTime.Now;
                 if (booking != null)
                 {
                     booking.Status = BookingStatusEnum.Paid;
+                    booking.PaidAt = timeNow;
                     _unitOfWork.Bookings.UpdateAsync(booking);
                 }
                 if (payment != null)
                 {
-                    payment.PaidAt = DateTime.Now;
+                    payment.PaidAt = timeNow;
                     _unitOfWork.Payments.UpdateAsync(payment);
                 }
             }
