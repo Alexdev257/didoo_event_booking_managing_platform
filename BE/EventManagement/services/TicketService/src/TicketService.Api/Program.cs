@@ -30,7 +30,7 @@ builder.WebHost.ConfigureKestrel(options =>
         //    o.UseHttps();
         //    o.Protocols = HttpProtocols.Http2;
         //});
-        options.ListenLocalhost(6201, o => o.Protocols = HttpProtocols.Http1);
+        options.ListenLocalhost(6201, o => o.Protocols = HttpProtocols.Http1AndHttp2);
     }
 });
 
