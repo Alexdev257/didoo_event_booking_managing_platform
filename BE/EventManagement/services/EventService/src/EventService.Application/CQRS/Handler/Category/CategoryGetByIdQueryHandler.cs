@@ -55,7 +55,7 @@ namespace EventService.Application.CQRS.Handler.Category
                     Name = category.Name,
                     Slug = category.Slug,
                     Status = category.Status,
-                    ParentCategory = request.HasParent.Value == true ? category.ParentCategoryId != null ? new CategoryDTO
+                    ParentCategory = (!request.HasParent.HasValue || (request.HasParent.HasValue && request.HasParent.Value == true)) ? category.ParentCategoryId != null ? new CategoryDTO
                     {
                         Id = category.ParentCategory.Id.ToString(),
                         Description = category.ParentCategory.Description,
@@ -65,7 +65,7 @@ namespace EventService.Application.CQRS.Handler.Category
                         Status = category.ParentCategory.Status,
 
                     } : null : null,
-                    SubCategories = request.HasSub.Value == true ? category.SubCategories.Any() ? category.SubCategories.Select(x => new CategoryDTO
+                    SubCategories = (!request.HasSub.HasValue || (request.HasSub.HasValue && request.HasSub.Value == true)) ? category.SubCategories.Any() ? category.SubCategories.Select(x => new CategoryDTO
                     {
                         Id = x.Id.ToString(),
                         Slug = x.Slug,

@@ -16,7 +16,7 @@ namespace TicketService.Application.CQRS.Query.Ticket
         [BindNever]
         public Guid Id { get; set; }
         public string? Fields { get; set; }
-        public bool? HasEvent { get; set; } = false!;
-        public bool? HasType { get; set; } = false!;
+        public bool? HasEvent { get; set; } = true!;
+        public bool? HasType { get; set; } = true!;
     }
 }

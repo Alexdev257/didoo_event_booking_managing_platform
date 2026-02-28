@@ -16,7 +16,7 @@ namespace AuthService.Application.CQRS.Query.User
         [BindNever]
         public Guid Id { get; set; }
         public string? Fields { get; set; }
-        public bool? HasLocation { get; set; } = false!;
+        public bool? HasLocation { get; set; } = true!;
 
     }
 }

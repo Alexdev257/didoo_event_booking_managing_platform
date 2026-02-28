@@ -58,6 +58,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                 Id = Guid.NewGuid(),
                 Longitude = request.Location.Longitude,
                 Latitude = request.Location.Latitude,
+                UserId = user.Id,
                 CreatedAt = DateTime.UtcNow,
             };
             await _unitOfWork.BeginTransactionAsync();
