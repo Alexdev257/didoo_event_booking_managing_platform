@@ -66,7 +66,7 @@ namespace TicketService.Application.CQRS.Handler.TicketType
                     AvailableQuantity = ticketType.AvailableQuantity,
                     Description = ticketType.Description,
                     CreatedAt = ticketType.CreatedAt,
-                    Event = new TicketTypeEventDTO
+                    Event = (request.HasEvent.HasValue && request.HasEvent.Value == true) ? new TicketTypeEventDTO
                     {
                         Id = eventResponse.Id.ToString(),
                         Name = eventResponse.Name,
@@ -85,7 +85,7 @@ namespace TicketService.Application.CQRS.Handler.TicketType
                                                 ? TimeOnly.Parse(eventResponse.ClosedTime)
                                                 : null,
                         Status = (int)eventResponse.Status
-                    }
+                    } : null
                 };
 
                 var sahpedData = DataShaper.ShapeData(dto, request.Fields);

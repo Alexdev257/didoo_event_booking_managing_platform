@@ -16,8 +16,8 @@ namespace EventService.Application.CQRS.Query.Event
         [BindNever]
         public Guid Id { get; set; }
         public string? Fields { get; set; }
-        public bool? HasCategory { get; set; } = false!;
-        public bool? HasOrganizer { get; set; } = false!;
-        public bool? HasLocations { get; set; } = false!;
+        public bool? HasCategory { get; set; } = true!;
+        public bool? HasOrganizer { get; set; } = true!;
+        public bool? HasLocations { get; set; } = true!;
     }
 }

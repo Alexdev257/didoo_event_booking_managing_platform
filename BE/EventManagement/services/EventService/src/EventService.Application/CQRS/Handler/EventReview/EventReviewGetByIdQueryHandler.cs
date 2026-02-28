@@ -77,7 +77,7 @@ namespace EventService.Application.CQRS.Handler.EventReview
                     },
                     Comment = review.Comment,
                     Rating = review.Rating,
-                    ParentReview = (review.ParentReview != null && request.HasParent.Value == true) ? new EventReviewDTO
+                    ParentReview = (review.ParentReview != null && (request.HasParent.HasValue && request.HasParent.Value == true)) ? new EventReviewDTO
                     {
                         Id = review.ParentReview.Id.ToString(),
                         User = new EventReviewUserDTO
@@ -91,7 +91,7 @@ namespace EventService.Application.CQRS.Handler.EventReview
                         Comment = review.ParentReview.Comment,
                         Rating = review.ParentReview.Rating,
                     } : null,
-                    Replies = ((review.Replies != null && review.Replies.Any()) && request.HasReplies.Value == true) ? review.Replies.Select(x => new EventReviewDTO
+                    Replies = ((review.Replies != null && review.Replies.Any()) && (request.HasReplies.HasValue && request.HasReplies.Value == true)) ? review.Replies.Select(x => new EventReviewDTO
                     {
                         Id = x.Id.ToString(),
                         User = new EventReviewUserDTO

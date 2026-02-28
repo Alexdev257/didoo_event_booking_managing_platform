@@ -59,7 +59,7 @@ namespace EventService.Application.CQRS.Handler.Organizer
                 TiktokUrl = organizer.TiktokUrl,
                 CreatedAt = organizer.CreatedAt,
                 UpdatedAt = organizer.UpdatedAt,
-                Events = organizer.Events.Any() ? organizer.Events.Select(x => new OrganizerEventDTO
+                Events = (organizer.Events.Any() && (request.HasEvents.HasValue && request.HasEvents.Value == true)) ? organizer.Events.Select(x => new OrganizerEventDTO
                 {
                     Id = x.Id.ToString(),
                     Name = x.Name,
@@ -75,7 +75,7 @@ namespace EventService.Application.CQRS.Handler.Organizer
                     ThumbnailUrl = x.ThumbnailUrl,
                     BannerUrl = x.BannerUrl,
                     AgeRestriction = x.AgeRestriction,
-                }).ToList() : null,
+                }).ToList() : new List<OrganizerEventDTO>(),
             };
 
             var shapedData = DataShaper.ShapeData(dto, request.Fields);

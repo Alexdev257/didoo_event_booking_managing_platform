@@ -64,7 +64,7 @@ namespace AuthService.Application.CQRS.Handler.User
                         Status = user.Role.Status.ToString(),
                     },
                     OrganizerId = user.OrganizerId,
-                    Locations = request.HasLocation!.Value ? user.Locations.Select(loc => new DTOs.Response.User.LocationUserDTO
+                    Locations = (user.Locations != null && (request.HasLocation!.Value && request!.HasLocation.Value == true)) ? user.Locations.Select(loc => new DTOs.Response.User.LocationUserDTO
                     {
                         Longitude = loc.Longitude!.Value,
                         Latitude = loc.Latitude!.Value,

@@ -16,7 +16,7 @@ namespace EventService.Application.CQRS.Query.EventReview
         [BindNever]
         public Guid Id { get; set; }
         public string? Fields { get; set; }
-        public bool? HasParent { get; set; } = false!;
-        public bool? HasReplies { get; set; } = false!;
+        public bool? HasParent { get; set; } = true!;
+        public bool? HasReplies { get; set; } = true!;
     }
 }

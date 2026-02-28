@@ -16,7 +16,7 @@ namespace EventService.Application.CQRS.Query.Category
         [BindNever]
         public Guid Id { get; set; }
         public string? Fields { get; set; }
-        public bool? HasParent { get; set; } = false!;
-        public bool? HasSub { get; set; } = false!;
+        public bool? HasParent { get; set; } = true!;
+        public bool? HasSub { get; set; } = true!;
     }
 }
