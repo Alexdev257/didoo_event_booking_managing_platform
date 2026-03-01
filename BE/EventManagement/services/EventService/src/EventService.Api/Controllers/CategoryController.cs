@@ -18,7 +18,7 @@ namespace EventService.Api.Controllers
             _mediator = mediator;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<IActionResult> GetListCategoryAsync([FromQuery] CategoryGetListQuery request)
         {
