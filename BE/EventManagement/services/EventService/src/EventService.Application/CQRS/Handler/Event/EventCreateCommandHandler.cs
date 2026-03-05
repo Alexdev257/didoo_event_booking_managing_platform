@@ -130,6 +130,7 @@ namespace EventService.Application.CQRS.Handler.Event
                         Status = newEvent.Status,
                         ThumbnailUrl = newEvent.ThumbnailUrl,
                         BannerUrl = newEvent.BannerUrl,
+                        TicketMapUrl = newEvent.TicketMapUrl,
                         AgeRestriction = newEvent.AgeRestriction,
                         Category = category != null ? new EventCategoryDTO
                         {
