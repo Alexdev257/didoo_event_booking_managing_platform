@@ -23,6 +23,7 @@ namespace EventService.Application.DTOs.Response.Event
         public EventStatusEnum Status { get; set; }
         public string? ThumbnailUrl { get; set; }
         public string? BannerUrl { get; set; }
+        public string? TicketMapUrl { get; set; }
         public int AgeRestriction { get; set; } = 18;
         public EventCategoryDTO? Category { get; set; }
         public EventOrganizerDTO? Organizer { get; set; }

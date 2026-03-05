@@ -26,6 +26,7 @@ namespace EventService.Application.CQRS.Command.Event
         public EventStatusEnum Status { get; set; } = EventStatusEnum.Draft;
         public string? ThumbnailUrl { get; set; }
         public string? BannerUrl { get; set; }
+        public string? TicketMapUrl { get; set; }
         public int AgeRestriction { get; set; } = 18;
         public Guid? CategoryId { get; set; }
         //public virtual Category? Category { get; set; }
