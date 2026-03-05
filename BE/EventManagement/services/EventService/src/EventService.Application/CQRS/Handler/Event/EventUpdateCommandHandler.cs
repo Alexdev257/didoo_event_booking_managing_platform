@@ -74,6 +74,7 @@ namespace EventService.Application.CQRS.Handler.Event
             currentEvent.Status = request.Status;
             currentEvent.ThumbnailUrl = request.ThumbnailUrl;
             currentEvent.BannerUrl = request.BannerUrl;
+            currentEvent.TicketMapUrl = request.TicketMapUrl;
             currentEvent.AgeRestriction = request.AgeRestriction;
             currentEvent.CategoryId = request.CategoryId;
             currentEvent.OrganizerId = request.OrganizerId;

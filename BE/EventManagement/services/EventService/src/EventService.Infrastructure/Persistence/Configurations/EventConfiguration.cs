@@ -58,6 +58,9 @@ namespace EventService.Infrastructure.Persistence.Configurations
             builder.Property(x => x.BannerUrl)
                 .HasColumnName("banner_url");
 
+            builder.Property(x => x.BannerUrl)
+                .HasColumnName("ticket_map_url");
+
             builder.Property(x => x.AgeRestriction)
                 .HasColumnName("age_restriction");
 

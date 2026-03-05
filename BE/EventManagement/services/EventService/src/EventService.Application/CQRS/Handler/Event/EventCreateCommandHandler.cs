@@ -75,6 +75,7 @@ namespace EventService.Application.CQRS.Handler.Event
                 Status = Domain.Enum.EventStatusEnum.Draft,
                 ThumbnailUrl = request.ThumbnailUrl,
                 BannerUrl = request.BannerUrl,
+                TicketMapUrl = request.TicketMapUrl,
                 AgeRestriction = request.AgeRestriction,
                 CategoryId = request.CategoryId,
                 OrganizerId = request.OrganizerId,
