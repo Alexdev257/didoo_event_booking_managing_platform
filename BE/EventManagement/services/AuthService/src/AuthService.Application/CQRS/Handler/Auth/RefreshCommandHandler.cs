@@ -1,4 +1,4 @@
-﻿using AuthService.Application.CQRS.Command.Auth;
+using AuthService.Application.CQRS.Command.Auth;
 using AuthService.Application.DTOs.Response.Auth;
 using AuthService.Application.Interfaces.Helpers;
 using AuthService.Application.Interfaces.Repositories;
