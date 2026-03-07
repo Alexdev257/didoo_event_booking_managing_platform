@@ -4,6 +4,7 @@ using AuthService.Application.DTOs.Response.User;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuthService.Api.Controllers
 {
@@ -61,6 +62,7 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] UserGetListQuery request)
         {

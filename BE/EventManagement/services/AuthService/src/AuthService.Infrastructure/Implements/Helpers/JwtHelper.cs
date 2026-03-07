@@ -1,4 +1,4 @@
-﻿using AuthService.Application.Interfaces.Helpers;
+using AuthService.Application.Interfaces.Helpers;
 using AuthService.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;

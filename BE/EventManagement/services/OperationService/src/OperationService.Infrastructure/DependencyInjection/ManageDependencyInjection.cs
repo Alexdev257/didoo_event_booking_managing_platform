@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -115,11 +115,12 @@ namespace OperationService.Infrastructure.DependencyInjection
                             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                             context.Response.ContentType = "application/json";
 
-                            var response = new CommonResponse<object>
+                            var response = new
                             {
-                                IsSuccess = false,
-                                Message = "You are not logged in or your token is expired.",
-                                Data = null,
+                                isSuccess = false,
+                                message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại hoặc làm mới Token.",
+                                data = (object?)null,
+                                listErrors = Array.Empty<object>()
                             };
 
                             return context.Response.WriteAsync(JsonSerializer.Serialize(response));
@@ -131,11 +132,12 @@ namespace OperationService.Infrastructure.DependencyInjection
                             context.Response.StatusCode = StatusCodes.Status403Forbidden;
                             context.Response.ContentType = "application/json";
 
-                            var response = new CommonResponse<object>
+                            var response = new
                             {
-                                IsSuccess = false,
-                                Message = "You are not allowed to access this endpoint.",
-                                Data = null,
+                                isSuccess = false,
+                                message = "You are not allowed to access this endpoint.",
+                                data = (object?)null,
+                                listErrors = Array.Empty<object>()
                             };
 
                             return context.Response.WriteAsync(JsonSerializer.Serialize(response));

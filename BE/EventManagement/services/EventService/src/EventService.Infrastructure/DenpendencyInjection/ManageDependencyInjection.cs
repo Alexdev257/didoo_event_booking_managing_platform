@@ -139,11 +139,12 @@ namespace EventService.Infrastructure.DependencyInjection
                                 errorCode = "MISSING_TOKEN";
                             }
 
-                            var response = new CommonResponse<object>
+                            var response = new
                             {
-                                IsSuccess = false,
-                                Message = errorMessage,
-                                Data = new { ErrorCode = errorCode } // Gửi kèm mã lỗi để Frontend dễ bắt
+                                isSuccess = false,
+                                message = errorMessage,
+                                data = new { errorCode },
+                                listErrors = Array.Empty<object>()
                             };
 
                             return context.Response.WriteAsync(JsonSerializer.Serialize(response));
@@ -155,11 +156,12 @@ namespace EventService.Infrastructure.DependencyInjection
                             context.Response.StatusCode = StatusCodes.Status403Forbidden;
                             context.Response.ContentType = "application/json";
 
-                            var response = new CommonResponse<object>
+                            var response = new
                             {
-                                IsSuccess = false,
-                                Message = "You are not allowed to access this endpoint.",
-                                Data = null,
+                                isSuccess = false,
+                                message = "You are not allowed to access this endpoint.",
+                                data = (object?)null,
+                                listErrors = Array.Empty<object>()
                             };
 
                             return context.Response.WriteAsync(JsonSerializer.Serialize(response));
