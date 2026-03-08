@@ -135,6 +135,42 @@ namespace BookingService.Application.CQRS.Handler.Booking
             await _unitOfWork.Payments.AddAsync(payment);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+            // 6. For free trades (price == 0), immediately transfer ownership and record audit transaction
+            //    (paid trades are handled via the Momo callback)
+            if (price == 0)
+            {
+                // Transfer ownership first; if this fails, no DB changes are made for this step
+                try
+                {
+                    await _ticketServiceClient.MarkListingSoldAsync(request.ListingId, request.BuyerUserId, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    return new CreateBookingResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Booking created but failed to transfer ticket ownership: {ex.Message}"
+                    };
+                }
+
+                // Ownership transferred successfully; persist PaidAt and audit record atomically
+                var paidAt = DateTime.UtcNow;
+                booking.PaidAt = paidAt;
+                _unitOfWork.Bookings.UpdateAsync(booking);
+
+                var resaleTransaction = new Domain.Entities.ResaleTransaction
+                {
+                    ResaleId = request.ListingId,
+                    BuyerUserId = request.BuyerUserId,
+                    Cost = price,
+                    FeeCost = 0,
+                    Status = Domain.Enum.ResaleTransactionStatusEnum.Completed,
+                    TransactionDate = paidAt,
+                };
+                await _unitOfWork.ResaleTransactions.AddAsync(resaleTransaction);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+
             return new CreateBookingResponse
             {
                 IsSuccess = true,
