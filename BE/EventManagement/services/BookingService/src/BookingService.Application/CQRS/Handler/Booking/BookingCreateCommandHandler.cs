@@ -128,6 +128,51 @@ namespace BookingService.Application.CQRS.Handler.Booking
             await _unitOfWork.Payments.AddAsync(payment);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+            // 5. For free bookings, synchronously create tickets (no payment callback will fire)
+            if (totalPrice == 0)
+            {
+                booking.PaidAt = DateTime.UtcNow;
+
+                var bulkRequest = new BulkCreateTicketsRequest
+                {
+                    TicketTypeId = request.TicketTypeId,
+                    EventId = request.EventId,
+                    OwnerId = request.UserId,
+                    Quantity = request.Quantity,
+                    Zone = null,
+                };
+
+                BulkCreateTicketsResult bulkResult;
+                try
+                {
+                    bulkResult = await _ticketServiceClient.BulkCreateTicketsAsync(bulkRequest, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    booking.Status = BookingStatusEnum.Canceled;
+                    booking.PaidAt = null;
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    return new CreateBookingResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Booking created but failed to create tickets: {ex.Message}"
+                    };
+                }
+
+                if (!bulkResult.IsSuccess)
+                {
+                    booking.Status = BookingStatusEnum.Canceled;
+                    booking.PaidAt = null;
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    return new CreateBookingResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Booking created but failed to create tickets: {bulkResult.Message}"
+                    };
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
 
             BookingDTO dto = new BookingDTO
             {
