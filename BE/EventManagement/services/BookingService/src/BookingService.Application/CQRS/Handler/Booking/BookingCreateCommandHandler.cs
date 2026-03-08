@@ -3,6 +3,7 @@ using BookingService.Application.DTOs.Request;
 using BookingService.Application.DTOs.Response.Booking;
 using BookingService.Application.Interfaces.Repositories;
 using BookingService.Application.Interfaces.Services;
+using BookingService.Domain.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using BookingDetailEntity = BookingService.Domain.Entities.BookingDetail;
@@ -62,12 +63,13 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 Phone = request.Phone,
                 Amount = request.Quantity,
                 TotalPrice = totalPrice,
-                Status = Domain.Enum.BookingStatusEnum.Pending
+                Status = totalPrice == 0 ? BookingStatusEnum.Paid : BookingStatusEnum.Pending,
             };
 
             BookingDetailEntity bookingDetail = new BookingDetailEntity
             {
                 BookingId = booking.Id,
+                TicketTypeId = request.TicketTypeId,
                 Quantity = request.Quantity,
                 PricePerTicket = pricePerTicket,
                 TotalPrice = totalPrice
@@ -96,7 +98,14 @@ namespace BookingService.Application.CQRS.Handler.Booking
             string paymentUrl;
             try
             {
-                paymentUrl = await _momoService.CreatePaymentURL(orderInfoModel, httpContext);
+                if (totalPrice != 0)
+                {
+                    paymentUrl = await _momoService.CreatePaymentURL(orderInfoModel, httpContext);
+                }
+                else
+                {
+                    paymentUrl = string.Empty;
+                }
             }
             catch (Exception ex)
             {
@@ -113,11 +122,57 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 BookingId = booking.Id,
                 Cost = totalPrice,
                 Currency = "VND",
+                PaidAt = totalPrice == 0 ? DateTime.UtcNow : DateTime.MinValue, // Mark as paid if total price is 0
             };
 
             await _unitOfWork.Payments.AddAsync(payment);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+            // 5. For free bookings, synchronously create tickets (no payment callback will fire)
+            if (totalPrice == 0)
+            {
+                booking.PaidAt = DateTime.UtcNow;
+
+                var bulkRequest = new BulkCreateTicketsRequest
+                {
+                    TicketTypeId = request.TicketTypeId,
+                    EventId = request.EventId,
+                    OwnerId = request.UserId,
+                    Quantity = request.Quantity,
+                    Zone = null,
+                };
+
+                BulkCreateTicketsResult bulkResult;
+                try
+                {
+                    bulkResult = await _ticketServiceClient.BulkCreateTicketsAsync(bulkRequest, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    booking.Status = BookingStatusEnum.Canceled;
+                    booking.PaidAt = null;
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    return new CreateBookingResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Booking created but failed to create tickets: {ex.Message}"
+                    };
+                }
+
+                if (!bulkResult.IsSuccess)
+                {
+                    booking.Status = BookingStatusEnum.Canceled;
+                    booking.PaidAt = null;
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    return new CreateBookingResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Booking created but failed to create tickets: {bulkResult.Message}"
+                    };
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
 
             BookingDTO dto = new BookingDTO
             {
@@ -130,6 +185,7 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 Amount = booking.Amount,
                 TotalPrice = booking.TotalPrice,
                 Status = booking.Status.ToString(),
+                BookingType = booking.BookingType.ToString(),
                 PaidAt = booking.PaidAt,
                 CreatedAt = booking.CreatedAt,
                 UpdatedAt = booking.UpdatedAt,

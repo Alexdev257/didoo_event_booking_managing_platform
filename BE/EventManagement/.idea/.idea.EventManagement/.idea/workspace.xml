@@ -46,25 +46,67 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d4c6d972-96e0-401f-81e2-5436336b091f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.EventManagement/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.EventManagement/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.EventManagement/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.EventManagement/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Controllers/TradeBookingController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Command/Booking/TradeBookingCreateCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/TradeBookingCreateCommandHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Enum/BookingTypeEnum.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/Controllers/TicketListingController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Command/Ticket/TicketBulkCreateCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Command/TicketListing/TicketListingCancelCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Command/TicketListing/TicketListingCreateCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Command/TicketListing/TicketListingMarkSoldCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Handler/Ticket/TicketBulkCreateCommandHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Handler/TicketListing/TicketListingCancelCommandHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Handler/TicketListing/TicketListingCreateCommandHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Handler/TicketListing/TicketListingGetByIdQueryHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Handler/TicketListing/TicketListingGetListQueryHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Handler/TicketListing/TicketListingMarkSoldCommandHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Query/TicketListing/TicketListingGetByIdQuery.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Query/TicketListing/TicketListingGetListQuery.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/DTOs/Response/TicketListing/TicketListingDTO.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/DTOs/Response/TicketListing/TicketListingResponses.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Domain/Entities/TicketListing.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Domain/Enum/TicketListingStatusEnum.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Persistence/Configurations/TicketListingConfiguration.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trading_feature.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.EventManagement/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.EventManagement/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EventManagement.sln" beforeDir="false" afterPath="$PROJECT_DIR$/EventManagement.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/instruction.md" beforeDir="false" afterPath="$PROJECT_DIR$/instruction.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ApiGatewayYarp/src/ApiGatewayYarp/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ApiGatewayYarp/src/ApiGatewayYarp/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/AuthService/src/AuthService.Api/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/AuthService/src/AuthService.Api/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/AuthService/src/AuthService.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/AuthService/src/AuthService.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/BookingService.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/BookingService.Api.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Controllers/BookingController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Controllers/BookingController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/BookingService.Application.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/BookingService.Application.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/DependencyInjection/ManageDependencyInjection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/DependencyInjection/ManageDependencyInjection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Migrations/ApplicationDbContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/ApplicationDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/ApplicationDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/EventService/src/EventService.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/EventService/src/EventService.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/OperationService/src/OperationService.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/OperationService/src/OperationService.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/TicketService.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/TicketService.Api.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/SharedContracts/Protos/ticket.proto" beforeDir="false" afterPath="$PROJECT_DIR$/shared/SharedContracts/Protos/ticket.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Controllers/PaymentController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Controllers/PaymentController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingCreateCommandHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingCreateCommandHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Request/OrderInfoModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Request/OrderInfoModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/Booking/GetAllBookingResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/Booking/GetAllBookingResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/Interfaces/Services/ITicketServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/Interfaces/Services/ITicketServiceClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/BookingService.Domain.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/BookingService.Domain.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/Booking.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/Booking.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/BookingDetail.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/BookingDetail.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/Resale.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/Resale.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/BookingService.Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/BookingService.Infrastructure.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Services/MomoServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Services/MomoServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Services/TicketServiceHttpClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Services/TicketServiceHttpClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Migrations/20251206140805_InitBooking.Designer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Migrations/20251206140805_InitBooking.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Migrations/20260220183314_AddPaymentAndResale.Designer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Migrations/20260220183314_AddPaymentAndResale.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/BookingConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/BookingConfiguration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/BookingDetailConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/BookingDetailConfiguration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/Controllers/TicketController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/Controllers/TicketController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/Interfaces/Repositories/ITicketUnitOfWork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Application/Interfaces/Repositories/ITicketUnitOfWork.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Domain/Entities/Ticket.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Domain/Entities/Ticket.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Implements/Repositories/UnitOfWork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Implements/Repositories/UnitOfWork.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Migrations/20251206123326_InitTicket.Designer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Migrations/20251206123326_InitTicket.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Migrations/20260213184809_UpdateTicketAddOwnerIdAndLockExpirarion.Designer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Migrations/20260213184809_UpdateTicketAddOwnerIdAndLockExpirarion.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Persistence/ApplicationDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/Persistence/ApplicationDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/TicketService.Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Infrastructure/TicketService.Infrastructure.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +117,15 @@
     <persistenceIdMap>
       <entry key="_D:/Project/Didoo/BE/EventManagement" value="39kxSsnXfu8neH6BZCe5Rybwm3s" />
     </persistenceIdMap>
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="chat-panel" value="Claude Sonnet 4.6" />
+      <entry key="agent-panel" value="Claude Sonnet 4.6" />
+    </selectedModels>
+  </component>
+  <component name="DpaMonitoringSettings">
+    <option name="firstShow" value="false" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -96,6 +147,13 @@
     &quot;accountId&quot;: &quot;996e7ab6-0574-4fda-bca2-770ec57932f9&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Command/TicketListing/TicketListingCreateCommand.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Handler/TicketListing/TicketListingCreateCommandHandler.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/services/TicketService/src/TicketService.Application/CQRS/Query/TicketListing/TicketListingGetListQuery.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/services/TicketService/src/TicketService.Application/DTOs/Response/TicketListing/TicketListingDTO.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/services/TicketService/src/TicketService.Application/DTOs/Response/TicketListing/TicketListingResponses.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -104,27 +162,37 @@
     <commands />
     <urls />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="39kxSsnXfu8neH6BZCe5Rybwm3s" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.ApiGateway: IIS Express.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.BookingService.Api: IIS Express.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.TicketService.Api: IIS Express.executor&quot;: &quot;Run&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev__be&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev__be__booking&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
-  <component name="RunManager" selected="Docker.docker-compose.yml: Compose Deployment">
+  <component name="RunManager" selected="Multi-Launch.Multi-Launch: EventManagement">
     <configuration name="ApiGatewayYarp: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/services/ApiGatewayYarp/src/ApiGatewayYarp/ApiGatewayYarp.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
@@ -605,6 +673,47 @@
         <option name="Build" />
       </method>
     </configuration>
+    <configuration name="Multi-Launch: EventManagement" type="com.intellij.execution.configurations.multilaunch" factoryName="MultiLaunchConfiguration">
+      <rows>
+        <ExecutableRowSnapshot>
+          <option name="condition">
+            <ConditionSnapshot>
+              <option name="type" value="immediately" />
+            </ConditionSnapshot>
+          </option>
+          <option name="executable">
+            <ExecutableSnapshot>
+              <option name="id" value="runConfig:.NET Launch Settings Profile.ApiGateway: IIS Express" />
+            </ExecutableSnapshot>
+          </option>
+        </ExecutableRowSnapshot>
+        <ExecutableRowSnapshot>
+          <option name="condition">
+            <ConditionSnapshot>
+              <option name="type" value="afterPreviousFinished" />
+            </ConditionSnapshot>
+          </option>
+          <option name="executable">
+            <ExecutableSnapshot>
+              <option name="id" value="runConfig:.NET Launch Settings Profile.BookingService.Api: IIS Express" />
+            </ExecutableSnapshot>
+          </option>
+        </ExecutableRowSnapshot>
+        <ExecutableRowSnapshot>
+          <option name="condition">
+            <ConditionSnapshot>
+              <option name="type" value="afterPreviousFinished" />
+            </ConditionSnapshot>
+          </option>
+          <option name="executable">
+            <ExecutableSnapshot>
+              <option name="id" value="runConfig:.NET Launch Settings Profile.TicketService.Api: IIS Express" />
+            </ExecutableSnapshot>
+          </option>
+        </ExecutableRowSnapshot>
+      </rows>
+      <method v="2" />
+    </configuration>
     <configuration name="ApiGatewayYarp/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
       <deployment type="dockerfile">
         <settings>
@@ -720,6 +829,49 @@
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue=".NET Launch Settings Profile.ApiGateway: http" />
+      <item itemvalue=".NET Launch Settings Profile.ApiGateway: https" />
+      <item itemvalue=".NET Launch Settings Profile.ApiGateway: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.ApiGatewayYarp: http" />
+      <item itemvalue=".NET Launch Settings Profile.ApiGatewayYarp: https" />
+      <item itemvalue=".NET Launch Settings Profile.ApiGatewayYarp: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.AuthService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.AuthService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.AuthService.Api: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.BookingService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.BookingService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.BookingService.Api: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.EmailService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.EmailService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.EmailService.Api: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.EventService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.EventService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.EventService.Api: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.OperationService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.OperationService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.OperationService.Api: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.PaymentService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.PaymentService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.PaymentService.Api: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.ResaleService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.ResaleService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.ResaleService.Api: IIS Express" />
+      <item itemvalue=".NET Launch Settings Profile.TicketService.Api: http" />
+      <item itemvalue=".NET Launch Settings Profile.TicketService.Api: https" />
+      <item itemvalue=".NET Launch Settings Profile.TicketService.Api: IIS Express" />
+      <item itemvalue="Docker.ApiGatewayYarp/Dockerfile" />
+      <item itemvalue="Docker.AuthService.Api/Dockerfile" />
+      <item itemvalue="Docker.BookingService.Api/Dockerfile" />
+      <item itemvalue="Docker.EmailService.Api/Dockerfile" />
+      <item itemvalue="Docker.EventService.Api/Dockerfile" />
+      <item itemvalue="Docker.OperationService.Api/Dockerfile" />
+      <item itemvalue="Docker.PaymentService.Api/Dockerfile" />
+      <item itemvalue="Docker.ResaleService.Api/Dockerfile" />
+      <item itemvalue="Docker.TicketService.Api/Dockerfile" />
+      <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+      <item itemvalue="Multi-Launch.Multi-Launch: EventManagement" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
@@ -740,9 +892,14 @@
       <workItem from="1771593795129" duration="2776000" />
       <workItem from="1771597106266" duration="1115000" />
       <workItem from="1771686881873" duration="948000" />
+      <workItem from="1772909447208" duration="2988000" />
+      <workItem from="1772974330505" duration="1500000" />
+      <workItem from="1772976229492" duration="163000" />
+      <workItem from="1772976915695" duration="1140000" />
     </task>
     <servers />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

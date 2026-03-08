@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.Application.CQRS.Command.Ticket;
@@ -65,6 +65,18 @@ namespace TicketService.Api.Controllers
             var request = new TicketRestoreCommand { Id = id };
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        /// <summary>
+        /// Internal endpoint called by BookingService after a normal (non-trade) payment is confirmed.
+        /// Creates <c>Quantity</c> Ticket records under the given TicketType, assigning OwnerId to the buyer.
+        /// </summary>
+        [HttpPost("internal/bulk-create")]
+        public async Task<IActionResult> BulkCreateAsync([FromBody] TicketBulkCreateCommand request)
+        {
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
     }

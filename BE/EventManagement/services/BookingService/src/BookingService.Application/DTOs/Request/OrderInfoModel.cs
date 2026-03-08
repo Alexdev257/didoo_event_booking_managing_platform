@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +15,9 @@ namespace BookingService.Application.DTOs.Request
         public string OrderDescription { get; set; } = string.Empty;
         public decimal Amount { get; set; } = 0;
         public string EventId { get; set; } = string.Empty;
+        /// <summary>
+        /// For TradePurchase bookings: the TicketListing Id. Passed as part of extraData.
+        /// </summary>
+        public string? ResaleId { get; set; }
     }
 }

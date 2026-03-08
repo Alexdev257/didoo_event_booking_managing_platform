@@ -1,4 +1,4 @@
-﻿using BookingService.Application.CQRS.Query.Payment;
+﻿﻿using BookingService.Application.CQRS.Query.Payment;
 using BookingService.Application.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -41,16 +41,28 @@ namespace BookingService.Api.Controllers
         {
             var response = await _momoService.GetPaymentStatus(Request.Query);
 
-            //if ( response.Message == "Payment successful")
-            //{
-            //    //UriBuilder uriBuilder = new UriBuilder($"http://localhost:5173/confirm/{(response.Message.ToLower() == "success" ? "success" : "failed")}");
-            //}
-            var bookingId = Request.Query.FirstOrDefault(s => s.Key == "orderId").Value;
-            var eventId = Request.Query.FirstOrDefault(s => s.Key == "extraData").Value;
+            var bookingId = Request.Query.FirstOrDefault(s => s.Key == "orderId").Value.ToString();
+            var extraData = Request.Query.FirstOrDefault(s => s.Key == "extraData").Value.ToString();
             var frontEndUrl = "http://localhost:3000";
-            var successUrl = $"{frontEndUrl}/events/{eventId}/booking/confirm?bookingId={bookingId}";
-            UriBuilder uriBuilder = new UriBuilder(successUrl);
-            return Redirect(uriBuilder.ToString());
+
+            // extraData is "eventId" for normal bookings, "eventId|resaleId" for trade purchases
+            var parts = extraData.Split('|');
+            var eventId = parts[0];
+
+            string successUrl;
+            if (parts.Length == 2)
+            {
+                // Trade purchase: redirect to trade confirmation page
+                var resaleId = parts[1];
+                successUrl = $"{frontEndUrl}/marketplace/confirm?bookingId={bookingId}&listingId={resaleId}";
+            }
+            else
+            {
+                // Normal booking
+                successUrl = $"{frontEndUrl}/events/{eventId}/booking/confirm?bookingId={bookingId}";
+            }
+
+            return Redirect(new UriBuilder(successUrl).ToString());
         }
     }
 }

@@ -30,6 +30,11 @@ namespace BookingService.Infrastructure.Persistence.Configurations
                 .HasColumnName("seat_id")
                 .HasConversion<string>();
 
+            builder.Property(x => x.TicketTypeId)
+                .HasColumnName("ticket_type_id")
+                .HasConversion<string>()
+                .IsRequired(false);
+
             builder.Property(x => x.TicketId)
                 .HasColumnName("ticket_id")
                 .HasConversion<string>();
@@ -44,6 +49,11 @@ namespace BookingService.Infrastructure.Persistence.Configurations
             builder.Property(x => x.TotalPrice)
                 .HasColumnName("total_price")
                 .HasPrecision(18, 2);
+
+            builder.Property(x => x.ResaleId)
+                .HasColumnName("resale_id")
+                .HasConversion<string>()
+                .IsRequired(false);
 
             // Relationship
             builder.HasOne(x => x.Booking)

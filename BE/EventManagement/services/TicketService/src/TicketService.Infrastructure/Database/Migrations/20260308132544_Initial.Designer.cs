@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TicketService.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace TicketService.Infrastructure.Migrations
+namespace TicketService.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260308132544_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,6 +143,71 @@ namespace TicketService.Infrastructure.Migrations
                     b.ToTable("Ticket", (string)null);
                 });
 
+            modelBuilder.Entity("TicketService.Domain.Entities.TicketListing", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("AskingPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("asking_price");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("SellerUserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(36)")
+                        .HasColumnName("seller_user_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("TicketId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("ticket_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SellerUserId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("TicketListing", (string)null);
+                });
+
             modelBuilder.Entity("TicketService.Domain.Entities.TicketType", b =>
                 {
                     b.Property<string>("Id")
@@ -220,6 +288,22 @@ namespace TicketService.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("TicketType");
+                });
+
+            modelBuilder.Entity("TicketService.Domain.Entities.TicketListing", b =>
+                {
+                    b.HasOne("TicketService.Domain.Entities.Ticket", "Ticket")
+                        .WithMany("Listings")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+                });
+
+            modelBuilder.Entity("TicketService.Domain.Entities.Ticket", b =>
+                {
+                    b.Navigation("Listings");
                 });
 
             modelBuilder.Entity("TicketService.Domain.Entities.TicketType", b =>

@@ -27,9 +27,15 @@ The API Gateway routes incoming requests to the following services:
 | `/api/interactions/*`   | event-cluster     | http://localhost:6101   | 6101 |
 | `/api/tickets/*`        | ticket-cluster    | http://localhost:6201   | 6201 |
 | `/api/tickettypes/*`    | ticket-cluster    | http://localhost:6201   | 6201 |
+| `/api/ticketlistings/*` | ticket-cluster    | http://localhost:6201   | 6201 |
 | `/hubs/ticket/*`        | ticket-cluster    | http://localhost:6201   | 6201 |
 | `/api/bookings/*`       | booking-cluster   | http://localhost:6301   | 6301 |
-| `/api/paymentmethods/*` | payment-cluster   | http://localhost:6401   | 6401 |
+| `/api/bookingdetails/*` | booking-cluster   | http://localhost:6301   | 6301 |
+| `/api/payments/*`       | booking-cluster   | http://localhost:6301   | 6301 |
+| `/api/paymentmethods/*` | booking-cluster   | http://localhost:6301   | 6301 |
+| `/api/trade-bookings/*` | booking-cluster   | http://localhost:6301   | 6301 |
+| `/api/resales/*`        | booking-cluster   | http://localhost:6301   | 6301 |
+| `/api/resaletransactions/*` | booking-cluster | http://localhost:6301 | 6301 |
 | `/api/notifications/*`  | operation-cluster | http://localhost:6501   | 6501 |
 | `/api/checkins/*`       | operation-cluster | http://localhost:6501   | 6501 |
 
@@ -1911,21 +1917,22 @@ Query Parameters:
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint            | Request               | Response                | Status Code | Notes                         |
-| ----------- | ------------------- | --------------------- | ----------------------- | ----------- | ----------------------------- |
-| **GET**     | `/api/tickets`      | `TicketGetListQuery`  | `TicketGetListResponse` | 200/400     | Get paginated list of tickets |
-| **GET**     | `/api/tickets/{id}` | `TicketGetByIdQuery`  | `TicketGetByIdResponse` | 200/400     | Get ticket details by ID      |
-| **POST**    | `/api/tickets`      | `TicketCreateCommand` | `TicketCreateResponse`  | 201/400     | Create new ticket             |
-| **PUT**     | `/api/tickets/{id}` | `TicketUpdateCommand` | `TicketUpdateResponse`  | 200/400     | Update ticket information     |
-| **DELETE**  | `/api/tickets/{id}` | -                     | `TicketDeleteResponse`  | 200/400     | Hard delete ticket            |
-| **PATCH**   | `/api/tickets/{id}` | -                     | `TicketRestoreResponse` | 200/400     | Restore soft-deleted ticket   |
+| HTTP Method | Endpoint                              | Request                    | Response                    | Status Code | Notes                                                    |
+| ----------- | ------------------------------------- | -------------------------- | --------------------------- | ----------- | -------------------------------------------------------- |
+| **GET**     | `/api/tickets`                        | `TicketGetListQuery`       | `TicketGetListResponse`     | 200/400     | Get paginated list of tickets                            |
+| **GET**     | `/api/tickets/{id}`                   | `TicketGetByIdQuery`       | `TicketGetByIdResponse`     | 200/400     | Get ticket details by ID                                 |
+| **POST**    | `/api/tickets`                        | `TicketCreateCommand`      | `TicketCreateResponse`      | 201/400     | Create new ticket                                        |
+| **PUT**     | `/api/tickets/{id}`                   | `TicketUpdateCommand`      | `TicketUpdateResponse`      | 200/400     | Update ticket information                                |
+| **DELETE**  | `/api/tickets/{id}`                   | -                          | `TicketDeleteResponse`      | 200/400     | Hard delete ticket                                       |
+| **PATCH**   | `/api/tickets/{id}`                   | -                          | `TicketRestoreResponse`     | 200/400     | Restore soft-deleted ticket                              |
+| **POST**    | `/api/tickets/internal/bulk-create`   | `TicketBulkCreateCommand`  | `TicketBulkCreateResponse`  | 201/400     | Internal: bulk-create tickets after normal payment confirmed |
 
 ##### Ticket Status Enum:
 
-- `0` = Ready
-- `1` = Sold
-- `2` = Expired
-- `3` = Cancelled
+- `1` = Available
+- `2` = Full
+- `3` = Unavailable
+- `4` = Locked
 
 ##### Request/Response Models:
 
@@ -2323,16 +2330,237 @@ Query Parameters:
 
 ---
 
-**PATCH /api/tickettypes/{id}:**
+**POST /api/tickets/internal/bulk-create - TicketBulkCreateCommand:**
 
-**TicketTypeRestoreResponse:**
+> Internal endpoint called by BookingService after a successful normal (non-trade) payment is confirmed.
+
+```json
+{
+  "ticketTypeId": "550e8400-e29b-41d4-a716-446655440020",
+  "eventId": "550e8400-e29b-41d4-a716-446655440009",
+  "ownerId": "550e8400-e29b-41d4-a716-446655440000",
+  "quantity": 2,
+  "zone": "A1"
+}
+```
+
+**TicketBulkCreateResponse:**
 
 ```json
 {
   "isSuccess": true,
-  "message": "Ticket type restored successfully",
-  "data": null,
-  "listErrors": []
+  "message": "2 ticket(s) created successfully.",
+  "data": [
+    "550e8400-e29b-41d4-a716-446655440031",
+    "550e8400-e29b-41d4-a716-446655440032"
+  ]
+}
+```
+
+---
+
+#### 3. Ticket Listing Controller (`/api/ticketlistings`)
+
+**Purpose:** Manage resale/trading listings where ticket owners list their tickets for sale.
+
+##### Endpoints:
+
+| HTTP Method | Endpoint                          | Request                        | Response                         | Status Code | Notes                                            |
+| ----------- | --------------------------------- | ------------------------------ | -------------------------------- | ----------- | ------------------------------------------------ |
+| **GET**     | `/api/ticketlistings`             | `TicketListingGetListQuery`    | `TicketListingGetListResponse`   | 200/400     | Get paginated list of listings                   |
+| **GET**     | `/api/ticketlistings/{id}`        | `TicketListingGetByIdQuery`    | `TicketListingGetByIdResponse`   | 200/400     | Get listing by ID                                |
+| **GET**     | `/api/ticketlistings/{id}/validate` | `TicketListingValidateQuery` | `TicketListingValidateResponse`  | 200/400     | Validate listing is active (used by BookingService) |
+| **POST**    | `/api/ticketlistings`             | `TicketListingCreateCommand`   | `TicketListingCreateResponse`    | 201/400     | Create a new resale listing                      |
+| **PATCH**   | `/api/ticketlistings/{id}/cancel` | `TicketListingCancelCommand`   | `TicketListingCancelResponse`    | 200/400     | Cancel an active listing                         |
+| **PATCH**   | `/api/ticketlistings/{id}/mark-sold` | `TicketListingMarkSoldCommand` | `TicketListingMarkSoldResponse` | 200/400   | Mark listing sold + transfer ticket ownership (internal) |
+
+##### Ticket Listing Status Enum:
+
+- `1` = Active
+- `2` = Pending
+- `3` = Sold
+- `4` = Cancelled
+
+##### Request/Response Models:
+
+**POST /api/ticketlistings - TicketListingCreateCommand:**
+
+```json
+{
+  "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+  "sellerUserId": "550e8400-e29b-41d4-a716-446655440000",
+  "askingPrice": 250000.00,
+  "description": "Selling my VIP ticket, unable to attend."
+}
+```
+
+**TicketListingCreateResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Ticket listing created successfully.",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440099",
+    "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+    "sellerUserId": "550e8400-e29b-41d4-a716-446655440000",
+    "askingPrice": 250000.00,
+    "description": "Selling my VIP ticket, unable to attend.",
+    "status": "Active",
+    "createdAt": "2026-03-08T10:00:00Z",
+    "updatedAt": null
+  }
+}
+```
+
+---
+
+**GET /api/ticketlistings - TicketListingGetListQuery:**
+
+Query Parameters:
+
+```json
+{
+  "pageNumber": 1,
+  "pageSize": 10,
+  "sellerUserId": null,
+  "ticketId": null,
+  "status": 1,
+  "fromPrice": null,
+  "toPrice": null,
+  "fields": "id,ticketId,sellerUserId,askingPrice,status",
+  "isDescending": false,
+  "isDeleted": false
+}
+```
+
+**TicketListingGetListResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Success",
+  "data": {
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 10,
+    "totalPage": 1,
+    "items": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440099",
+        "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+        "sellerUserId": "550e8400-e29b-41d4-a716-446655440000",
+        "askingPrice": 250000.00,
+        "description": "Selling my VIP ticket, unable to attend.",
+        "status": "Active",
+        "createdAt": "2026-03-08T10:00:00Z",
+        "updatedAt": null
+      }
+    ]
+  }
+}
+```
+
+---
+
+**GET /api/ticketlistings/{id} - TicketListingGetByIdQuery:**
+
+**TicketListingGetByIdResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Success",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440099",
+    "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+    "sellerUserId": "550e8400-e29b-41d4-a716-446655440000",
+    "askingPrice": 250000.00,
+    "description": "Selling my VIP ticket, unable to attend.",
+    "status": "Active",
+    "createdAt": "2026-03-08T10:00:00Z",
+    "updatedAt": null
+  }
+}
+```
+
+---
+
+**GET /api/ticketlistings/{id}/validate - TicketListingValidateQuery:**
+
+**TicketListingValidateResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Listing is available.",
+  "data": {
+    "isAvailable": true,
+    "message": "Listing is active and available for purchase.",
+    "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "askingPrice": 250000.00
+  }
+}
+```
+
+---
+
+**PATCH /api/ticketlistings/{id}/cancel - TicketListingCancelCommand:**
+
+```json
+{
+  "sellerUserId": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**TicketListingCancelResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Listing cancelled successfully.",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440099",
+    "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+    "sellerUserId": "550e8400-e29b-41d4-a716-446655440000",
+    "askingPrice": 250000.00,
+    "description": "Selling my VIP ticket, unable to attend.",
+    "status": "Cancelled",
+    "createdAt": "2026-03-08T10:00:00Z",
+    "updatedAt": "2026-03-08T11:00:00Z"
+  }
+}
+```
+
+---
+
+**PATCH /api/ticketlistings/{id}/mark-sold - TicketListingMarkSoldCommand:**
+
+> Internal endpoint called by BookingService after trade payment is confirmed.
+
+```json
+{
+  "newOwnerUserId": "550e8400-e29b-41d4-a716-446655440001"
+}
+```
+
+**TicketListingMarkSoldResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Ticket ownership transferred and listing marked as sold.",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440099",
+    "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+    "sellerUserId": "550e8400-e29b-41d4-a716-446655440000",
+    "askingPrice": 250000.00,
+    "description": "Selling my VIP ticket, unable to attend.",
+    "status": "Sold",
+    "createdAt": "2026-03-08T10:00:00Z",
+    "updatedAt": "2026-03-08T12:00:00Z"
+  }
 }
 ```
 
@@ -2352,7 +2580,11 @@ Query Parameters:
 | ----------- | -------------------- | ---------------------- | ------------------------ | ----------- | -------------------------------------------- |
 | **GET**     | `/api/bookings`      | `BookingGetListQuery`  | `BookingGetListResponse` | 200/400     | Get paginated list of bookings               |
 | **GET**     | `/api/bookings/{id}` | `BookingGetByIdQuery`  | `BookingGetByIdResponse` | 200/400     | Get booking by ID (includes booking details) |
-| **POST**    | `/api/bookings`      | `BookingCreateCommand` | `CreateBookingResponse`  | 201/400     | Create new booking                           |
+| **POST**    | `/api/bookings`      | `BookingCreateCommand` | `CreateBookingResponse`  | 201/400     | Create new normal booking                    |
+
+##### Booking Type Enum:
+- `1` = Normal
+- `2` = TradePurchase
 
 ##### Request/Response Models:
 
@@ -2367,7 +2599,7 @@ Query Parameters:
   "userId": "550e8400-e29b-41d4-a716-446655440000",
   "eventId": "550e8400-e29b-41d4-a716-446655440009",
   "status": 1,
-  "fields": "id,userId,eventId,fullname,amount,totalPrice,status,bookingDetails",
+  "fields": "id,userId,eventId,fullname,amount,totalPrice,status,bookingType,bookingDetails",
   "isDescending": true,
   "isDeleted": false
 }
@@ -2395,6 +2627,7 @@ Query Parameters:
         "amount": 2,
         "totalPrice": 300.0,
         "status": "Pending",
+        "bookingType": "Normal",
         "paidAt": null,
         "createdAt": "2024-06-01T10:00:00Z",
         "updatedAt": null,
@@ -2404,7 +2637,8 @@ Query Parameters:
           {
             "id": "550e8400-e29b-41d4-a716-446655440040",
             "seatId": null,
-            "ticketId": "550e8400-e29b-41d4-a716-446655440050",
+            "ticketId": null,
+            "resaleId": null,
             "quantity": 2,
             "pricePerTicket": 150.0,
             "totalPrice": 300.0
@@ -2425,7 +2659,7 @@ Query Parameters:
 
 ```json
 {
-  "fields": "id,userId,eventId,fullname,email,phone,amount,totalPrice,status,paidAt,bookingDetails"
+  "fields": "id,userId,eventId,fullname,email,phone,amount,totalPrice,status,bookingType,paidAt,bookingDetails"
 }
 ```
 
@@ -2445,6 +2679,7 @@ Query Parameters:
     "amount": 2,
     "totalPrice": 300.0,
     "status": "Pending",
+    "bookingType": "Normal",
     "paidAt": null,
     "createdAt": "2024-06-01T10:00:00Z",
     "updatedAt": null,
@@ -2455,7 +2690,8 @@ Query Parameters:
       {
         "id": "550e8400-e29b-41d4-a716-446655440040",
         "seatId": null,
-        "ticketId": "550e8400-e29b-41d4-a716-446655440050",
+        "ticketId": null,
+        "resaleId": null,
         "quantity": 2,
         "pricePerTicket": 150.0,
         "totalPrice": 300.0
@@ -2472,19 +2708,13 @@ Query Parameters:
 
 ```json
 {
+  "ticketTypeId": "550e8400-e29b-41d4-a716-446655440020",
+  "quantity": 2,
   "userId": "550e8400-e29b-41d4-a716-446655440000",
   "eventId": "550e8400-e29b-41d4-a716-446655440009",
   "fullname": "John Doe",
   "email": "john@example.com",
-  "phone": "0912345678",
-  "bookingDetails": [
-    {
-      "ticketId": "550e8400-e29b-41d4-a716-446655440050",
-      "seatId": null,
-      "quantity": 2,
-      "pricePerTicket": 150.0
-    }
-  ]
+  "phone": "0912345678"
 }
 ```
 
@@ -2504,9 +2734,10 @@ Query Parameters:
     "amount": 2,
     "totalPrice": 300.0,
     "status": "Pending",
+    "bookingType": "Normal",
     "paidAt": null,
     "createdAt": "2024-06-01T10:00:00Z",
-    "paymentUrl": "https://payment.example.com/pay?orderId=..."
+    "paymentUrl": "https://payment.momo.vn/pay?orderId=..."
   },
   "listErrors": []
 }
@@ -2704,6 +2935,111 @@ Query Parameters:
 
 ---
 
+#### 4. Trade Booking Controller (`/api/trade-bookings`)
+
+**Purpose:** Create bookings for resale/trade ticket listings. Returns a Momo payment URL to complete the purchase.
+
+##### Endpoints:
+
+| HTTP Method | Endpoint              | Request                     | Response                | Status Code | Notes                                       |
+| ----------- | --------------------- | --------------------------- | ----------------------- | ----------- | ------------------------------------------- |
+| **POST**    | `/api/trade-bookings` | `TradeBookingCreateCommand` | `CreateBookingResponse` | 201/400     | Create trade booking + get Momo payment URL |
+
+##### Request/Response Models:
+
+**POST /api/trade-bookings - TradeBookingCreateCommand:**
+
+```json
+{
+  "listingId": "550e8400-e29b-41d4-a716-446655440099",
+  "buyerUserId": "550e8400-e29b-41d4-a716-446655440001",
+  "fullname": "Nguyen Van A",
+  "email": "buyer@example.com",
+  "phone": "0912345678"
+}
+```
+
+**CreateBookingResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Trade booking created successfully.",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440030",
+    "userId": "550e8400-e29b-41d4-a716-446655440001",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "fullname": "Nguyen Van A",
+    "email": "buyer@example.com",
+    "phone": "0912345678",
+    "amount": 1,
+    "totalPrice": 250000.0,
+    "status": "Pending",
+    "bookingType": "TradePurchase",
+    "paidAt": null,
+    "createdAt": "2026-03-08T10:00:00Z",
+    "paymentUrl": "https://payment.momo.vn/pay?orderId=...",
+    "bookingDetails": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440040",
+        "seatId": null,
+        "ticketId": "550e8400-e29b-41d4-a716-446655440030",
+        "resaleId": "550e8400-e29b-41d4-a716-446655440099",
+        "quantity": 1,
+        "pricePerTicket": 250000.0,
+        "totalPrice": 250000.0
+      }
+    ]
+  },
+  "listErrors": []
+}
+```
+
+---
+
+#### 5. Payment Controller (`/api/payments`)
+
+**Purpose:** Manage payments and handle Momo payment gateway callbacks.
+
+##### Endpoints:
+
+| HTTP Method | Endpoint                 | Request               | Response                 | Status Code | Notes                                                             |
+| ----------- | ------------------------ | --------------------- | ------------------------ | ----------- | ----------------------------------------------------------------- |
+| **GET**     | `/api/payments`          | `PaymentGetListQuery` | `PaymentGetListResponse` | 200/400     | Get paginated list of payments                                    |
+| **GET**     | `/api/payments/{id}`     | `PaymentGetByIdQuery` | `PaymentGetByIdResponse` | 200/400     | Get payment by ID                                                 |
+| **GET**     | `/api/payments/callback` | Query params (Momo)   | Redirect (302)           | 302         | Momo payment callback — updates booking + redirects to frontend   |
+
+##### Payment Callback: `GET /api/payments/callback`
+
+Momo redirects the user back to this endpoint after completing (or failing) payment.
+
+**Key query parameters received from Momo:**
+
+| Parameter   | Description                                                          |
+| ----------- | -------------------------------------------------------------------- |
+| `orderId`   | The Booking ID                                                       |
+| `message`   | `"success"` or error description                                     |
+| `extraData` | Normal: `{eventId}` · TradePurchase: `{eventId}\|{listingId}`        |
+| `amount`    | Payment amount                                                       |
+| `transId`   | Momo transaction ID                                                  |
+
+**Callback logic (`GetPaymentStatus`):**
+
+- **Payment failed** (`message != "success"`) → `Booking.Status = Canceled`
+- **Payment succeeded** (`message == "success"`):
+  - `Booking.Status = Paid`, `Booking.PaidAt = now`, `Payment.PaidAt = now`
+  - **Normal booking** (`BookingType = Normal`) → calls `POST /api/tickets/internal/bulk-create` on TicketService — creates `Quantity` individual `Ticket` rows with `OwnerId = buyer`
+  - **Trade booking** (`BookingType = TradePurchase`) → calls `PATCH /api/ticketlistings/{listingId}/mark-sold` on TicketService — sets `Ticket.OwnerId = buyer`, `Listing.Status = Sold`; creates `ResaleTransaction` in BookingService
+
+**Frontend redirect after callback:**
+
+| Booking type | Redirect URL |
+|---|---|
+| Normal | `http://localhost:3000/events/{eventId}/booking/confirm?bookingId={bookingId}` |
+| TradePurchase | `http://localhost:3000/marketplace/confirm?bookingId={bookingId}&listingId={listingId}` |
+
+---
+
 ## Response Structure
 
 All responses follow a standardized wrapper structure:
@@ -2833,6 +3169,22 @@ Services communicate asynchronously through integration events via RabbitMQ/Mess
 ### Ticket Purchase:
 
 1. Get ticket types: `GET /api/tickettypes?eventId={eventId}`
-2. Create booking: `POST /api/bookings`
-3. Process payment: `POST /api/paymentmethods`
-4. Receive tickets: `GET /api/tickets?eventId={eventId}&status=Sold`
+2. Create booking: `POST /api/bookings` (with `ticketTypeId` + `quantity`)
+3. Redirect user to `paymentUrl` from response
+4. Momo calls back `GET /api/payments/callback` → BookingService creates Ticket records via TicketService
+5. User redirected to `/events/{eventId}/booking/confirm?bookingId={bookingId}`
+
+### Trading Place (Resale):
+
+**Seller flow:**
+1. Get owned tickets: `GET /api/tickets?ownerId={userId}`
+2. Create listing: `POST /api/ticketlistings` (with `ticketId`, `sellerUserId`, `askingPrice`)
+3. Cancel if needed: `PATCH /api/ticketlistings/{id}/cancel`
+
+**Buyer flow:**
+1. Browse listings: `GET /api/ticketlistings?status=1`
+2. Validate listing: `GET /api/ticketlistings/{id}/validate`
+3. Create trade booking: `POST /api/trade-bookings` (with `listingId`, `buyerUserId`)
+4. Redirect user to `paymentUrl` from response
+5. Momo calls back `GET /api/payments/callback` → BookingService calls TicketService to transfer `Ticket.OwnerId` to buyer
+6. User redirected to `/marketplace/confirm?bookingId={bookingId}&listingId={listingId}`

@@ -1,4 +1,4 @@
-﻿using SharedContracts.Common.Wrappers;
+﻿﻿using SharedContracts.Common.Wrappers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +20,7 @@ namespace BookingService.Application.DTOs.Response.Booking
         public int Amount { get; set; }
         public decimal TotalPrice { get; set; }
         public string Status { get; set; } = string.Empty;
+        public string BookingType { get; set; } = string.Empty;
         public DateTime? PaidAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
@@ -34,6 +35,8 @@ namespace BookingService.Application.DTOs.Response.Booking
         public string Id { get; set; } = default!;
         public string? SeatId { get; set; }
         public string? TicketId { get; set; }
+        /// <summary>For TradePurchase bookings: the TicketListing Id.</summary>
+        public string? ResaleId { get; set; }
         public int Quantity { get; set; }
         public decimal PricePerTicket { get; set; }
         public decimal TotalPrice { get; set; }
