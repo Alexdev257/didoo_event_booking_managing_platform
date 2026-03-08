@@ -9,12 +9,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BookingService.Infrastructure.Implements.Services
 {
@@ -22,15 +18,22 @@ namespace BookingService.Infrastructure.Implements.Services
     {
         private readonly IOptions<MomoConfig> _momoConfig;
         private readonly IManageUnitOfWork _unitOfWork;
+        private readonly ITicketServiceClient _ticketServiceClient;
 
-
-        public MomoServices(IOptions<MomoConfig> momoConfig, IManageUnitOfWork unitOfWork)
+        public MomoServices(IOptions<MomoConfig> momoConfig, IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient)
         {
             _momoConfig = momoConfig;
             _unitOfWork = unitOfWork;
+            _ticketServiceClient = ticketServiceClient;
         }
+
         public async Task<string> CreatePaymentURL(OrderInfoModel orderInfo, HttpContext context)
         {
+            // extraData encodes "eventId" for normal bookings, "eventId|resaleId" for trade bookings
+            var extraData = string.IsNullOrEmpty(orderInfo.ResaleId)
+                ? orderInfo.EventId
+                : $"{orderInfo.EventId}|{orderInfo.ResaleId}";
+
             var rawData =
                 $"partnerCode={_momoConfig.Value.PartnerCode}" +
                 $"&accessKey={_momoConfig.Value.AccessKey}" +
@@ -40,7 +43,7 @@ namespace BookingService.Infrastructure.Implements.Services
                 $"&orderInfo={orderInfo.OrderDescription}" +
                 $"&returnUrl={_momoConfig.Value.ReturnUrl}" +
                 $"&notifyUrl={_momoConfig.Value.NotifyUrl}" +
-                $"&extraData={orderInfo.EventId}";
+                $"&extraData={extraData}";
             var signature = ComputeHmacSha256(rawData, _momoConfig.Value.SecretKey);
 
             var client = new RestClient(_momoConfig.Value.MomoApiUrl);
@@ -57,7 +60,7 @@ namespace BookingService.Infrastructure.Implements.Services
                 amount = orderInfo.Amount.ToString("0.##"),
                 orderInfo = orderInfo.OrderDescription,
                 requestId = orderInfo.OrderId,
-                extraData = orderInfo.EventId,
+                extraData = extraData,
                 signature = signature
             };
 
@@ -79,12 +82,13 @@ namespace BookingService.Infrastructure.Implements.Services
             var orderId = collection.FirstOrDefault(s => s.Key == "orderId").Value;
             var message = collection.FirstOrDefault(s => s.Key == "message").Value;
             var trancasionID = collection.FirstOrDefault(s => s.Key == "transId").Value;
-            //var BookingID = collection.FirstOrDefault(s => s.Key == "BookingID").Value;
+            // extraData can be "eventId" or "eventId|resaleId"
+            var extraData = collection.FirstOrDefault(s => s.Key == "extraData").Value.ToString();
 
             var booking = await _unitOfWork.Bookings.GetByIdAsync(Guid.Parse(orderId!));
-            var payment =  _unitOfWork.Payments.FindAsync(x => x.BookingId == Guid.Parse(orderId!)).FirstOrDefault();
+            var payment = _unitOfWork.Payments.FindAsync(x => x.BookingId == Guid.Parse(orderId!)).FirstOrDefault();
 
-            if( message.ToString().ToLower() != "success")
+            if (message.ToString().ToLower() != "success")
             {
                 if (booking != null)
                 {
@@ -100,7 +104,54 @@ namespace BookingService.Infrastructure.Implements.Services
                     booking.Status = BookingStatusEnum.Paid;
                     booking.PaidAt = timeNow;
                     _unitOfWork.Bookings.UpdateAsync(booking);
+
+                    if (booking.BookingType == BookingTypeEnum.TradePurchase)
+                    {
+                        // --- Trade booking: transfer ticket ownership via TicketService ---
+                        // Parse resaleId from extraData ("eventId|resaleId")
+                        var parts = extraData.Split('|');
+                        if (parts.Length == 2 && Guid.TryParse(parts[1], out var listingId))
+                        {
+                            // Update OwnerId in Ticket via TicketService (MarkListingSoldAsync sets ticket.OwnerId = buyerId)
+                            await _ticketServiceClient.MarkListingSoldAsync(listingId, booking.UserId);
+
+                            // Record a ResaleTransaction for audit trail
+                            var resaleTransaction = new Domain.Entities.ResaleTransaction
+                            {
+                                ResaleId = listingId,
+                                BuyerUserId = booking.UserId,
+                                Cost = booking.TotalPrice,
+                                FeeCost = 0,
+                                Status = ResaleTransactionStatusEnum.Completed,
+                                TransactionDate = timeNow,
+                            };
+                            await _unitOfWork.ResaleTransactions.AddAsync(resaleTransaction);
+                        }
+                    }
+                    else
+                    {
+                        // --- Normal booking: create Ticket records in TicketService ---
+                        // Retrieve the BookingDetail to get TicketTypeId and Quantity
+                        var bookingDetail = _unitOfWork.BookingDetails
+                            .FindAsync(x => x.BookingId == booking.Id)
+                            .FirstOrDefault();
+
+                        if (bookingDetail != null && bookingDetail.TicketTypeId.HasValue)
+                        {
+                            var bulkRequest = new BulkCreateTicketsRequest
+                            {
+                                TicketTypeId = bookingDetail.TicketTypeId.Value,
+                                EventId = booking.EventId,
+                                OwnerId = booking.UserId,
+                                Quantity = bookingDetail.Quantity,
+                                Zone = null,
+                            };
+
+                            await _ticketServiceClient.BulkCreateTicketsAsync(bulkRequest);
+                        }
+                    }
                 }
+
                 if (payment != null)
                 {
                     payment.PaidAt = timeNow;
@@ -117,7 +168,6 @@ namespace BookingService.Infrastructure.Implements.Services
                 OrderDescription = orderInfo!,
                 Message = message!,
                 TrancasionID = trancasionID!,
-                //BookingID = BookingID!
             });
         }
 

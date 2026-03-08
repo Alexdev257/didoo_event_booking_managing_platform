@@ -30,4 +30,9 @@
 		<ProjectReference Include="..\TicketService.Application\TicketService.Application.csproj" />
 		<ProjectReference Include="..\TicketService.Domain\TicketService.Domain.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Database\" />
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
 </Project>

@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BookingService.Infrastructure.Migrations
+namespace BookingService.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260220183314_AddPaymentAndResale")]
-    partial class AddPaymentAndResale
+    [Migration("20260308131600_InitialBookingDb")]
+    partial class InitialBookingDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,6 +36,14 @@ namespace BookingService.Infrastructure.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("int")
                         .HasColumnName("amount");
+
+                    b.Property<string>("BookingType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasDefaultValue("Normal")
+                        .HasColumnName("booking_type");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
@@ -139,6 +147,10 @@ namespace BookingService.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int")
                         .HasColumnName("quantity");
+
+                    b.Property<string>("ResaleId")
+                        .HasColumnType("varchar(36)")
+                        .HasColumnName("resale_id");
 
                     b.Property<string>("SeatId")
                         .HasColumnType("varchar(36)")
@@ -301,6 +313,9 @@ namespace BookingService.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("booking_detail_id");
+
+                    b.Property<Guid>("BuyerUserId")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
