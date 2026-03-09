@@ -2,6 +2,7 @@ using AuthService.Application.CQRS.Query.User;
 using AuthService.Application.DTOs.Response.User;
 using AuthService.Application.Interfaces.Repositories;
 using AuthService.Domain.Entities;
+using AuthService.Domain.Enum;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SharedContracts.Common.Wrappers;
@@ -93,9 +94,9 @@ namespace AuthService.Application.CQRS.Handler.User
                     users = users.Where(x => x.Status == request.Status.Value);
                 }
 
-                if (request.RoleId.HasValue && request.RoleId != Guid.Empty)
+                if (request.Role.HasValue)
                 {
-                    users = users.Where(x => x.RoleId == request.RoleId.Value);
+                    users = users.Where(x => x.Role.Name == request.Role);
                 }
 
                 if (request.OrganizerId.HasValue)

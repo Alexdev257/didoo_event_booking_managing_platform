@@ -39,13 +39,13 @@ namespace AuthService.Application.CQRS.Handler.Role
                     CreatedAt = DateTime.Now,
                     Status = Domain.Enum.StatusEnum.Active,
                 },
-                new AuthService.Domain.Entities.Role()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = Domain.Enum.RoleNameEnum.Manager,
-                    CreatedAt = DateTime.Now,
-                    Status = Domain.Enum.StatusEnum.Active,
-                },
+                //new AuthService.Domain.Entities.Role()
+                //{
+                //    Id = Guid.NewGuid(),
+                //    Name = Domain.Enum.RoleNameEnum.Manager,
+                //    CreatedAt = DateTime.Now,
+                //    Status = Domain.Enum.StatusEnum.Active,
+                //},
                 new AuthService.Domain.Entities.Role()
                 {
                     Id = Guid.NewGuid(),
@@ -53,13 +53,13 @@ namespace AuthService.Application.CQRS.Handler.Role
                     CreatedAt = DateTime.Now,
                     Status = Domain.Enum.StatusEnum.Active,
                 },
-                new AuthService.Domain.Entities.Role()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = Domain.Enum.RoleNameEnum.Guest,
-                    CreatedAt = DateTime.Now,
-                    Status = Domain.Enum.StatusEnum.Active,
-                }
+                //new AuthService.Domain.Entities.Role()
+                //{
+                //    Id = Guid.NewGuid(),
+                //    Name = Domain.Enum.RoleNameEnum.Guest,
+                //    CreatedAt = DateTime.Now,
+                //    Status = Domain.Enum.StatusEnum.Active,
+                //}
             };
             await _unitOfWork.BeginTransactionAsync();
             try

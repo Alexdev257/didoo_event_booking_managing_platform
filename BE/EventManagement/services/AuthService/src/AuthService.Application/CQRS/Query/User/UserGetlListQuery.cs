@@ -21,7 +21,7 @@ namespace AuthService.Application.CQRS.Query.User
         public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
         public StatusEnum? Status { get; set; }
-        public Guid? RoleId { get; set; }
+        public RoleNameEnum? Role { get; set; }
         public Guid? OrganizerId { get; set; }
         public string? Fields { get; set; }
         public bool? HasLocation { get; set; } = false!;
