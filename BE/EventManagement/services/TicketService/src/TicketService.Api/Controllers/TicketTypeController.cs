@@ -41,6 +41,14 @@ namespace TicketService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [HttpPost("array")]
+        public async Task<IActionResult> CreateArrayTicketTypeAsync([FromBody] TicketTypeCreateArrayCommand request)
+        {
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTicketTypeAsync([FromRoute] Guid id, [FromBody] TicketTypeUpdateCommand request)
         {

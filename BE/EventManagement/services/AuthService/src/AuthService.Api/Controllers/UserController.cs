@@ -62,7 +62,7 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] UserGetListQuery request)
         {

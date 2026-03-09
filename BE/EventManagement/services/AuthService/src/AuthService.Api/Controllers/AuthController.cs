@@ -1,7 +1,9 @@
 ﻿using AuthService.Application.CQRS.Command.Auth;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AuthService.Api.Controllers
 {
@@ -14,6 +16,26 @@ namespace AuthService.Api.Controllers
         {
             _mediator = mediator;
         }
+        private Guid? GetAdminIdFromClaim()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("UserId")?.Value
+                ?? User.FindFirst("sub")?.Value;
+            return Guid.TryParse(userId, out var id) ? id : null;
+        }
+
+        private string? GetTokenFromHeader()
+        {
+            var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (authHeader != null && authHeader.StartsWith("Bearer "))
+            {
+                return authHeader.Substring("Bearer ".Length);
+            }
+
+            return null;
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginCommand request)
         {
@@ -30,9 +52,18 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPost("refresh")]
-        public async Task<IActionResult> RefreshAsync([FromBody] RefreshCommand request)
+        public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequest RefreshToken)
         {
+            var request = new RefreshCommand
+            {
+                Id = GetAdminIdFromClaim()?.ToString() ?? string.Empty,
+                AccessToken = GetTokenFromHeader() ?? string.Empty,
+                RefreshToken = RefreshToken.RefreshToken,
+            };
+            Console.WriteLine($"AccessToken: {request.AccessToken}");
+            Console.WriteLine($"UserId: {request.Id}");
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             return StatusCode(StatusCodes.Status400BadRequest, result);
@@ -101,5 +132,10 @@ namespace AuthService.Api.Controllers
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
+    }
+
+    public class RefreshTokenRequest
+    {
+        public string RefreshToken { get; set; }
     }
 }

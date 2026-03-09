@@ -55,7 +55,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
             if(user == null)
             {
                 var id = Guid.NewGuid();
-                var basePassword = $"Event{id}";
+                var basePassword = $"Event_{id}";
                 var role = await _unitOfWork.Roles.GetAllAsync().Where(x => x.Name == Domain.Enum.RoleNameEnum.User).FirstOrDefaultAsync();
                 user = new Domain.Entities.User
                 {
@@ -66,7 +66,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     IsVerified = true,
                     Password = _bcryptHelper.HashPassword(basePassword),
                     AvatarUrl = validatedResult.Picture,
-                    Gender = null,
+                    Gender = 1,
                     DateOfBirth = null,
                     Address = null,
                     RoleId = role.Id,
@@ -127,6 +127,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                 };
                 try
                 {
+                    await _unitOfWork.BeginTransactionAsync();
                     await _unitOfWork.UserLocations.AddAsync(location);
                     await _unitOfWork.CommitTransactionAsync();
                     var accessToken = _jwtHelper.GenerateAccessToken(user);
