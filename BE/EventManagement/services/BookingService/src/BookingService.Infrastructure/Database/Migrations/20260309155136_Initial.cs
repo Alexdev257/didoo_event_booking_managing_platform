@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BookingService.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialBookingDb : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -109,6 +109,8 @@ namespace BookingService.Infrastructure.Database.Migrations
                     booking_id = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     seat_id = table.Column<string>(type: "varchar(36)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ticket_type_id = table.Column<string>(type: "varchar(36)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ticket_id = table.Column<string>(type: "varchar(36)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),

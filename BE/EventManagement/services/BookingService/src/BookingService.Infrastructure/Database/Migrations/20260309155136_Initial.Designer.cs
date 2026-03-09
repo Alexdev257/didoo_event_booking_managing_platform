@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260308131600_InitialBookingDb")]
-    partial class InitialBookingDb
+    [Migration("20260309155136_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -159,6 +159,10 @@ namespace BookingService.Infrastructure.Database.Migrations
                     b.Property<string>("TicketId")
                         .HasColumnType("varchar(36)")
                         .HasColumnName("ticket_id");
+
+                    b.Property<string>("TicketTypeId")
+                        .HasColumnType("varchar(36)")
+                        .HasColumnName("ticket_type_id");
 
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)

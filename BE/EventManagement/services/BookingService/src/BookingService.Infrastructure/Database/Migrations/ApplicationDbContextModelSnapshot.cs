@@ -157,6 +157,10 @@ namespace BookingService.Infrastructure.Database.Migrations
                         .HasColumnType("varchar(36)")
                         .HasColumnName("ticket_id");
 
+                    b.Property<string>("TicketTypeId")
+                        .HasColumnType("varchar(36)")
+                        .HasColumnName("ticket_type_id");
+
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
