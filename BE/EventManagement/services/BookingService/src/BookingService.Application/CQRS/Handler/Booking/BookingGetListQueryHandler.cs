@@ -4,7 +4,7 @@ using BookingService.Application.Interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SharedInfrastructure.Extensions;
-
+using BookingService.Domain.Enum;
 namespace BookingService.Application.CQRS.Handler.Booking
 {
     public class BookingGetListQueryHandler : IRequestHandler<BookingGetListQuery, BookingGetListResponse>
@@ -65,7 +65,7 @@ namespace BookingService.Application.CQRS.Handler.Booking
                     UpdatedAt = booking.UpdatedAt,
                     IsDeleted = booking.IsDeleted,
                     DeletedAt = booking.DeletedAt,
-
+                    BookingType = booking.BookingType == BookingTypeEnum.Normal ? "Normal" : "TradePurchase",
                     BookingDetails = booking.BookingDetails.Select(d => new BookingDetailSubDTO
                     {
                         Id = d.Id.ToString(),

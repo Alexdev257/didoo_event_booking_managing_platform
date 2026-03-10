@@ -54,7 +54,7 @@ namespace BookingService.Api.Controllers
             {
                 // Trade purchase: redirect to trade confirmation page
                 var resaleId = parts[1];
-                successUrl = $"{frontEndUrl}/marketplace/confirm?bookingId={bookingId}&listingId={resaleId}";
+              successUrl = $"{frontEndUrl}/resale/{eventId}/trade-booking/{parts[1]}/confirm?bookingId={bookingId}";
             }
             else
             {
