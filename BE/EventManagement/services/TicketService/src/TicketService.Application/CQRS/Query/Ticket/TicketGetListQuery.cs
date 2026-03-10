@@ -13,6 +13,7 @@ namespace TicketService.Application.CQRS.Query.Ticket
 {
     public class TicketGetListQuery : PaginationRequest, IRequest<TicketGetListResponse>
     {
+        public Guid? OwnerId { get; set; }
         public Guid? TicketTypeId { get; set; }
         public Guid? EventId { get; set; }
         public string? Zone { get; set; }

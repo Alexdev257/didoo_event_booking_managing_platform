@@ -39,6 +39,10 @@ namespace TicketService.Application.CQRS.Handler.Ticket
                     }
                 }
             }
+            if(request.OwnerId != null && request.OwnerId != Guid.Empty)
+            {
+                tickets = tickets.Where(x => x.OwnerId == request.OwnerId);
+            }
             if(request.TicketTypeId != null && request.TicketTypeId != Guid.Empty)
             {
                 tickets = tickets.Where(x => x.TicketTypeId == request.TicketTypeId);

@@ -67,8 +67,8 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
         private static TicketListingDTO MapToDTO(Domain.Entities.TicketListing l) => new()
         {
             Id = l.Id.ToString(),
-            TicketId = l.TicketId.ToString(),
-            SellerUserId = l.SellerUserId.ToString(),
+            //TicketId = l.TicketId.ToString(),
+            //SellerUserId = l.SellerUserId.ToString(),
             AskingPrice = l.AskingPrice,
             Description = l.Description,
             Status = l.Status,

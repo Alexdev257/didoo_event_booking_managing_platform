@@ -9,6 +9,7 @@ namespace TicketService.Application.CQRS.Query.TicketListing
     {
         public Guid? SellerUserId { get; set; }
         public Guid? TicketId { get; set; }
+        public Guid? EventId { get; set; }
         public TicketListingStatusEnum? Status { get; set; }
         public decimal? FromPrice { get; set; }
         public decimal? ToPrice { get; set; }
