@@ -25,9 +25,6 @@ namespace BookingService.Infrastructure.Persistence
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
 
-        // Resale
-        public virtual DbSet<Resale> Resales { get; set; }
-        public virtual DbSet<ResaleTransaction> ResaleTransactions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -15,8 +15,5 @@ namespace BookingService.Application.Interfaces.Repositories
 
         IGenericRepository<Payment> Payments { get; }
         IGenericRepository<PaymentMethod> PaymentMethods { get; }
-
-        IGenericRepository<Resale> Resales { get; }
-        IGenericRepository<ResaleTransaction> ResaleTransactions { get; }
     }
 }

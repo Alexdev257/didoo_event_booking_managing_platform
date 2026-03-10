@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BookingService.Domain.Enum;
 
 namespace BookingService.Application.CQRS.Handler.Booking
 {
@@ -34,6 +35,7 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 Status = d.Status.ToString(),
                 PaidAt = d.PaidAt,
                 CreatedAt = d.CreatedAt,
+                BookingType = d.BookingType == BookingTypeEnum.Normal ? "Normal" : "TradePurchase",
                 UpdatedAt = d.UpdatedAt,
                 IsDeleted = d.IsDeleted,
                 DeletedAt = d.DeletedAt,

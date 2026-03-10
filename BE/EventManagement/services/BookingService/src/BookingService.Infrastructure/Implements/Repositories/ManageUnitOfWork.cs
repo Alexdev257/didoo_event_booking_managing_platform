@@ -30,10 +30,6 @@ namespace BookingService.Infrastructure.Implements.Repositories
 
         public IGenericRepository<PaymentMethod> PaymentMethods => new GenericRepository<PaymentMethod>(_context);
 
-        public IGenericRepository<Resale> Resales => new GenericRepository<Resale>(_context);
-
-        public IGenericRepository<ResaleTransaction> ResaleTransactions => new GenericRepository<ResaleTransaction>(_context);
-
         public async Task BeginTransactionAsync()
         {
             if (_currentTransaction != null)
