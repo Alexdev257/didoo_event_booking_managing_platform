@@ -75,7 +75,7 @@ namespace BookingService.Application.CQRS.Handler.Booking
             {
                 BookingId = booking.Id,
                 TicketId = ticketId,
-                ResaleId = request.ListingId,   // link to the TicketListing
+                TicketListingId = request.ListingId,   // link to the TicketListing
                 Quantity = 1,
                 PricePerTicket = price,
                 TotalPrice = price,
@@ -85,9 +85,6 @@ namespace BookingService.Application.CQRS.Handler.Booking
             booking.BookingDetails.Add(bookingDetail);
             await _unitOfWork.Bookings.AddAsync(booking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            // 3. Build extraData as "eventId|listingId" so callback can route correctly
-            var extraData = $"{eventId}|{request.ListingId}";
 
             var orderInfoModel = new OrderInfoModel
             {
@@ -158,16 +155,6 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 booking.PaidAt = paidAt;
                 _unitOfWork.Bookings.UpdateAsync(booking);
 
-                var resaleTransaction = new Domain.Entities.ResaleTransaction
-                {
-                    ResaleId = request.ListingId,
-                    BuyerUserId = request.BuyerUserId,
-                    Cost = price,
-                    FeeCost = 0,
-                    Status = Domain.Enum.ResaleTransactionStatusEnum.Completed,
-                    TransactionDate = paidAt,
-                };
-                await _unitOfWork.ResaleTransactions.AddAsync(resaleTransaction);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
@@ -195,7 +182,8 @@ namespace BookingService.Application.CQRS.Handler.Booking
                         {
                             Id = bookingDetail.Id.ToString(),
                             TicketId = bookingDetail.TicketId?.ToString(),
-                            ResaleId = bookingDetail.ResaleId?.ToString(),
+                            TicketListingId = bookingDetail.TicketListingId?.ToString(),
+                            TicketTypeId = bookingDetail.TicketTypeId.HasValue ? bookingDetail.TicketTypeId.Value.ToString() : null,
                             Quantity = bookingDetail.Quantity,
                             PricePerTicket = bookingDetail.PricePerTicket,
                             TotalPrice = bookingDetail.TotalPrice,

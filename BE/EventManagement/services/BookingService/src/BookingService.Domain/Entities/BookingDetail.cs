@@ -19,7 +19,7 @@ namespace BookingService.Domain.Entities
         /// <summary>
         /// For TradePurchase bookings: the TicketListing Id being purchased.
         /// </summary>
-        public Guid? ResaleId { get; set; }
+        public Guid? TicketListingId { get; set; }
         public int Quantity { get; set; }
         public decimal PricePerTicket { get; set; }
         public decimal TotalPrice { get; set; }

@@ -114,18 +114,6 @@ namespace BookingService.Infrastructure.Implements.Services
                         {
                             // Update OwnerId in Ticket via TicketService (MarkListingSoldAsync sets ticket.OwnerId = buyerId)
                             await _ticketServiceClient.MarkListingSoldAsync(listingId, booking.UserId);
-
-                            // Record a ResaleTransaction for audit trail
-                            var resaleTransaction = new Domain.Entities.ResaleTransaction
-                            {
-                                ResaleId = listingId,
-                                BuyerUserId = booking.UserId,
-                                Cost = booking.TotalPrice,
-                                FeeCost = 0,
-                                Status = ResaleTransactionStatusEnum.Completed,
-                                TransactionDate = timeNow,
-                            };
-                            await _unitOfWork.ResaleTransactions.AddAsync(resaleTransaction);
                         }
                     }
                     else

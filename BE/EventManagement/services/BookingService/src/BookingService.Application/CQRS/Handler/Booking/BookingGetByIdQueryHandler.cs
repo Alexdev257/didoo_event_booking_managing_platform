@@ -1,6 +1,7 @@
 using BookingService.Application.CQRS.Query.Booking;
 using BookingService.Application.DTOs.Response.Booking;
 using BookingService.Application.Interfaces.Repositories;
+using BookingService.Domain.Enum;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SharedInfrastructure.Extensions;
@@ -54,12 +55,15 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 CreatedAt = booking.CreatedAt,
                 UpdatedAt = booking.UpdatedAt,
                 IsDeleted = booking.IsDeleted,
+                BookingType = booking.BookingType == BookingTypeEnum.Normal ? "Normal" : "TradePurchase",
                 DeletedAt = booking.DeletedAt,
                 BookingDetails = booking.BookingDetails.Select(d => new BookingDetailSubDTO
                 {
                     Id = d.Id.ToString(),
                     SeatId = d.SeatId.HasValue ? d.SeatId.Value.ToString() : null,
                     TicketId = d.TicketId.HasValue ? d.TicketId.Value.ToString() : null,
+                    TicketListingId = d.TicketListingId.HasValue ? d.TicketListingId.Value.ToString() : null,
+                    TicketTypeId = d.TicketTypeId.HasValue ? d.TicketTypeId.Value.ToString() : null,
                     Quantity = d.Quantity,
                     PricePerTicket = d.PricePerTicket,
                     TotalPrice = d.TotalPrice

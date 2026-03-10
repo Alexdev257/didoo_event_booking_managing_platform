@@ -10,6 +10,8 @@ namespace BookingService.Application.CQRS.Query.Booking
         public Guid? UserId { get; set; }
         public Guid? EventId { get; set; }
         public BookingStatusEnum? Status { get; set; }
+        
+        public BookingTypeEnum? BookingType { get; set; }
         public string? Fields { get; set; }
         public bool? IsDescending { get; set; }
         public bool? IsDeleted { get; set; }

@@ -50,8 +50,8 @@ namespace BookingService.Infrastructure.Persistence.Configurations
                 .HasColumnName("total_price")
                 .HasPrecision(18, 2);
 
-            builder.Property(x => x.ResaleId)
-                .HasColumnName("resale_id")
+            builder.Property(x => x.TicketListingId)
+                .HasColumnName("ticket_listing_id")
                 .HasConversion<string>()
                 .IsRequired(false);
 

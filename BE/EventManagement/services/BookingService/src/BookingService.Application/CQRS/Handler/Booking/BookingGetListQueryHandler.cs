@@ -38,6 +38,9 @@ namespace BookingService.Application.CQRS.Handler.Booking
             if (request.Status.HasValue)
                 bookings = bookings.Where(x => x.Status == request.Status.Value);
 
+            if (request.BookingType.HasValue)
+                bookings = bookings.Where(x => x.BookingType == request.BookingType.Value);
+
             bookings = (request.IsDescending.HasValue && request.IsDescending.Value)
                 ? bookings.OrderByDescending(x => x.CreatedAt)
                 : bookings.OrderBy(x => x.CreatedAt);
@@ -62,11 +65,14 @@ namespace BookingService.Application.CQRS.Handler.Booking
                     UpdatedAt = booking.UpdatedAt,
                     IsDeleted = booking.IsDeleted,
                     DeletedAt = booking.DeletedAt,
+
                     BookingDetails = booking.BookingDetails.Select(d => new BookingDetailSubDTO
                     {
                         Id = d.Id.ToString(),
                         SeatId = d.SeatId.HasValue ? d.SeatId.Value.ToString() : null,
                         TicketId = d.TicketId.HasValue ? d.TicketId.Value.ToString() : null,
+                        TicketListingId = d.TicketListingId.HasValue ? d.TicketListingId.Value.ToString() : null,
+                        TicketTypeId = d.TicketTypeId.HasValue ? d.TicketTypeId.Value.ToString() : null,
                         Quantity = d.Quantity,
                         PricePerTicket = d.PricePerTicket,
                         TotalPrice = d.TotalPrice

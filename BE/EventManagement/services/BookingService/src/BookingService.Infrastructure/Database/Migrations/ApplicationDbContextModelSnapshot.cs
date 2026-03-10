@@ -145,10 +145,6 @@ namespace BookingService.Infrastructure.Database.Migrations
                         .HasColumnType("int")
                         .HasColumnName("quantity");
 
-                    b.Property<string>("ResaleId")
-                        .HasColumnType("varchar(36)")
-                        .HasColumnName("resale_id");
-
                     b.Property<string>("SeatId")
                         .HasColumnType("varchar(36)")
                         .HasColumnName("seat_id");
@@ -156,6 +152,10 @@ namespace BookingService.Infrastructure.Database.Migrations
                     b.Property<string>("TicketId")
                         .HasColumnType("varchar(36)")
                         .HasColumnName("ticket_id");
+
+                    b.Property<string>("TicketListingId")
+                        .HasColumnType("varchar(36)")
+                        .HasColumnName("ticket_listing_id");
 
                     b.Property<string>("TicketTypeId")
                         .HasColumnType("varchar(36)")
@@ -301,145 +301,6 @@ namespace BookingService.Infrastructure.Database.Migrations
                     b.ToTable("PaymentMethod", (string)null);
                 });
 
-            modelBuilder.Entity("BookingService.Domain.Entities.Resale", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("id");
-
-                    b.Property<string>("BookingDetailId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("booking_detail_id");
-
-                    b.Property<Guid>("BuyerUserId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<decimal?>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("price");
-
-                    b.Property<Guid>("SalerUserId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingDetailId")
-                        .IsUnique();
-
-                    b.HasIndex("SalerUserId");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("Resales", (string)null);
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.ResaleTransaction", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("id");
-
-                    b.Property<string>("BuyerUserId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("buyer_user_id");
-
-                    b.Property<decimal>("Cost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("cost");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<decimal>("FeeCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("fee_cost");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("ResaleId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("resale_id");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("transaction_date");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuyerUserId");
-
-                    b.HasIndex("ResaleId");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("ResaleTransactions", (string)null);
-                });
-
             modelBuilder.Entity("BookingService.Domain.Entities.BookingDetail", b =>
                 {
                     b.HasOne("BookingService.Domain.Entities.Booking", "Booking")
@@ -461,17 +322,6 @@ namespace BookingService.Infrastructure.Database.Migrations
                     b.Navigation("PaymentMethod");
                 });
 
-            modelBuilder.Entity("BookingService.Domain.Entities.ResaleTransaction", b =>
-                {
-                    b.HasOne("BookingService.Domain.Entities.Resale", "Resale")
-                        .WithMany("Transactions")
-                        .HasForeignKey("ResaleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Resale");
-                });
-
             modelBuilder.Entity("BookingService.Domain.Entities.Booking", b =>
                 {
                     b.Navigation("BookingDetails");
@@ -480,11 +330,6 @@ namespace BookingService.Infrastructure.Database.Migrations
             modelBuilder.Entity("BookingService.Domain.Entities.PaymentMethod", b =>
                 {
                     b.Navigation("Payments");
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.Resale", b =>
-                {
-                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }
