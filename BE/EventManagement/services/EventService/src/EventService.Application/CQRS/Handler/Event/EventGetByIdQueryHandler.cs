@@ -77,6 +77,12 @@ namespace EventService.Application.CQRS.Handler.Event
                 {
                     Id = x.Id.ToString(),
                     Name = x.Name,
+                    District = x.District,
+                    Ward = x.Ward,
+                    Zipcode = x.Zipcode,
+                    Status = x.Status,
+                    ContactEmail = x.ContactEmail,
+                    ContactPhone = x.ContactPhone,
                     Address = x.Address,
                     Province = x.Province,
                     Latitude = x.Latitude,

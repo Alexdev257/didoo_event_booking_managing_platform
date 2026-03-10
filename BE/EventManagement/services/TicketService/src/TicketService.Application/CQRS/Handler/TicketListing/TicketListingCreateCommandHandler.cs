@@ -65,16 +65,16 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
 
             var listings = new List<TicketListingDTO>();
 
-            foreach (var ticketReq in request.Tickets)
+            foreach (var ticketId in request.TicketIds)
             {
-                var ticket = await _unitOfWork.Tickets.GetByIdAsync(ticketReq.TicketId);
+                var ticket = await _unitOfWork.Tickets.GetByIdAsync(ticketId);
 
                 if (ticket == null || ticket.IsDeleted)
                 {
                     return new TicketListingCreateResponse
                     {
                         IsSuccess = false,
-                        Message = $"Ticket {ticketReq.TicketId} not found."
+                        Message = $"Ticket {ticketId} not found."
                     };
                 }
 
@@ -83,7 +83,7 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                     return new TicketListingCreateResponse
                     {
                         IsSuccess = false,
-                        Message = $"You do not own ticket {ticketReq.TicketId}."
+                        Message = $"You do not own ticket {ticketId}."
                     };
                 }
 
@@ -92,12 +92,12 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                     return new TicketListingCreateResponse
                     {
                         IsSuccess = false,
-                        Message = $"Ticket {ticketReq.TicketId} is not available."
+                        Message = $"Ticket {ticketId} is not available."
                     };
                 }
 
                 var existingActive = (_unitOfWork.TicketListings.GetAllAsync())
-                    .Any(x => x.TicketId == ticketReq.TicketId
+                    .Any(x => x.TicketId == ticketId
                            && x.Status == TicketListingStatusEnum.Active
                            && !x.IsDeleted);
 
@@ -106,7 +106,7 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                     return new TicketListingCreateResponse
                     {
                         IsSuccess = false,
-                        Message = $"Active listing already exists for ticket {ticketReq.TicketId}"
+                        Message = $"Active listing already exists for ticket {ticketId}"
                     };
                 }
 
@@ -117,7 +117,7 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                 var listing = new Domain.Entities.TicketListing
                 {
                     Id = Guid.NewGuid(),
-                    TicketId = ticketReq.TicketId,
+                    TicketId = ticketId,
                     SellerUserId = request.SellerUserId,
                     EventId = request.EventId,
                     AskingPrice = request.AskingPrice,
