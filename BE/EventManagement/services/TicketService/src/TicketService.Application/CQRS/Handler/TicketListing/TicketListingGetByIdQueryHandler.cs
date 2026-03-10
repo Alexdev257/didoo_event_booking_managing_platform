@@ -94,7 +94,7 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                         Status = (int)eventResponse.Status
 
                     },
-                    SellerUserId = new TicketListingUserDTO
+                    SellerUser = new TicketListingUserDTO
                     {
                         Id = userResponse.Id.ToString(),
                         FullName = userResponse.FullName,

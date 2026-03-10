@@ -47,6 +47,18 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                     Id = listing.Id.ToString(),
                     //TicketId = listing.TicketId.ToString(),
                     //SellerUserId = listing.SellerUserId.ToString(),
+                    Ticket = new TicketListingTicketDTO
+                    {
+                        Id = listing.TicketId.ToString(),
+                    },
+                    Event = new TicketListingEventDTO
+                    {
+                        Id = listing.EventId.ToString(),
+                    },
+                    SellerUser = new TicketListingUserDTO
+                    {
+                        Id = listing.SellerUserId.ToString(),
+                    },
                     AskingPrice = listing.AskingPrice,
                     Description = listing.Description,
                     Status = listing.Status,
