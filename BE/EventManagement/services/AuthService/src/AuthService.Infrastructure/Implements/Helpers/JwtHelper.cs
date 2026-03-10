@@ -40,12 +40,13 @@ namespace AuthService.Infrastructure.Implements.Helpers
                 new Claim("UserId", user.Id.ToString()),
                 new Claim("FullName", user.FullName),
                 new Claim("Email", user.Email),
-                new Claim("Role", ((int)user.Role.Name).ToString())
+                new Claim("Role", ((int)user.Role.Name).ToString()),
+                new Claim("IsOrganizer", (user.OrganizerId.HasValue).ToString().ToLower())
                 //new Claim("Role", user.Role.RoleName.ToString().ToLower()),
             }),
 
                 // expire in 1 hours
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddMinutes(1),
                 Issuer = Issuer,
                 Audience = Audience,
                 SigningCredentials =
@@ -104,11 +105,11 @@ namespace AuthService.Infrastructure.Implements.Helpers
                 return (false, "Invalid Token Argorithm!");
 
             //Check: Access Token expired or not
-            var utcExpiredToken = long.Parse(tokenInVerification.Claims
-                .FirstOrDefault(t => t.Type == JwtRegisteredClaimNames.Exp).Value);
-            var expiredDate = ConvertUnixTimeToDateTime(utcExpiredToken);
+            //var utcExpiredToken = long.Parse(tokenInVerification.Claims
+            //    .FirstOrDefault(t => t.Type == JwtRegisteredClaimNames.Exp).Value);
+            //var expiredDate = ConvertUnixTimeToDateTime(utcExpiredToken);
 
-            if (expiredDate > DateTime.UtcNow) return (false, "Access Token has not expired yet!");
+            //if (expiredDate > DateTime.UtcNow) return (false, "Access Token has not expired yet!");s
             return (true, null);
         }
     }

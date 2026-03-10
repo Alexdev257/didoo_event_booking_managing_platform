@@ -3,6 +3,7 @@ using AuthService.Application.DTOs.Response.Auth;
 using AuthService.Application.Interfaces.Helpers;
 using AuthService.Application.Interfaces.Repositories;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SharedContracts.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     IsSuccess = false,
                     Message = "RefreshToken is used or expired!"
                 };
-            var user = await _unitOfWork.Users.GetByIdAsync(Guid.Parse(request.Id));
+            var user = await _unitOfWork.Users.GetAllAsync().Include(x => x.Role).FirstOrDefaultAsync(x => x.Id == Guid.Parse(request.Id));
             var newAccessToken = _jwtHelper.GenerateAccessToken(user!);
             var newRefreshToken = _jwtHelper.GenerateRefreshToken();
             await _cacheService.RemoveAsync($"RT_{request.Id}");
