@@ -7,7 +7,7 @@
         {
             public List<Guid> TicketIds { get; set; }
             public Guid SellerUserId { get; set; }
-            public Guid EventId { get; set; }
+            //public Guid EventId { get; set; }
             public decimal AskingPrice { get; set; }
             public string? Description { get; set; }
         }

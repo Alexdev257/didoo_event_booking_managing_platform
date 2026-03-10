@@ -119,7 +119,7 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                     Id = Guid.NewGuid(),
                     TicketId = ticketId,
                     SellerUserId = request.SellerUserId,
-                    EventId = request.EventId,
+                    EventId = ticket.EventId,
                     AskingPrice = request.AskingPrice,
                     Description = request.Description,
                     Status = TicketListingStatusEnum.Active,
