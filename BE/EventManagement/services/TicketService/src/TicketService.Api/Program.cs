@@ -84,6 +84,27 @@ builder.Services.AddGrpcClient<EventGrpc.EventGrpcClient>(o =>
     o.Address = new Uri(url);
 });
 
+builder.Services.AddGrpcClient<AuthGrpc.AuthGrpcClient>(o =>
+{
+    // L?y URL t? bi?n m�i tr??ng (Docker)
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__AuthServiceUrl");
+
+    // N?u kh�ng c�, l?y t? appsettings.json (Local)
+    if (string.IsNullOrEmpty(url))
+    {
+        url = builder.Configuration["GrpcSettings:AuthServiceUrl"];
+    }
+
+    // Fallback n?u v?n null (M?c ??nh Docker)
+    if (string.IsNullOrEmpty(url))
+    {
+        url = "http://auth-service:80";
+    }
+
+    Console.WriteLine($"--> TicketService connecting to EventGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
