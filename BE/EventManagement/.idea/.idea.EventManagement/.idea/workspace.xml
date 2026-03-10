@@ -45,48 +45,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c6d972-96e0-401f-81e2-5436336b091f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Controllers/ResaleController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/Controllers/ResaleTransactionController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingGetAllQueryHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingGetAllQueryHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingGetByIdQueryHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingGetByIdQueryHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingGetListQueryHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/BookingGetListQueryHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/TradeBookingCreateCommandHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Booking/TradeBookingCreateCommandHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Resale/ResaleGetAllQueryHandler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Resale/ResaleGetByIdQueryHandler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/Resale/ResaleGetListQueryHandler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/ResaleTransaction/ResaleTransactionGetAllQueryHandler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/ResaleTransaction/ResaleTransactionGetByIdQueryHandler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Handler/ResaleTransaction/ResaleTransactionGetListQueryHandler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/Booking/BookingGetListQuery.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/Booking/BookingGetListQuery.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/Resale/ResaleGetAllQuery.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/Resale/ResaleGetByIdQuery.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/Resale/ResaleGetListQuery.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/ResaleTransaction/ResaleTransactionGetAllQuery.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/ResaleTransaction/ResaleTransactionGetByIdQuery.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/CQRS/Query/ResaleTransaction/ResaleTransactionGetListQuery.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/Booking/GetAllBookingResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/Booking/GetAllBookingResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/Resale/GetAllResaleResponse.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/Resale/ResaleGetResponse.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/ResaleTransaction/GetAllResaleTransactionResponse.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/DTOs/Response/ResaleTransaction/ResaleTransactionGetResponse.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/Interfaces/Repositories/IManageUnitOfWork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Application/Interfaces/Repositories/IManageUnitOfWork.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/BookingDetail.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/BookingDetail.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/Resale.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Domain/Entities/ResaleTransaction.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/BookingService.Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/BookingService.Infrastructure.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Database/Migrations/20260309155136_Initial.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Database/Migrations/20260309155136_Initial.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Database/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Repositories/ManageUnitOfWork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Repositories/ManageUnitOfWork.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Services/MomoServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Implements/Services/MomoServices.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/ApplicationDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/ApplicationDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/BookingDetailConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/BookingDetailConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/ResaleConfiguration.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/BookingService/src/BookingService.Infrastructure/Persistence/Configurations/ResaleTransactionConfiguration.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TicketService/src/TicketService.Api/appsettings.json" afterDir="false" />
-    </list>
+    <list default="true" id="d4c6d972-96e0-401f-81e2-5436336b091f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -879,12 +838,23 @@
       <workItem from="1772976915695" duration="1140000" />
       <workItem from="1773071255577" duration="365000" />
     </task>
+    <task id="LOCAL-00001" summary="Optimize domain">
+      <option name="closed" value="true" />
+      <created>1773159687812</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1773159687812</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Optimize domain" />
+    <option name="LAST_COMMIT_MESSAGE" value="Optimize domain" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
