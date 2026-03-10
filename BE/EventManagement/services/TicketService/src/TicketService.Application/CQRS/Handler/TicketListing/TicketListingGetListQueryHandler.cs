@@ -57,7 +57,7 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                     {
                         Id = l.Ticket.Id.ToString(),
                     },
-                    SellerUserId = new TicketListingUserDTO
+                    SellerUser = new TicketListingUserDTO
                     {
                         Id = l.SellerUserId.ToString(),
                     },

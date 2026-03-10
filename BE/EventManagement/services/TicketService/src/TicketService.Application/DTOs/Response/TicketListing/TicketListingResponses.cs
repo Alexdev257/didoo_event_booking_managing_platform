@@ -2,7 +2,7 @@ using SharedContracts.Common.Wrappers;
 
 namespace TicketService.Application.DTOs.Response.TicketListing
 {
-    public class TicketListingCreateResponse : CommonResponse<TicketListingDTO> { }
+    public class TicketListingCreateResponse : CommonResponse<List<TicketListingDTO>> { }
     public class TicketListingGetByIdResponse : CommonResponse<object> { }
     public class TicketListingGetListResponse : CommonResponse<PaginationResponse<object>> { }
     public class TicketListingCancelResponse : CommonResponse<TicketListingDTO> { }
