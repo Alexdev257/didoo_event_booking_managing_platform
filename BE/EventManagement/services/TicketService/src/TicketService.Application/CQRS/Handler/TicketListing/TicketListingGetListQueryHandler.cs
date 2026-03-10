@@ -28,6 +28,9 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
             if (request.TicketId.HasValue && request.TicketId.Value != Guid.Empty)
                 listings = listings.Where(x => x.TicketId == request.TicketId.Value);
 
+            if(request.EventId.HasValue && request.EventId.Value != Guid.Empty)
+                listings = listings.Where(x => x.Ticket.EventId == request.EventId.Value);
+
             if (request.Status.HasValue)
                 listings = listings.Where(x => x.Status == request.Status.Value);
 
@@ -48,8 +51,20 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                 l => new TicketListingDTO
                 {
                     Id = l.Id.ToString(),
-                    TicketId = l.TicketId.ToString(),
-                    SellerUserId = l.SellerUserId.ToString(),
+                    //TicketId = l.TicketId.ToString(),
+                    //SellerUserId = l.SellerUserId.ToString(),
+                    Ticket = new TicketListingTicketDTO
+                    {
+                        Id = l.Ticket.Id.ToString(),
+                    },
+                    SellerUserId = new TicketListingUserDTO
+                    {
+                        Id = l.SellerUserId.ToString(),
+                    },
+                    Event = new TicketListingEventDTO
+                    {
+                        Id = l.Ticket.EventId.ToString(),
+                    },
                     AskingPrice = l.AskingPrice,
                     Description = l.Description,
                     Status = l.Status,
