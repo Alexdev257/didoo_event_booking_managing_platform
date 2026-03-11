@@ -64,6 +64,7 @@ namespace TicketService.Application.CQRS.Handler.TicketType
                 ticketType.Description = request.Description;
                 ticketType.TotalQuantity = request.TotalQuantity;
                 ticketType.AvailableQuantity = request.AvailableQuantity;
+                ticketType.MaxTicketsPerUser = request.MaxTicketsPerUser;
                 _unitOfWork.TicketTypes.UpdateAsync(ticketType);
                 await _unitOfWork.CommitTransactionAsync();
                 return new TicketTypeUpdateResponse
@@ -78,6 +79,7 @@ namespace TicketService.Application.CQRS.Handler.TicketType
                         TotalQuantity = ticketType.TotalQuantity,
                         AvailableQuantity = ticketType.AvailableQuantity,
                         Description = ticketType.Description,
+                        MaxTicketsPerUser = ticketType.MaxTicketsPerUser,
                         CreatedAt = ticketType.CreatedAt,
                         Event = new TicketTypeEventDTO
                         {

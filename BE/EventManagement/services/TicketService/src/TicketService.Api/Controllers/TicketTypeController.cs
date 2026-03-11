@@ -84,5 +84,14 @@ namespace TicketService.Api.Controllers
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
+
+        [HttpPatch("{id}/increment")]
+        public async Task<IActionResult> IncrementAvailabilityAsync([FromRoute] Guid id, [FromBody] TicketTypeIncrementCommand request)
+        {
+            request.Id = id;
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
     }
 }

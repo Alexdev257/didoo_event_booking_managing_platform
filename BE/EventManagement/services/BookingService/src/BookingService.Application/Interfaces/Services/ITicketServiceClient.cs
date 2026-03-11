@@ -6,6 +6,7 @@ namespace BookingService.Application.Interfaces.Services
         public string? Message { get; set; }
         public int RemainingQuantity { get; set; }
         public decimal PricePerTicket { get; set; }
+        public int? MaxTicketsPerUser { get; set; }
     }
 
     public class TicketListingValidateResult
@@ -39,5 +40,6 @@ namespace BookingService.Application.Interfaces.Services
         Task<TicketListingValidateResult> ValidateListingAsync(Guid listingId, CancellationToken cancellationToken = default);
         Task<bool> MarkListingSoldAsync(Guid listingId, Guid newOwnerUserId, CancellationToken cancellationToken = default);
         Task<BulkCreateTicketsResult> BulkCreateTicketsAsync(BulkCreateTicketsRequest bulkRequest, CancellationToken cancellationToken = default);
+        Task<bool> IncrementAsync(Guid ticketTypeId, int quantity, CancellationToken cancellationToken = default);
     }
 }

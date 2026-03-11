@@ -15,6 +15,7 @@ namespace TicketService.Application.DTOs.Response.TicketType
         public int? TotalQuantity { get; set; }
         public int? AvailableQuantity { get; set; }
         public string? Description { get; set; }
+        public int? MaxTicketsPerUser { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

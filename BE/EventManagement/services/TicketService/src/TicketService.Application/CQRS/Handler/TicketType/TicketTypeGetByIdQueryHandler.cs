@@ -65,6 +65,7 @@ namespace TicketService.Application.CQRS.Handler.TicketType
                     TotalQuantity = ticketType.TotalQuantity,
                     AvailableQuantity = ticketType.AvailableQuantity,
                     Description = ticketType.Description,
+                    MaxTicketsPerUser = ticketType.MaxTicketsPerUser,
                     CreatedAt = ticketType.CreatedAt,
                     Event = (request.HasEvent.HasValue && request.HasEvent.Value == true) ? new TicketTypeEventDTO
                     {

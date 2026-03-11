@@ -52,6 +52,7 @@ namespace TicketService.Application.CQRS.Handler.TicketType
                         TotalQuantity = item.TotalQuantity,
                         AvailableQuantity = item.AvailableQuantity,
                         Description = item.Description,
+                        MaxTicketsPerUser = item.MaxTicketsPerUser,
                         CreatedAt = DateTime.UtcNow,
                     };
 
@@ -66,6 +67,7 @@ namespace TicketService.Application.CQRS.Handler.TicketType
                         TotalQuantity = ticketType.TotalQuantity,
                         AvailableQuantity = ticketType.AvailableQuantity,
                         Description = ticketType.Description,
+                        MaxTicketsPerUser = ticketType.MaxTicketsPerUser,
                         CreatedAt = ticketType.CreatedAt,
                         Event = new TicketTypeEventDTO
                         {

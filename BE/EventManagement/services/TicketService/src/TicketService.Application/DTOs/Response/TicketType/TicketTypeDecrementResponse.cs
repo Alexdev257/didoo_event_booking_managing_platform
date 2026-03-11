@@ -12,5 +12,6 @@ namespace TicketService.Application.DTOs.Response.TicketType
         public string? Message { get; set; }
         public int RemainingQuantity { get; set; }
         public decimal PricePerTicket { get; set; }
+        public int? MaxTicketsPerUser { get; set; }
     }
 }
