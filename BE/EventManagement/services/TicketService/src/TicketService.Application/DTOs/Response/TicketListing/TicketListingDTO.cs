@@ -5,7 +5,7 @@ namespace TicketService.Application.DTOs.Response.TicketListing
     public class TicketListingDTO
     {
         public string Id { get; set; } = string.Empty;
-        public TicketListingTicketDTO? Ticket { get; set; }
+        public List<TicketListingTicketDTO>? Ticket { get; set; }
         public TicketListingUserDTO? SellerUser { get; set; }
         public TicketListingEventDTO? Event { get; set; }
         public decimal AskingPrice { get; set; }

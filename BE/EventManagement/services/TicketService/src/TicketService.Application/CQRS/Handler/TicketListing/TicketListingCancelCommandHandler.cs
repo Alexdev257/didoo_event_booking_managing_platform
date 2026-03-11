@@ -50,9 +50,12 @@ namespace TicketService.Application.CQRS.Handler.TicketListing
                 Data = new TicketListingDTO
                 {
                     Id = listing.Id.ToString(),
-                    Ticket = new TicketListingTicketDTO
+                    Ticket = new List<TicketListingTicketDTO>
                     {
-                        Id = listing.TicketId.ToString(),
+                        new TicketListingTicketDTO
+                        {
+                            Id = listing.TicketId.ToString(),
+                        },
                     },
                     SellerUser = new TicketListingUserDTO
                     {
