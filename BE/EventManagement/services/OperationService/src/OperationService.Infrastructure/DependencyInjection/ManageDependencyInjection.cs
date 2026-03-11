@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using OperationService.Application.Interfaces.Repositories;
 using OperationService.Infrastructure.Implements.Repositories;
+using OperationService.Infrastructure.MessageConsumers;
 using OperationService.Infrastructure.Persistence;
 using SharedContracts.Common.Wrappers;
 using SharedInfrastructure.Bus;
@@ -33,7 +34,8 @@ namespace OperationService.Infrastructure.DependencyInjection
             services.AddAuthorizationRole();
             services.AddSharedSwaggerGen("Operation Service API");
 
-            //services.AddMessageBus(configuration);
+            services.AddMessageBus(configuration, typeof(BookingSuccessEventConsumer).Assembly);
+            
             return services;
         }
 

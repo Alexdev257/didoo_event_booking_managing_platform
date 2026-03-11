@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using OperationService.Api.Hubs;
+using OperationService.Api.SignalRServices;
+using OperationService.Application.Interfaces.SignalRServices;
 using OperationService.Infrastructure.DependencyInjection;
 using OperationService.Infrastructure.Persistence;
 using SharedInfrastructure;
@@ -12,8 +15,35 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SignalRPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+var redisConnection = builder.Configuration.GetConnectionString("Redis");
+if (!string.IsNullOrEmpty(redisConnection))
+{
+    builder.Services.AddSignalR()
+        .AddStackExchangeRedis(redisConnection, options =>
+        {
+            options.Configuration.ChannelPrefix = "OperationService_SignalR";
+        });
+}
+else
+{
+    builder.Services.AddSignalR();
+}
+
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddOperationServiceInfrastructure(builder.Configuration);
+
+builder.Services.AddScoped<INotificationHubService, NotificationHubService>();
 
 var app = builder.Build();
 
@@ -49,10 +79,13 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
+app.UseCors("SignalRPolicy");
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<NotificationHub>("/hubs/notification");
 
 app.MapControllers();
 

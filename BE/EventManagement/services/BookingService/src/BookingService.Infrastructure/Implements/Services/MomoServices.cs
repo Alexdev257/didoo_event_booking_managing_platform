@@ -9,6 +9,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using SharedContracts.Events;
+using SharedContracts.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -19,12 +21,14 @@ namespace BookingService.Infrastructure.Implements.Services
         private readonly IOptions<MomoConfig> _momoConfig;
         private readonly IManageUnitOfWork _unitOfWork;
         private readonly ITicketServiceClient _ticketServiceClient;
+        private readonly IMessageProducer _messageProducer;
 
-        public MomoServices(IOptions<MomoConfig> momoConfig, IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient)
+        public MomoServices(IOptions<MomoConfig> momoConfig, IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMessageProducer messageProducer)
         {
             _momoConfig = momoConfig;
             _unitOfWork = unitOfWork;
             _ticketServiceClient = ticketServiceClient;
+            _messageProducer = messageProducer;
         }
 
         public async Task<string> CreatePaymentURL(OrderInfoModel orderInfo, HttpContext context)
@@ -148,6 +152,38 @@ namespace BookingService.Infrastructure.Implements.Services
             }
 
             await _unitOfWork.SaveChangesAsync();
+
+            // Publish notification events after successful payment
+            if (message.ToString().ToLower() == "success" && booking != null)
+            {
+                if (booking.BookingType == BookingTypeEnum.TradePurchase)
+                {
+                    // Trade/Resale booking: parse resaleId from extraData
+                    var resaleParts = extraData.Split('|');
+                    var resaleId = resaleParts.Length == 2 && Guid.TryParse(resaleParts[1], out var rid) ? rid : Guid.Empty;
+
+                    await _messageProducer.PublishAsync(new TicketResaleSuccessNotificationEvent
+                    {
+                        SellerUserId = Guid.Empty, // Seller info not available here
+                        BuyerUserId = booking.UserId,
+                        ResaleId = resaleId,
+                        EventId = booking.EventId,
+                        EventName = "",
+                        SoldPrice = booking.TotalPrice
+                    });
+                }
+                else
+                {
+                    // Normal booking
+                    await _messageProducer.PublishAsync(new BookingSuccessNotificationEvent
+                    {
+                        UserId = booking.UserId,
+                        BookingId = booking.Id,
+                        EventId = booking.EventId,
+                        EventName = ""
+                    });
+                }
+            }
 
             return await Task.FromResult(new RespondModel()
             {

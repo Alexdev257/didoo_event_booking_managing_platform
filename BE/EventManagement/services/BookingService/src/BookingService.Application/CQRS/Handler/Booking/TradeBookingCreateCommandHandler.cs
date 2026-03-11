@@ -6,6 +6,8 @@ using BookingService.Application.Interfaces.Services;
 using BookingService.Domain.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SharedContracts.Events;
+using SharedContracts.Interfaces;
 using BookingDetailEntity = BookingService.Domain.Entities.BookingDetail;
 using BookingEntity = BookingService.Domain.Entities.Booking;
 
@@ -16,15 +18,18 @@ namespace BookingService.Application.CQRS.Handler.Booking
         private readonly IManageUnitOfWork _unitOfWork;
         private readonly ITicketServiceClient _ticketServiceClient;
         private readonly IMomoService _momoService;
+        private readonly IMessageProducer _messageProducer;
 
         public TradeBookingCreateCommandHandler(
             IManageUnitOfWork unitOfWork,
             ITicketServiceClient ticketServiceClient,
-            IMomoService momoService)
+            IMomoService momoService,
+            IMessageProducer messageProducer)
         {
             _unitOfWork = unitOfWork;
             _ticketServiceClient = ticketServiceClient;
             _momoService = momoService;
+            _messageProducer = messageProducer;
         }
 
         public async Task<CreateBookingResponse> Handle(TradeBookingCreateCommand request, CancellationToken cancellationToken)
@@ -156,6 +161,17 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 _unitOfWork.Bookings.UpdateAsync(booking);
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                // Publish notification event for free trade
+                await _messageProducer.PublishAsync(new TicketResaleSuccessNotificationEvent
+                {
+                    SellerUserId = Guid.Empty, // Seller info not available here
+                    BuyerUserId = request.BuyerUserId,
+                    ResaleId = request.ListingId,
+                    EventId = eventId,
+                    EventName = "",
+                    SoldPrice = price
+                }, cancellationToken);
             }
 
             return new CreateBookingResponse

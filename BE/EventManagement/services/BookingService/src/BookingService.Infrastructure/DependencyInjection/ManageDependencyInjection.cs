@@ -37,7 +37,7 @@ namespace BookingService.Infrastructure.DependencyInjection
             services.AddAuthorizationRole();
             services.AddSharedSwaggerGen("Booking Service API");
             services.Configure<MomoConfig>(configuration.GetSection("MomoAPI"));
-            //services.AddMessageBus(configuration);
+            services.AddMessageBus(configuration);
             return services;
         }
 

@@ -6,6 +6,8 @@ using BookingService.Application.Interfaces.Services;
 using BookingService.Domain.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SharedContracts.Events;
+using SharedContracts.Interfaces;
 using BookingDetailEntity = BookingService.Domain.Entities.BookingDetail;
 using BookingEntity = BookingService.Domain.Entities.Booking;
 
@@ -16,12 +18,14 @@ namespace BookingService.Application.CQRS.Handler.Booking
         private readonly IManageUnitOfWork _unitOfWork;
         private readonly ITicketServiceClient _ticketServiceClient;
         private readonly IMomoService _momoService;
+        private readonly IMessageProducer _messageProducer;
 
-        public BookingCreateCommandHandler(IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMomoService momoService)
+        public BookingCreateCommandHandler(IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMomoService momoService, IMessageProducer messageProducer)
         {
             _unitOfWork = unitOfWork;
             _ticketServiceClient = ticketServiceClient;
             _momoService = momoService;
+            _messageProducer = messageProducer;
         }
 
         public async Task<CreateBookingResponse> Handle(BookingCreateCommand request, CancellationToken cancellationToken)
@@ -172,6 +176,15 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                // Publish notification event for free booking
+                await _messageProducer.PublishAsync(new BookingSuccessNotificationEvent
+                {
+                    UserId = request.UserId,
+                    BookingId = booking.Id,
+                    EventId = request.EventId,
+                    EventName = ""
+                }, cancellationToken);
             }
 
             BookingDTO dto = new BookingDTO

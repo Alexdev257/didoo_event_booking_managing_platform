@@ -13,6 +13,8 @@ using SharedInfrastructure.Swagger;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using EventService.Infrastructure.BackgroundJobs;
+using SharedContracts.Common.Wrappers;
 
 namespace EventService.Infrastructure.DependencyInjection
 {
@@ -29,6 +31,10 @@ namespace EventService.Infrastructure.DependencyInjection
             services.AddAuthorizationRole();
             services.AddSharedSwaggerGen("Event Service API");
             services.AddMessageBus(configuration);
+            
+            // Đăng ký Background Service chạy CronJob
+            services.AddHostedService<EventStatusUpdateBackgroundService>();
+            
             return services;        
         }
 

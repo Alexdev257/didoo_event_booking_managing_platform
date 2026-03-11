@@ -3,6 +3,8 @@ using EventService.Application.DTOs.Response.Organizer;
 using EventService.Application.Interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedContracts.Events;
+using SharedContracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +16,11 @@ namespace EventService.Application.CQRS.Handler.Organizer
     public class OrganizerVerifyCommandHandler : IRequestHandler<OrganizerVerifyCommand, OrganizerVerifyResponse>
     {
         private readonly IEventUnitOfWork _unitOfWork;
-        public OrganizerVerifyCommandHandler(IEventUnitOfWork unitOfWork)
+        private readonly IMessageProducer _messageProducer;
+        public OrganizerVerifyCommandHandler(IEventUnitOfWork unitOfWork, IMessageProducer messageProducer)
         { 
             _unitOfWork = unitOfWork;
+            _messageProducer = messageProducer;
         }
         public async Task<OrganizerVerifyResponse> Handle(OrganizerVerifyCommand request, CancellationToken cancellationToken)
         {
@@ -74,6 +78,14 @@ namespace EventService.Application.CQRS.Handler.Organizer
                 organizer.Status = Domain.Enum.OrganizerStatusEnum.Verified;
                 _unitOfWork.Organizers.UpdateAsync(organizer);
                 await _unitOfWork.CommitTransactionAsync();
+
+                // Publish notification event
+                await _messageProducer.PublishAsync(new OrganizerVerifiedNotificationEvent
+                {
+                    OrganizerId = organizer.Id,
+                    UserId = organizer.CreatedBy ?? Guid.Empty,
+                    OrganizerName = organizer.Name ?? string.Empty
+                }, cancellationToken);
                 return new OrganizerVerifyResponse
                 {
                     IsSuccess = true,
