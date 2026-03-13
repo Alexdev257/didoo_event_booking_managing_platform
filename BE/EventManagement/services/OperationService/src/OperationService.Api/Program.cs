@@ -15,16 +15,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("SignalRPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
 
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
 if (!string.IsNullOrEmpty(redisConnection))
@@ -45,7 +35,28 @@ builder.Services.AddOperationServiceInfrastructure(builder.Configuration);
 
 builder.Services.AddScoped<INotificationHubService, NotificationHubService>();
 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+builder.Services.AddGrpc();
+builder.Services.AddGrpcClient<SharedContracts.Protos.AuthGrpc.AuthGrpcClient>(o =>
+{
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__AuthServiceUrl") 
+              ?? builder.Configuration["GrpcSettings:AuthServiceUrl"] 
+              ?? "http://auth-service:80";
+    Console.WriteLine($"--> OperationService connecting to AuthGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
+builder.Services.AddGrpcClient<SharedContracts.Protos.EventGrpc.EventGrpcClient>(o =>
+{
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__EventServiceUrl") 
+              ?? builder.Configuration["GrpcSettings:EventServiceUrl"] 
+              ?? "http://event-service:80";
+    Console.WriteLine($"--> OperationService connecting to EventGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
 var app = builder.Build();
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -79,7 +90,7 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-app.UseCors("SignalRPolicy");
+
 app.UseCors("AllowAll");
 
 app.UseAuthentication();

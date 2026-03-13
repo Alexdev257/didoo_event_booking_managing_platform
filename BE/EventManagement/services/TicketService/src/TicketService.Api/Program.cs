@@ -36,13 +36,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("SignalRPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000") // Thay b?ng URL Frontend c?a b?n
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // B?t bu?c ph?i c� d�ng n�y cho SignalR
-    });
+    
 });
 
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
@@ -137,7 +131,7 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-app.UseCors("SignalRPolicy");
+
 app.UseCors("AllowAll");
 
 app.MapHub<TicketHub>("/hubs/ticket");

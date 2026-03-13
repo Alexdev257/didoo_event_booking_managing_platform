@@ -53,8 +53,9 @@ namespace OperationService.Infrastructure.DependencyInjection
         private static void AddScopedInterface(this IServiceCollection service)
         {
             service.AddScoped<IOperationUnitOfWork, UnitOfWork>();
-
+            service.AddScoped<OperationService.Application.Interfaces.Services.IExternalGrpcService, OperationService.Infrastructure.Services.ExternalGrpcService>();
         }
+
 
         private static void AddMediatRInfrastructure(this IServiceCollection service, IConfiguration config)
         {
@@ -71,9 +72,10 @@ namespace OperationService.Infrastructure.DependencyInjection
             service.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
-                    policy => policy.AllowAnyOrigin()
+                    policy => policy.SetIsOriginAllowed(origin => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
             });
         }
 

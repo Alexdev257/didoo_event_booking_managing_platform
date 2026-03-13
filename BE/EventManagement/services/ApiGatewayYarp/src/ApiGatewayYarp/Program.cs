@@ -2,12 +2,12 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. C?u hÏnh CORS (Ch? khai b·o 1 l?n duy nh?t ? ?‚y)
+// 1. C?u h√¨nh CORS (Ch? khai b√°o 1 l?n duy nh?t ? ?√¢y)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // URL Frontend
+        policy.SetIsOriginAllowed(_ => true) // Cho ph√©p t?t c? Frontend
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials(); // B?t bu?c cho SignalR
@@ -20,10 +20,10 @@ builder.Services.AddReverseProxy()
 
 builder.Services.AddEndpointsApiExplorer();
 
-// 3. Add Swagger Gen (G?P T?T C? V¿O ?¬Y)
+// 3. Add Swagger Gen (G?P T?T C? V√ÄO ?√ÇY)
 builder.Services.AddSwaggerGen(c =>
 {
-    // --- KHAI B¡O C¡C DOCUMENT ---
+    // --- KHAI B√ÅO C√ÅC DOCUMENT ---
     c.SwaggerDoc("auth", new OpenApiInfo { Title = "Auth Service API", Version = "v1" });
     c.SwaggerDoc("events", new OpenApiInfo { Title = "Event Service API", Version = "v1" });
     c.SwaggerDoc("tickets", new OpenApiInfo { Title = "Ticket Service API", Version = "v1" });
@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("resales", new OpenApiInfo { Title = "Resale Service API", Version = "v1" });
     c.SwaggerDoc("operation", new OpenApiInfo { Title = "Operations Service API", Version = "v1" });
 
-    // --- C?U HÃNH SECURITY (AUTHORIZE BUTTON) ---
+    // --- C?U H√åNH SECURITY (AUTHORIZE BUTTON) ---
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Nh?p token theo ??nh d?ng: Bearer {token}",
@@ -58,7 +58,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // Fix l?i tr˘ng tÍn Schema n?u cÛ
+    // Fix l?i tr√πng t√™n Schema n?u c√≥
     c.CustomSchemaIds(type => type.FullName);
 });
 
@@ -70,7 +70,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        // Khai b·o Endpoint ?? UI bi?t load file JSON n‡o
+        // Khai b√°o Endpoint ?? UI bi?t load file JSON n√†o
         options.SwaggerEndpoint("/auth-service/swagger/v1/swagger.json", "Auth Service API");
         options.SwaggerEndpoint("/event-service/swagger/v1/swagger.json", "Event Service API");
         options.SwaggerEndpoint("/ticket-service/swagger/v1/swagger.json", "Tickets Service API");
@@ -79,18 +79,18 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/operation-service/swagger/v1/swagger.json", "Operations Service API");
         options.SwaggerEndpoint("/resale-service/swagger/v1/swagger.json", "Resales Service API");
 
-        // T?t highlight code ?? load nhanh h?n (t˘y ch?n)
+        // T?t highlight code ?? load nhanh h?n (t√πy ch?n)
         options.ConfigObject.AdditionalItems["syntaxHighlight"] = false;
     });
 }
 
-// KÌch ho?t WebSockets cho SignalR
+// K√≠ch ho?t WebSockets cho SignalR
 app.UseWebSockets();
 
-// KÌch ho?t CORS
+// K√≠ch ho?t CORS
 app.UseCors("AllowAll");
 
-// KÌch ho?t YARP
+// K√≠ch ho?t YARP
 app.MapReverseProxy();
 
 app.Run();
