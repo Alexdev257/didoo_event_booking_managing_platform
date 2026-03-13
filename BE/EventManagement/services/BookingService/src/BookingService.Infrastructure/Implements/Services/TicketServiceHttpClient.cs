@@ -60,7 +60,8 @@ namespace BookingService.Infrastructure.Implements.Services
                 IsAvailable = raw.Data.IsAvailable,
                 Message = raw.Data.Message,
                 RemainingQuantity = raw.Data.RemainingQuantity,
-                PricePerTicket = raw.Data.PricePerTicket
+                PricePerTicket = raw.Data.PricePerTicket,
+                MaxTicketsPerUser = raw.Data.MaxTicketsPerUser
             };
         }
 
@@ -144,6 +145,15 @@ namespace BookingService.Infrastructure.Implements.Services
             };
         }
 
+        public async Task<bool> IncrementAsync(Guid ticketTypeId, int quantity, CancellationToken cancellationToken = default)
+        {
+            var body = JsonSerializer.Serialize(new { quantity });
+            var content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PatchAsync($"/api/tickettypes/{ticketTypeId}/increment", content, cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
+
         // Internal DTOs matching TicketService response shapes
         private class TicketDecrementHttpResponse
         {
@@ -158,6 +168,7 @@ namespace BookingService.Infrastructure.Implements.Services
             [JsonPropertyName("message")] public string? Message { get; set; }
             [JsonPropertyName("remainingQuantity")] public int RemainingQuantity { get; set; }
             [JsonPropertyName("pricePerTicket")] public decimal PricePerTicket { get; set; }
+            [JsonPropertyName("maxTicketsPerUser")] public int? MaxTicketsPerUser { get; set; }
         }
 
         private class TicketListingValidateHttpResponse

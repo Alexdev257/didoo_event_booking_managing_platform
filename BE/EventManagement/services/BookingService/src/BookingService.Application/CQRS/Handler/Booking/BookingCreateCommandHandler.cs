@@ -54,6 +54,31 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 };
             }
 
+            // 1b. Check per-user ticket limit
+            if (ticketResult.MaxTicketsPerUser.HasValue)
+            {
+                var existingBookings = _unitOfWork.Bookings
+                    .FindAsync(b => b.UserId == request.UserId
+                                 && b.EventId == request.EventId
+                                 && b.Status != BookingStatusEnum.Canceled
+                                 && !b.IsDeleted);
+
+                int totalBooked = existingBookings.Sum(b => b.Amount);
+                int maxAllowed = ticketResult.MaxTicketsPerUser.Value;
+
+                if (totalBooked + request.Quantity > maxAllowed)
+                {
+                    // Rollback: increment lại số vé đã decrement
+                    await _ticketServiceClient.IncrementAsync(request.TicketTypeId, request.Quantity, cancellationToken);
+
+                    int remaining = maxAllowed - totalBooked;
+                    return new CreateBookingResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Bạn đã đặt {totalBooked}/{maxAllowed} vé cho sự kiện này. Bạn chỉ có thể đặt thêm tối đa {(remaining > 0 ? remaining : 0)} vé."
+                    };
+                }
+            }
             // 2. Create booking
             decimal pricePerTicket = ticketResult.PricePerTicket;
             decimal totalPrice = pricePerTicket * request.Quantity;

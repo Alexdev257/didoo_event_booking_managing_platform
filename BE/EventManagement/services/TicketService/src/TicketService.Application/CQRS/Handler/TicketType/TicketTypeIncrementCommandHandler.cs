@@ -5,16 +5,16 @@ using TicketService.Application.Interfaces.Repositories;
 
 namespace TicketService.Application.CQRS.Handler.TicketType
 {
-    public class TicketTypeDecrementCommandHandler : IRequestHandler<TicketTypeDecrementCommand, TicketTypeDecrementResponse>
+    public class TicketTypeIncrementCommandHandler : IRequestHandler<TicketTypeIncrementCommand, TicketTypeDecrementResponse>
     {
         private readonly ITicketUnitOfWork _unitOfWork;
 
-        public TicketTypeDecrementCommandHandler(ITicketUnitOfWork unitOfWork)
+        public TicketTypeIncrementCommandHandler(ITicketUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<TicketTypeDecrementResponse> Handle(TicketTypeDecrementCommand request, CancellationToken cancellationToken)
+        public async Task<TicketTypeDecrementResponse> Handle(TicketTypeIncrementCommand request, CancellationToken cancellationToken)
         {
             var ticketType = await _unitOfWork.TicketTypes.GetByIdAsync(request.Id);
             if (ticketType == null || ticketType.IsDeleted)
@@ -28,31 +28,19 @@ namespace TicketService.Application.CQRS.Handler.TicketType
             }
 
             int available = ticketType.AvailableQuantity ?? 0;
-            if (available < request.Quantity)
-            {
-                return new TicketTypeDecrementResponse
-                {
-                    IsSuccess = false,
-                    Message = $"Not enough tickets available. Remaining: {available}",
-                    Data = new TicketTypeDecrementDTO
-                    {
-                        IsAvailable = false,
-                        Message = $"Not enough tickets available. Remaining: {available}",
-                        RemainingQuantity = available,
-                        PricePerTicket = ticketType.Price ?? 0,
-                        MaxTicketsPerUser = ticketType.MaxTicketsPerUser
-                    }
-                };
-            }
+            int total = ticketType.TotalQuantity ?? 0;
 
-            ticketType.AvailableQuantity = available - request.Quantity;
+            // Không cho increment vượt quá TotalQuantity
+            int newAvailable = Math.Min(available + request.Quantity, total);
+
+            ticketType.AvailableQuantity = newAvailable;
             _unitOfWork.TicketTypes.UpdateAsync(ticketType);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new TicketTypeDecrementResponse
             {
                 IsSuccess = true,
-                Message = "Availability decremented successfully",
+                Message = "Availability incremented successfully",
                 Data = new TicketTypeDecrementDTO
                 {
                     IsAvailable = true,

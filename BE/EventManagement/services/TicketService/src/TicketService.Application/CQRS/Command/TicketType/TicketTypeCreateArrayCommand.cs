@@ -21,5 +21,6 @@ namespace TicketService.Application.CQRS.Command.TicketType
         public int? TotalQuantity { get; set; }
         public int? AvailableQuantity { get; set; }
         public string? Description { get; set; }
+        public int? MaxTicketsPerUser { get; set; }
     }
 }

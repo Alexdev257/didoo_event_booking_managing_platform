@@ -15,6 +15,7 @@ namespace TicketService.Domain.Entities
         public int? TotalQuantity { get; set; }
         public int? AvailableQuantity { get; set; }
         public string? Description { get; set; }
+        public int? MaxTicketsPerUser { get; set; } // null = không giới hạn
         public virtual ICollection<Seat> Seats { get; set; } = new List<Seat>();
         public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
