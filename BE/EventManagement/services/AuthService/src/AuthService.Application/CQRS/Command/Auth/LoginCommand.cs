@@ -63,7 +63,7 @@ namespace AuthService.Application.CQRS.Command.Auth
                     Field = "Password",
                     Detail = "Password must contain at least 1 digit!"
                 });
-            if (!Regex.IsMatch(Password, @"^(?=.*[!@#$%^&*(),.?"":{}|<>]).+$"))
+            if (!Regex.IsMatch(Password, @"^(?=.*[!@#$%^&*(),.?"":{}|_<>]).+$"))
                 response.ListErrors.Add(new Errors
                 {
                     Field = "Password",
