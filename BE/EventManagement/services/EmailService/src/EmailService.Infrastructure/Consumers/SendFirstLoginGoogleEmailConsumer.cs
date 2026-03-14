@@ -42,9 +42,6 @@ namespace EmailService.Infrastructure.Consumers
                           Bạn đã <b>đăng nhập lần đầu tiên</b> vào hệ thống bằng tài khoản
                           <b>Google</b>.
                         </p>
-                        <p>
-                          Mật khẩu mặc định của bạn là : <b>{msg.BasePassword}</b>
-                        </p>
 
                         <div style='background:#f0f4f8; padding:15px; border-radius:6px; margin:20px 0'>
                           <p style='margin:0'><b>Thời gian đăng nhập:</b> {msg.LoginAt:dd/MM/yyyy HH:mm}</p>
