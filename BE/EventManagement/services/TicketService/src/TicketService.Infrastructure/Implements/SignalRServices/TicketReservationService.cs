@@ -54,10 +54,14 @@ namespace TicketService.Infrastructure.Implements.SignalRServices
                     using var scope = _scopeFactory.CreateScope();
                     var unitOfWork = scope.ServiceProvider.GetRequiredService<ITicketUnitOfWork>();
                     
-                    // We calculate available by finding total tickets with status Available
-                    var availableInDb = await unitOfWork.Tickets
-                        .GetAllAsync()
-                        .CountAsync(x => x.TicketTypeId == ticketTypeId && x.Status == Domain.Enum.TicketStatusEnum.Available);
+
+                    // // We calculate available by finding total tickets with status Available
+                    // var availableInDb = await unitOfWork.Tickets
+                    //     .GetAllAsync()
+                    //     .CountAsync(x => x.TicketTypeId == ticketTypeId && x.Status == Domain.Enum.TicketStatusEnum.Available);
+                    // Get AvailableQuantity from TicketType instead of counting physical tickets
+                    var ticketType = await unitOfWork.TicketTypes.GetByIdAsync(ticketTypeId);
+                    var availableInDb = ticketType?.AvailableQuantity ?? 0;
                         
                     currentAvailableDb = availableInDb;
                     _ticketTypeAvailability[ticketTypeId] = currentAvailableDb;
@@ -192,9 +196,8 @@ namespace TicketService.Infrastructure.Implements.SignalRServices
                 // Not in memory, check DB
                 using var scope = _scopeFactory.CreateScope();
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<ITicketUnitOfWork>();
-                var availableInDb = await unitOfWork.Tickets
-                    .GetAllAsync()
-                    .CountAsync(x => x.TicketTypeId == ticketTypeId && x.Status == Domain.Enum.TicketStatusEnum.Available);
+                var ticketType = await unitOfWork.TicketTypes.GetByIdAsync(ticketTypeId);
+                var availableInDb = ticketType?.AvailableQuantity ?? 0;
                 
                 _ticketTypeAvailability[ticketTypeId] = availableInDb;
                 return availableInDb;

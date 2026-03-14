@@ -1,4 +1,4 @@
-﻿using EventService.Application.CQRS.Command.Event;
+using EventService.Application.CQRS.Command.Event;
 using EventService.Application.CQRS.Query.Event;
 using EventService.Application.DTOs.Response.Event;
 using EventService.Application.Interfaces.Repositories;
