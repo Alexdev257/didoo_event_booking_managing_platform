@@ -32,7 +32,7 @@ namespace AuthService.Infrastructure.DependencyInjection
         public static IServiceCollection AddAuthServiceInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDatabase(configuration);
-            services.AddScopedInterface();
+            services.AddScopedInterface(configuration);
             services.AddMediatRInfrastructure(configuration);
             services.AddCorsExtentions();
             services.AddJwtAuthentication(configuration);
@@ -54,13 +54,26 @@ namespace AuthService.Infrastructure.DependencyInjection
             services.AddScoped<DbContext>(provider => provider.GetService<ApplicationDbContext>()!);
         }
 
-        private static void AddScopedInterface(this IServiceCollection service)
+        private static void AddScopedInterface(this IServiceCollection service, IConfiguration configuration)
         {
             service.AddScoped<IAuthUnitOfWork, UnitOfWork>();
             service.AddScoped<IJwtHelper, JwtHelper>();
             service.AddScoped<IBcryptHelper, BcryptHelper>();
             service.AddScoped<IGoolgeOAuthHelper, GoogleOAuthHelper>();
 
+            service.AddGrpcClient<SharedContracts.Protos.EventGrpc.EventGrpcClient>(o =>
+            {
+                var url = Environment.GetEnvironmentVariable("GrpcSettings__EventServiceUrl");
+                if (string.IsNullOrEmpty(url))
+                {
+                    url = configuration["GrpcSettings:EventServiceUrl"];
+                }
+                if (string.IsNullOrEmpty(url))
+                {
+                    url = "http://event-service:81";
+                }
+                o.Address = new Uri(url);
+            });
         }
 
         private static void AddMediatRInfrastructure(this IServiceCollection service, IConfiguration config)

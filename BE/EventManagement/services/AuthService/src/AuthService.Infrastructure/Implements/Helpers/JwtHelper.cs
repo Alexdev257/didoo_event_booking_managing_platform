@@ -16,13 +16,15 @@ namespace AuthService.Infrastructure.Implements.Helpers
     public class JwtHelper : IJwtHelper
     {
         private readonly IConfiguration _configuration;
+        private readonly SharedContracts.Protos.EventGrpc.EventGrpcClient _eventGrpcClient;
 
-        public JwtHelper(IConfiguration configuration)
+        public JwtHelper(IConfiguration configuration, SharedContracts.Protos.EventGrpc.EventGrpcClient eventGrpcClient)
         {
             _configuration = configuration;
+            _eventGrpcClient = eventGrpcClient;
         }
 
-        public string GenerateAccessToken(User user)
+        public async Task<string> GenerateAccessToken(User user)
         {
             var SecretKey = _configuration["JwtSettings:SecretKey"];
             var Issuer = _configuration["JwtSettings:Issuer"];
@@ -30,6 +32,29 @@ namespace AuthService.Infrastructure.Implements.Helpers
 
             var Key = Encoding.UTF8.GetBytes(SecretKey);
             var TokenHandler = new JwtSecurityTokenHandler();
+
+            bool isVerifiedOrganizer = false;
+            if (user.OrganizerId.HasValue)
+            {
+                try
+                {
+                    var response = await _eventGrpcClient.GetOrganizerStatusAsync(new SharedContracts.Protos.OrganizerStatusRequest
+                    {
+                        OrganizerId = user.OrganizerId.ToString()
+                    });
+
+                    // Consider verified if is_verified is true and status is Verified (2)
+                    Console.WriteLine($"---------------------------------------------IsVerified: {response.IsVerified}");
+                    Console.WriteLine($"---------------------------------------------Status: {response.Status}");
+                    isVerifiedOrganizer = response.IsVerified && response.Status == 2;
+                }
+                catch (Exception ex)
+                {
+                    // Log error if needed, for now assume false
+                    Console.WriteLine($"Error calling gRPC: {ex.Message}");
+                    isVerifiedOrganizer = false;
+                }
+            }
 
             var TokenDescriptor = new SecurityTokenDescriptor
             {
@@ -42,8 +67,7 @@ namespace AuthService.Infrastructure.Implements.Helpers
                 new Claim("FullName", user.FullName),
                 new Claim("Email", user.Email),
                 new Claim("Role", ((int)user.Role.Name).ToString()),
-                new Claim("IsOrganizer", (user.OrganizerId.HasValue).ToString().ToLower())
-                //new Claim("Role", user.Role.RoleName.ToString().ToLower()),
+                new Claim("IsOrganizer", isVerifiedOrganizer.ToString().ToLower())
             }),
 
                 // expire in 1 hours

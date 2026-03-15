@@ -1,4 +1,4 @@
-﻿using AuthService.Application.CQRS.Command.Auth;
+using AuthService.Application.CQRS.Command.Auth;
 using AuthService.Application.DTOs.Response.Auth;
 using AuthService.Application.Interfaces.Helpers;
 using AuthService.Application.Interfaces.Repositories;
@@ -90,7 +90,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     await _unitOfWork.UserLocations.AddAsync(location);
                     await _unitOfWork.CommitTransactionAsync();
                     await _messageProducer.PublishAsync<SendFirstLoginGoogleEmailEvent>(new SendFirstLoginGoogleEmailEvent(validatedResult.Email, basePassword, validatedResult.Name, DateTime.UtcNow), cancellationToken);
-                    var accessToken = _jwtHelper.GenerateAccessToken(user);
+                    var accessToken = await _jwtHelper.GenerateAccessToken(user);
                     var refreshToken = _jwtHelper.GenerateRefreshToken();
                     await _cacheService.SetAsync<string>($"RT_{user.Id}", refreshToken, TimeSpan.FromDays(7), cancellationToken);
                     return new LoginGoogleResponse
@@ -130,7 +130,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     await _unitOfWork.BeginTransactionAsync();
                     await _unitOfWork.UserLocations.AddAsync(location);
                     await _unitOfWork.CommitTransactionAsync();
-                    var accessToken = _jwtHelper.GenerateAccessToken(user);
+                    var accessToken = await _jwtHelper.GenerateAccessToken(user);
                     var refreshToken = _jwtHelper.GenerateRefreshToken();
                     await _cacheService.SetAsync<string>($"RT_{user.Id}", refreshToken, TimeSpan.FromDays(7), cancellationToken);
                     return new LoginGoogleResponse

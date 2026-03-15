@@ -1,4 +1,4 @@
-﻿syntax = "proto3";
+syntax = "proto3";
 
 option csharp_namespace = "SharedContracts.Protos";
 
@@ -8,6 +8,7 @@ import "google/protobuf/timestamp.proto";
 
 service EventGrpc {
   rpc GetEventDetail (EventRequest) returns (EventResponse);
+  rpc GetOrganizerStatus (OrganizerStatusRequest) returns (OrganizerStatusResponse);
 }
 
 message EventRequest {
@@ -36,4 +37,13 @@ message EventResponse {
   string thumbnail_url = 12;
   string banner_url = 13;
   int32 age_restriction = 14;
+}
+
+message OrganizerStatusRequest {
+  string organizer_id = 1;
+}
+
+message OrganizerStatusResponse {
+  bool is_verified = 1;
+  int32 status = 2;
 }

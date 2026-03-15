@@ -41,7 +41,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     Message = "RefreshToken is used or expired!"
                 };
             var user = await _unitOfWork.Users.GetAllAsync().Include(x => x.Role).FirstOrDefaultAsync(x => x.Id == Guid.Parse(request.Id));
-            var newAccessToken = _jwtHelper.GenerateAccessToken(user!);
+            var newAccessToken = await _jwtHelper.GenerateAccessToken(user!);
             var newRefreshToken = _jwtHelper.GenerateRefreshToken();
             await _cacheService.RemoveAsync($"RT_{request.Id}");
             await _cacheService.SetAsync($"RT_{request.Id}", newRefreshToken);

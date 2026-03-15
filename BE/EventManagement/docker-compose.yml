@@ -72,6 +72,7 @@ services:
       Jwt__Key: xynbqiydczvhbcomoewzcldjrqnwrwii
       Jwt__Issuer: https://localhost
       Jwt__Audience: https://localhost
+      GrpcSettings__EventServiceUrl: http://event-service:81
     ports:
       - "6002:80"
       - "6004:81"

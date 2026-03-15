@@ -7,6 +7,8 @@ using SharedInfrastructure;
 using SharedInfrastructure.Bus;
 using SharedInfrastructure.Swagger;
 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options =>
 {

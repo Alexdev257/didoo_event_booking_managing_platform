@@ -1,4 +1,4 @@
-﻿using AuthService.Application.CQRS.Command.Auth;
+using AuthService.Application.CQRS.Command.Auth;
 using AuthService.Application.DTOs.Response.Auth;
 using AuthService.Application.Interfaces.Helpers;
 using AuthService.Application.Interfaces.Repositories;
@@ -50,7 +50,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
                 };
             }
 
-            var accessToken = _jwtHelper.GenerateAccessToken(user);
+            var accessToken = await _jwtHelper.GenerateAccessToken(user);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
             await _cacheService.SetAsync<string>($"RT_{user.Id}", refreshToken, TimeSpan.FromDays(7), cancellationToken);
             var location = new UserLocation
