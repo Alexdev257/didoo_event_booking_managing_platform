@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using SharedInfrastructure.Services;
@@ -40,14 +40,13 @@ namespace SharedInfrastructure.Persistence.Interceptors
                 if (entry.State == EntityState.Added)
                 {
                     entry.Entity.CreatedAt = DateTime.UtcNow;
-                    if (!Guid.TryParse(_currentUserService.UserId, out var uid))
+                    // Only overwrite CreatedBy if it hasn't been explicitly set
+                    if (entry.Entity.CreatedBy == null || entry.Entity.CreatedBy == Guid.Empty)
                     {
-                        entry.Entity.CreatedBy = uid;
-                    }
-                    else
-                    {
-                        var defaultGuid = Guid.Empty;
-                        entry.Entity.CreatedBy = null;
+                        if (Guid.TryParse(_currentUserService.UserId, out var uid))
+                        {
+                            entry.Entity.CreatedBy = uid;
+                        }
                     }
                     
                 }

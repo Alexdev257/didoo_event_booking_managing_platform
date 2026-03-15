@@ -37,6 +37,7 @@ namespace AuthService.Infrastructure.Implements.Helpers
                 {
                 new Claim(JwtRegisteredClaimNames.Jti,
                     Math.Abs(BitConverter.ToInt64(Guid.NewGuid().ToByteArray())).ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // REQUIRED for SignalR Context.UserIdentifier
                 new Claim("UserId", user.Id.ToString()),
                 new Claim("FullName", user.FullName),
                 new Claim("Email", user.Email),

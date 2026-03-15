@@ -70,6 +70,7 @@ namespace EventService.Application.CQRS.Handler.Organizer
                 IsVerified = request.IsVerified,
                 Status = request.Status,
                 CreatedAt = DateTime.UtcNow,
+                CreatedBy = request.UserId,
                 
             };
 
