@@ -6,6 +6,7 @@ using SharedKernel.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,15 +41,17 @@ namespace SharedInfrastructure.Persistence.Interceptors
                 if (entry.State == EntityState.Added)
                 {
                     entry.Entity.CreatedAt = DateTime.UtcNow;
-                    // Only overwrite CreatedBy if it hasn't been explicitly set
-                    if (entry.Entity.CreatedBy == null || entry.Entity.CreatedBy == Guid.Empty)
+                    string? currentUserId = _currentUserService.UserId;
+                    if (Guid.TryParse(currentUserId, out var uid))
                     {
-                        if (Guid.TryParse(_currentUserService.UserId, out var uid))
-                        {
-                            entry.Entity.CreatedBy = uid;
-                        }
+                        Console.WriteLine($"[AuditableEntityInterceptor] User found: {uid}. Setting CreatedBy.");
+                        entry.Entity.CreatedBy = uid;
                     }
-                    
+                    else
+                    {
+                        Console.WriteLine($"[AuditableEntityInterceptor] No user found (UserId: '{currentUserId}'). Setting CreatedBy to Guid.Empty.");
+                        entry.Entity.CreatedBy = Guid.Empty;
+                    }
                 }
 
                 if(entry.State == EntityState.Deleted)

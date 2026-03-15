@@ -25,4 +25,6 @@ RUN dotnet publish "AuthService.Api.csproj" -c Release -o /app/publish /p:UseApp
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+EXPOSE 80
+EXPOSE 81
 ENTRYPOINT ["dotnet", "AuthService.Api.dll"]

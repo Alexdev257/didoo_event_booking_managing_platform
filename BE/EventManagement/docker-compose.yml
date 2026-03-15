@@ -63,7 +63,7 @@ services:
       dockerfile: services/AuthService/src/AuthService.Api/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:80
+      ASPNETCORE_URLS: http://+:80;http://+:81
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=AuthDb;Uid=root;Pwd=Password123!;
       ConnectionStrings__Redis: redis:6379
       RabbitMQ__Host: rabbitmq
@@ -74,6 +74,7 @@ services:
       Jwt__Audience: https://localhost
     ports:
       - "6002:80"
+      - "6004:81"
     depends_on:
       mysql:
         condition: service_healthy
@@ -89,13 +90,14 @@ services:
       dockerfile: services/EventService/src/EventService.Api/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:80
+      ASPNETCORE_URLS: http://+:80;http://+:81
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=EventDb;Uid=root;Pwd=Password123!;
       ConnectionStrings__Redis: redis:6379
       RabbitMQ__Host: rabbitmq
-      GrpcSettings__AuthServiceUrl: http://auth-service:80
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
     ports:
       - "6100:80"
+      - "6102:81"
     depends_on:
       mysql:
         condition: service_healthy
@@ -111,13 +113,15 @@ services:
       dockerfile: services/TicketService/src/TicketService.Api/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:80
+      ASPNETCORE_URLS: http://+:80;http://+:81
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=TicketDb;Uid=root;Pwd=Password123!;
       ConnectionStrings__Redis: redis:6379
       RabbitMQ__Host: rabbitmq
-      GrpcSettings__EventServiceUrl: http://event-service:80
+      GrpcSettings__EventServiceUrl: http://event-service:81
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
     ports:
       - "6200:80"
+      - "6202:81"
     depends_on:
       mysql:
         condition: service_healthy
@@ -161,11 +165,14 @@ services:
       dockerfile: services/OperationService/src/OperationService.Api/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:80
+      ASPNETCORE_URLS: http://+:80;http://+:81
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=OperationDb;Uid=root;Pwd=Password123!;
       RabbitMQ__Host: rabbitmq
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
+      GrpcSettings__EventServiceUrl: http://event-service:81
     ports:
       - "6500:80"
+      - "6502:81"
     depends_on:
       mysql:
         condition: service_healthy

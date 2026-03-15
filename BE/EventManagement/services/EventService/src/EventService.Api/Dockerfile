@@ -25,4 +25,6 @@ RUN dotnet publish "EventService.Api.csproj" -c Release -o /app/publish /p:UseAp
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+EXPOSE 80
+EXPOSE 81
 ENTRYPOINT ["dotnet", "EventService.Api.dll"]

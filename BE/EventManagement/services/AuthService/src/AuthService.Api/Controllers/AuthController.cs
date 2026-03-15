@@ -132,6 +132,12 @@ namespace AuthService.Api.Controllers
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
+
+        [HttpGet("testguid")]
+        public async Task<IActionResult> Test()
+        {
+            return Ok(Guid.Empty);
+        }
     }
 
     public class RefreshTokenRequest

@@ -1,4 +1,4 @@
-﻿using EventService.Application.CQRS.Command.Category;
+using EventService.Application.CQRS.Command.Category;
 using EventService.Application.CQRS.Command.Organizer;
 using EventService.Application.CQRS.Query.Organizer;
 using MediatR;
@@ -44,7 +44,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateOrganizerAsync([FromBody] OrganizerCreateCommand request)
         {
@@ -80,6 +80,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPatch("{id}/verify")]
         public async Task<IActionResult> vERIFYOrganizerAsync([FromRoute] Guid id)
         {

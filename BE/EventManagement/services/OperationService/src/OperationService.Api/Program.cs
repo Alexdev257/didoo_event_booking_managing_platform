@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using OperationService.Api.Hubs;
 using OperationService.Api.SignalRServices;
@@ -7,6 +8,26 @@ using OperationService.Infrastructure.Persistence;
 using SharedInfrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    bool isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    if (isRunningInDocker)
+    {
+        // Port 80: REST API (HTTP 1.1)
+        options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 81: gRPC (HTTP 2)
+        options.ListenAnyIP(81, o => o.Protocols = HttpProtocols.Http2);
+    }
+    else
+    {
+        // Port 6501: REST API / SignalR
+        options.ListenLocalhost(6501, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 6502: gRPC Server (if any)
+        options.ListenLocalhost(6502, o => o.Protocols = HttpProtocols.Http2);
+    }
+});
 
 // Add services to the container.
 
