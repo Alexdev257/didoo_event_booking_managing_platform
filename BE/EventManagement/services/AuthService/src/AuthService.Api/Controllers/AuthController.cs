@@ -16,7 +16,7 @@ namespace AuthService.Api.Controllers
         {
             _mediator = mediator;
         }
-        private Guid? GetAdminIdFromClaim()
+        private Guid? GetUserIdFromClaim()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? User.FindFirst("UserId")?.Value
@@ -58,7 +58,7 @@ namespace AuthService.Api.Controllers
         {
             var request = new RefreshCommand
             {
-                Id = GetAdminIdFromClaim()?.ToString() ?? string.Empty,
+                Id = GetUserIdFromClaim()?.ToString() ?? string.Empty,
                 AccessToken = GetTokenFromHeader() ?? string.Empty,
                 RefreshToken = RefreshToken.RefreshToken,
             };
@@ -131,6 +131,12 @@ namespace AuthService.Api.Controllers
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [HttpGet("testguid")]
+        public async Task<IActionResult> Test()
+        {
+            return Ok(Guid.Empty);
         }
     }
 

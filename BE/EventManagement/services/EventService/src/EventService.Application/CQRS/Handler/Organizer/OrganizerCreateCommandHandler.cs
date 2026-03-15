@@ -1,4 +1,4 @@
-﻿using EventService.Application.CQRS.Command.Organizer;
+using EventService.Application.CQRS.Command.Organizer;
 using EventService.Application.DTOs.Response.EventUserInteraction;
 using EventService.Application.DTOs.Response.Organizer;
 using EventService.Application.Interfaces.Repositories;
@@ -70,41 +70,56 @@ namespace EventService.Application.CQRS.Handler.Organizer
                 IsVerified = request.IsVerified,
                 Status = request.Status,
                 CreatedAt = DateTime.UtcNow,
+                CreatedBy = request.UserId,
                 
             };
 
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var userRequest = new UserRequest { UserId = request.UserId.ToString() };
-
-                var userResponse = await _authGrpcClient.GetUserProfileAsync(userRequest, cancellationToken: cancellationToken);
-
-                if (userResponse == null)
+                if (request.UserId != Guid.Empty)
                 {
-                    return new OrganizerCreateResponse
-                    {
-                        IsSuccess = false,
-                        Message = "User is not found"
-                    };
-                }
-                await _unitOfWork.Organizers.AddAsync(organizer);
-                await _unitOfWork.CommitTransactionAsync();
-                await _messageProducer.PublishAsync<OrganizerCreatedEvent>(new OrganizerCreatedEvent(request.UserId, id), cancellationToken);
-                if(request.HasSendEmail.HasValue && request.HasSendEmail.Value == true)
-                {
-                    var adminRequest = new GetAdminEmailsRequest();
-                    var adminResponse = await _authGrpcClient.GetAdminEmailsAsync(adminRequest, cancellationToken: cancellationToken);
-                    if (!adminResponse.Emails.Any())
+                    var userRequest = new UserRequest { UserId = request.UserId.ToString() };
+
+                    var userResponse = await _authGrpcClient.GetUserProfileAsync(userRequest, cancellationToken: cancellationToken);
+
+                    if (userResponse == null)
                     {
                         return new OrganizerCreateResponse
                         {
                             IsSuccess = false,
-                            Message = "Admins do not exist"
+                            Message = "User is not found"
                         };
                     }
-                    await _messageProducer.PublishAsync<SendEmailOpenOrganizerToAdminEvent>(new SendEmailOpenOrganizerToAdminEvent(userResponse.FullName, adminResponse.Emails.ToList(), request.Name, id), cancellationToken);
+
+                    if (request.HasSendEmail.HasValue && request.HasSendEmail.Value == true)
+                    {
+                        var adminRequest = new GetAdminEmailsRequest();
+                        var adminResponse = await _authGrpcClient.GetAdminEmailsAsync(adminRequest, cancellationToken: cancellationToken);
+                        if (adminResponse.Emails.Any())
+                        {
+                            await _messageProducer.PublishAsync<SendEmailOpenOrganizerToAdminEvent>(new SendEmailOpenOrganizerToAdminEvent(userResponse.FullName, adminResponse.Emails.ToList(), request.Name, id), cancellationToken);
+                        }
+                    }
+                    await _unitOfWork.Organizers.AddAsync(organizer);
+                    await _unitOfWork.CommitTransactionAsync();
+                    await _messageProducer.PublishAsync<OrganizerCreatedEvent>(new OrganizerCreatedEvent(request.UserId, id), cancellationToken);
+                    if (request.HasSendEmail.HasValue && request.HasSendEmail.Value == true)
+                    {
+                        var adminRequest = new GetAdminEmailsRequest();
+                        var adminResponse = await _authGrpcClient.GetAdminEmailsAsync(adminRequest, cancellationToken: cancellationToken);
+                        if (!adminResponse.Emails.Any())
+                        {
+                            return new OrganizerCreateResponse
+                            {
+                                IsSuccess = false,
+                                Message = "Admins do not exist"
+                            };
+                        }
+                        await _messageProducer.PublishAsync<SendEmailOpenOrganizerToAdminEvent>(new SendEmailOpenOrganizerToAdminEvent(userResponse.FullName, adminResponse.Emails.ToList(), request.Name, id), cancellationToken);
+                    }
                 }
+                
                 return new OrganizerCreateResponse
                 {
                     IsSuccess = true,

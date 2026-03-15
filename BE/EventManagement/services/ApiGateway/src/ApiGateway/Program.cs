@@ -23,14 +23,15 @@ builder.Services.AddOcelot(builder.Configuration);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy",
-        builder => builder.AllowAnyOrigin()
+    options.AddPolicy("AllowAll",
+        builder => builder.SetIsOriginAllowed(_ => true)
                           .AllowAnyMethod()
-                          .AllowAnyHeader());
+                          .AllowAnyHeader()
+                          .AllowCredentials());
 });
 
 var app = builder.Build();
-app.UseCors("CorsPolicy");
+app.UseCors("AllowAll");
 
 app.UseSwaggerForOcelotUI(opt =>
 {

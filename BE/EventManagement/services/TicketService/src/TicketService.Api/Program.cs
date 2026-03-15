@@ -16,33 +16,25 @@ builder.WebHost.ConfigureKestrel(options =>
     bool isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
     if (isRunningInDocker)
     {
-        options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1AndHttp2);
+        // Port 80: REST API (HTTP 1.1)
+        options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 81: gRPC (HTTP 2)
+        options.ListenAnyIP(81, o => o.Protocols = HttpProtocols.Http2);
     }
     else
     {
-        //options.ListenLocalhost(6200, o =>
-        //{
-        //    o.Protocols = HttpProtocols.Http1;
-        //});
+        // Port 6201: REST API / SignalR
+        options.ListenLocalhost(6201, o => o.Protocols = HttpProtocols.Http1);
 
-        //options.ListenLocalhost(6201, o =>
-        //{
-        //    o.UseHttps();
-        //    o.Protocols = HttpProtocols.Http2;
-        //});
-        options.ListenLocalhost(6201, o => o.Protocols = HttpProtocols.Http1AndHttp2);
+        // Port 6202: gRPC Server
+        options.ListenLocalhost(6202, o => o.Protocols = HttpProtocols.Http2);
     }
 });
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("SignalRPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000") // Thay b?ng URL Frontend c?a b?n
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // B?t bu?c ph?i c� d�ng n�y cho SignalR
-    });
+    
 });
 
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
@@ -137,7 +129,7 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-app.UseCors("SignalRPolicy");
+
 app.UseCors("AllowAll");
 
 app.MapHub<TicketHub>("/hubs/ticket");

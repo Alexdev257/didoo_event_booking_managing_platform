@@ -1,9 +1,11 @@
-﻿using EventService.Application.CQRS.Command.Category;
+using EventService.Application.CQRS.Command.Category;
 using EventService.Application.CQRS.Command.Organizer;
 using EventService.Application.CQRS.Query.Organizer;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EventService.Api.Controllers
 {
@@ -15,6 +17,14 @@ namespace EventService.Api.Controllers
         public OrganizerController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        private Guid? GetUserIdFromClaim()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("UserId")?.Value
+                ?? User.FindFirst("sub")?.Value;
+            return Guid.TryParse(userId, out var id) ? id : null;
         }
 
         [HttpGet]
@@ -34,6 +44,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateOrganizerAsync([FromBody] OrganizerCreateCommand request)
         {
@@ -69,6 +80,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPatch("{id}/verify")]
         public async Task<IActionResult> vERIFYOrganizerAsync([FromRoute] Guid id)
         {

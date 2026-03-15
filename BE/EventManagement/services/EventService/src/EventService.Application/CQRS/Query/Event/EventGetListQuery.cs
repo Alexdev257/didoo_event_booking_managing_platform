@@ -1,4 +1,4 @@
-﻿using EventService.Application.DTOs.Response.Event;
+using EventService.Application.DTOs.Response.Event;
 using EventService.Domain.Enum;
 using MediatR;
 using SharedContracts.Common.Wrappers.Requests;

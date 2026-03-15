@@ -37,6 +37,7 @@ namespace AuthService.Infrastructure.Implements.Helpers
                 {
                 new Claim(JwtRegisteredClaimNames.Jti,
                     Math.Abs(BitConverter.ToInt64(Guid.NewGuid().ToByteArray())).ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // REQUIRED for SignalR Context.UserIdentifier
                 new Claim("UserId", user.Id.ToString()),
                 new Claim("FullName", user.FullName),
                 new Claim("Email", user.Email),
@@ -46,7 +47,7 @@ namespace AuthService.Infrastructure.Implements.Helpers
             }),
 
                 // expire in 1 hours
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddHours(1),
                 Issuer = Issuer,
                 Audience = Audience,
                 SigningCredentials =

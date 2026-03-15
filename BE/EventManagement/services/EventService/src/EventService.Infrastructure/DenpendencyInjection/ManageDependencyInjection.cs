@@ -70,9 +70,10 @@ namespace EventService.Infrastructure.DependencyInjection
             service.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
-                    policy => policy.AllowAnyOrigin()
+                    policy => policy.SetIsOriginAllowed(origin => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
             });
         }
 

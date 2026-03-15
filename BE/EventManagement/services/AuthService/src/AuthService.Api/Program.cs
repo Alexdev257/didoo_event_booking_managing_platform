@@ -48,18 +48,21 @@ builder.WebHost.ConfigureKestrel(options =>
 
     if (isRunningInDocker)
     {
-        // === S?A L?I ?O?N N�Y ===
-        // Trong Docker: M? Port 80 cho C? HAI giao th?c (REST v� gRPC ch?y chung)
+        // Port 80: REST API (HTTP 1.1)
         options.ListenAnyIP(80, listenOptions =>
         {
-            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+            listenOptions.Protocols = HttpProtocols.Http1;
         });
 
-        // B? ?o?n config Port 81 ?i v� kh�ng c?n thi?t n?a n?u g?p chung v�o 80
+        // Port 81: gRPC (HTTP 2)
+        options.ListenAnyIP(81, listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http2;
+        });
     }
     else
     {
-        // Ch?y Localhost (Gi? nguy�n nh? c? ?? t�ch port n?u mu?n)
+        // Ch?y Localhost (Gi? nguyn nh? c? ?? tch port n?u mu?n)
         options.ListenLocalhost(6003, listenOptions =>
         {
             listenOptions.Protocols = HttpProtocols.Http1;

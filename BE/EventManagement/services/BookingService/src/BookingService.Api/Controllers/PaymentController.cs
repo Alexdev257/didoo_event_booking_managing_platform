@@ -43,7 +43,7 @@ namespace BookingService.Api.Controllers
 
             var bookingId = Request.Query.FirstOrDefault(s => s.Key == "orderId").Value.ToString();
             var extraData = Request.Query.FirstOrDefault(s => s.Key == "extraData").Value.ToString();
-            var frontEndUrl = "http://localhost:3000";
+            var frontEndUrl = "https://didoo-events.vercel.app";
 
             // extraData is "eventId" for normal bookings, "eventId|resaleId" for trade purchases
             var parts = extraData.Split('|');

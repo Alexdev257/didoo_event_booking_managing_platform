@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using OperationService.Api.Hubs;
 using OperationService.Api.SignalRServices;
@@ -7,6 +8,26 @@ using OperationService.Infrastructure.Persistence;
 using SharedInfrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    bool isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    if (isRunningInDocker)
+    {
+        // Port 80: REST API (HTTP 1.1)
+        options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 81: gRPC (HTTP 2)
+        options.ListenAnyIP(81, o => o.Protocols = HttpProtocols.Http2);
+    }
+    else
+    {
+        // Port 6501: REST API / SignalR
+        options.ListenLocalhost(6501, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 6502: gRPC Server (if any)
+        options.ListenLocalhost(6502, o => o.Protocols = HttpProtocols.Http2);
+    }
+});
 
 // Add services to the container.
 
@@ -15,16 +36,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("SignalRPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
 
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
 if (!string.IsNullOrEmpty(redisConnection))
@@ -45,7 +56,28 @@ builder.Services.AddOperationServiceInfrastructure(builder.Configuration);
 
 builder.Services.AddScoped<INotificationHubService, NotificationHubService>();
 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+builder.Services.AddGrpc();
+builder.Services.AddGrpcClient<SharedContracts.Protos.AuthGrpc.AuthGrpcClient>(o =>
+{
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__AuthServiceUrl") 
+              ?? builder.Configuration["GrpcSettings:AuthServiceUrl"] 
+              ?? "http://auth-service:80";
+    Console.WriteLine($"--> OperationService connecting to AuthGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
+builder.Services.AddGrpcClient<SharedContracts.Protos.EventGrpc.EventGrpcClient>(o =>
+{
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__EventServiceUrl") 
+              ?? builder.Configuration["GrpcSettings:EventServiceUrl"] 
+              ?? "http://event-service:80";
+    Console.WriteLine($"--> OperationService connecting to EventGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
 var app = builder.Build();
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -79,7 +111,7 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-app.UseCors("SignalRPolicy");
+
 app.UseCors("AllowAll");
 
 app.UseAuthentication();

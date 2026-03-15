@@ -83,7 +83,7 @@ namespace EventService.Application.CQRS.Handler.Organizer
                 await _messageProducer.PublishAsync(new OrganizerVerifiedNotificationEvent
                 {
                     OrganizerId = organizer.Id,
-                    UserId = organizer.CreatedBy ?? Guid.Empty,
+                    UserId = organizer.CreatedBy!.Value,
                     OrganizerName = organizer.Name ?? string.Empty
                 }, cancellationToken);
                 return new OrganizerVerifyResponse

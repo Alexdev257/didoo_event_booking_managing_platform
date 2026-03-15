@@ -10,13 +10,21 @@ namespace OperationService.Api.Controllers
 {
     [Route("api/notifications")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class NotificationController : ControllerBase
     {
         private readonly IMediator _mediator;
         public NotificationController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        private Guid? GetUserIdFromClaim()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("UserId")?.Value
+                ?? User.FindFirst("sub")?.Value;
+            return Guid.TryParse(userId, out var id) ? id : null;
         }
 
         [HttpGet]
@@ -27,11 +35,11 @@ namespace OperationService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMyNotificationsAsync([FromQuery] NotificationGetListQuery request)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                              ?? User.FindFirst("sub")?.Value;
+            var userIdClaim = GetUserIdFromClaim() != null ? GetUserIdFromClaim().ToString() : null;
 
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
@@ -53,23 +61,24 @@ namespace OperationService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateNotificationAsync([FromBody] NotificationCreateCommand request)
-        {
-            var result = await _mediator.Send(request);
-            if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
-            else return StatusCode(StatusCodes.Status400BadRequest, result);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateNotificationAsync([FromBody] NotificationCreateCommand request)
+        //{
+        //    var result = await _mediator.Send(request);
+        //    if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
+        //    else return StatusCode(StatusCodes.Status400BadRequest, result);
+        //}
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateNotificationAsync([FromRoute] Guid id, [FromBody] NotificationUpdateCommand request)
-        {
-            request.Id = id;
-            var result = await _mediator.Send(request);
-            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
-            else return StatusCode(StatusCodes.Status400BadRequest, result);
-        }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateNotificationAsync([FromRoute] Guid id, [FromBody] NotificationUpdateCommand request)
+        //{
+        //    request.Id = id;
+        //    var result = await _mediator.Send(request);
+        //    if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+        //    else return StatusCode(StatusCodes.Status400BadRequest, result);
+        //}
 
+        [Authorize]
         [HttpPatch("{id}/read")]
         public async Task<IActionResult> MarkAsReadAsync([FromRoute] Guid id)
         {
@@ -79,22 +88,22 @@ namespace OperationService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteNotificationAsync([FromRoute] Guid id)
-        {
-            var request = new NotificationDeleteCommand { Id = id };
-            var result = await _mediator.Send(request);
-            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
-            else return StatusCode(StatusCodes.Status400BadRequest, result);
-        }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteNotificationAsync([FromRoute] Guid id)
+        //{
+        //    var request = new NotificationDeleteCommand { Id = id };
+        //    var result = await _mediator.Send(request);
+        //    if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+        //    else return StatusCode(StatusCodes.Status400BadRequest, result);
+        //}
 
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> RestoreNotificationAsync([FromRoute] Guid id)
-        {
-            var request = new NotificationRestoreCommand { Id = id };
-            var result = await _mediator.Send(request);
-            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
-            else return StatusCode(StatusCodes.Status400BadRequest, result);
-        }
+        //[HttpPatch("{id}")]
+        //public async Task<IActionResult> RestoreNotificationAsync([FromRoute] Guid id)
+        //{
+        //    var request = new NotificationRestoreCommand { Id = id };
+        //    var result = await _mediator.Send(request);
+        //    if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+        //    else return StatusCode(StatusCodes.Status400BadRequest, result);
+        //}
     }
 }

@@ -50,7 +50,7 @@ namespace EmailService.Infrastructure.Consumers
                     </table>
 
                     <div style='text-align: center; margin-top: 35px; margin-bottom: 20px;'>
-                        <a href='http://localhost:3000/admin/organizers/{data.OrganizerId}' 
+                        <a href='https://didoo-events.vercel.app/admin/organizers/{data.OrganizerId}' 
                            style='background-color: #27ae60; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;'>
                            Kiểm Tra & Xét Duyệt
                         </a>

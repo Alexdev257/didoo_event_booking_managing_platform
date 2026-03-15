@@ -16,7 +16,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TicketService.Application.Interfaces.Repositories;
+using TicketService.Application.Interfaces.SignalRServices;
 using TicketService.Infrastructure.Implements.Repositories;
+using TicketService.Infrastructure.Implements.SignalRServices;
 using TicketService.Infrastructure.Persistence;
 
 namespace TicketService.Infrastructure.DependencyInjection
@@ -51,6 +53,7 @@ namespace TicketService.Infrastructure.DependencyInjection
         private static void AddScopedInterface(this IServiceCollection service)
         {
             service.AddScoped<ITicketUnitOfWork, UnitOfWork>();
+            service.AddSingleton<ITicketReservationService, TicketReservationService>();
             //service.AddScoped<IJwtHelper, JwtHelper>();
             //service.AddScoped<IBcryptHelper, BcryptHelper>();
 
@@ -71,9 +74,10 @@ namespace TicketService.Infrastructure.DependencyInjection
             service.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
-                    policy => policy.AllowAnyOrigin()
+                    policy => policy.SetIsOriginAllowed(origin => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
             });
         }
 

@@ -36,7 +36,7 @@ namespace EmailService.Infrastructure.Consumers
                         <p>Nhấn vào nút bên dưới để tạo mật khẩu mới:</p>
 
                         <div style='text-align:center; margin:30px 0'>
-                          <a href='http://localhost:3000/confirm?key={msg.Key}'
+                          <a href='https://didoo-events.vercel.app/confirm?key={msg.Key}'
                              style='background:#00466a; color:#ffffff; padding:14px 28px;
                                     text-decoration:none; border-radius:6px; font-size:16px;
                                     display:inline-block;'>
