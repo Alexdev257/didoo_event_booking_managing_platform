@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option csharp_namespace = "SharedContracts.Protos";
+
+package booking;
+
+service BookingGrpc {
+  rpc GetBookingAnalytics (BookingAnalyticsRequest) returns (BookingAnalyticsResponse);
+}
+
+message BookingAnalyticsRequest {
+  repeated string event_ids = 1;
+}
+
+message BookingAnalyticsResponse {
+  int32 total_bookings = 1;
+  double total_revenue = 2;
+}

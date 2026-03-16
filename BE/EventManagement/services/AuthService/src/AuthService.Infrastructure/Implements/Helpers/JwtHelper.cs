@@ -67,7 +67,8 @@ namespace AuthService.Infrastructure.Implements.Helpers
                 new Claim("FullName", user.FullName),
                 new Claim("Email", user.Email),
                 new Claim("Role", ((int)user.Role.Name).ToString()),
-                new Claim("IsOrganizer", isVerifiedOrganizer.ToString().ToLower())
+                new Claim("IsOrganizer", isVerifiedOrganizer.ToString().ToLower()),
+                new Claim("OrganizerId", user.OrganizerId?.ToString() ?? "")
             }),
 
                 // expire in 1 hours

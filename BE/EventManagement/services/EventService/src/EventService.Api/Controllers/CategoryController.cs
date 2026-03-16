@@ -1,4 +1,4 @@
-﻿using EventService.Application.CQRS.Command.Category;
+using EventService.Application.CQRS.Command.Category;
 using EventService.Application.CQRS.Query.Category;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -36,6 +36,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<IActionResult> CreateCategoryAsync([FromBody] CategoryCreateCommand request)
         {
@@ -44,6 +45,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategoryAsync([FromRoute] Guid id, [FromBody] CategoryUpdateCommand request)
         {
@@ -53,6 +55,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategoryAsync([FromRoute] Guid id)
         {
@@ -62,6 +65,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> RestoreCategoryAsync([FromRoute] Guid id)
         {

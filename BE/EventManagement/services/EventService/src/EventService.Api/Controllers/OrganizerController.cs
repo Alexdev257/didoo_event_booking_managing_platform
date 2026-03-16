@@ -44,7 +44,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [Authorize]
+        [Authorize(Policy = "UserOnly")]
         [HttpPost]
         public async Task<IActionResult> CreateOrganizerAsync([FromBody] OrganizerCreateCommand request)
         {
@@ -53,6 +53,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrganizerAsync([FromRoute] Guid id, [FromBody] OrganizerUpdateCommand request)
         {
@@ -62,6 +63,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganizerAsync([FromRoute] Guid id)
         {
@@ -71,6 +73,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> RestoreOrganizerAsync([FromRoute] Guid id)
         {
@@ -80,7 +83,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [Authorize]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("{id}/verify")]
         public async Task<IActionResult> vERIFYOrganizerAsync([FromRoute] Guid id)
         {

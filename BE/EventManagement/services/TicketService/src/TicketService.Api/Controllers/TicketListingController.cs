@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.Application.CQRS.Command.TicketListing;
 using TicketService.Application.CQRS.Query.TicketListing;
@@ -33,6 +34,7 @@ namespace TicketService.Api.Controllers
         /// <summary>
         /// Called by BookingService to validate a listing before creating a trade booking.
         /// </summary>
+        [AllowAnonymous]
         [HttpGet("{id}/validate")]
         public async Task<IActionResult> ValidateAsync([FromRoute] Guid id)
         {
@@ -40,6 +42,7 @@ namespace TicketService.Api.Controllers
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] TicketListingCreateCommand request)
         {
@@ -47,6 +50,7 @@ namespace TicketService.Api.Controllers
             return result.IsSuccess ? StatusCode(201, result) : BadRequest(result);
         }
 
+        [Authorize]
         [HttpPatch("{id}/cancel")]
         public async Task<IActionResult> CancelAsync([FromRoute] Guid id, [FromBody] TicketListingCancelCommand request)
         {
@@ -58,6 +62,7 @@ namespace TicketService.Api.Controllers
         /// <summary>
         /// Called internally (e.g. from BookingService payment callback) to mark listing as sold and transfer ownership.
         /// </summary>
+        [AllowAnonymous]
         [HttpPatch("{id}/mark-sold")]
         public async Task<IActionResult> MarkSoldAsync([FromRoute] Guid id, [FromBody] TicketListingMarkSoldCommand request)
         {

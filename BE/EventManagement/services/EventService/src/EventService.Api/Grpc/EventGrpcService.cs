@@ -2,6 +2,7 @@ using EventService.Application.Interfaces.Repositories;
 using EventService.Domain.Enum;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using SharedContracts.Protos;
 
 namespace EventService.Api.Grpc
@@ -93,6 +94,48 @@ namespace EventService.Api.Grpc
                 IsVerified = organizer.IsVerified ?? false,
                 Status = (int)organizer.Status
             };
+        }
+        public override async Task<AdminOverviewResponse> GetAdminOverview(AdminOverviewRequest request, ServerCallContext context)
+        {
+            var totalEvents = await _unitOfWork.Events.GetAllAsync().CountAsync();
+            var totalOrganizers = await _unitOfWork.Organizers.GetAllAsync().CountAsync();
+            
+            return new AdminOverviewResponse
+            {
+                TotalEvents = totalEvents,
+                TotalOrganizers = totalOrganizers
+            };
+        }
+
+        public override async Task<OrganizerOverviewResponse> GetOrganizerOverview(OrganizerOverviewRequest request, ServerCallContext context)
+        {
+            if (!Guid.TryParse(request.OrganizerId, out var organizerId))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid Organizer ID format"));
+            }
+
+            var totalEvents = await _unitOfWork.Events.FindAsync(e => e.OrganizerId == organizerId).CountAsync();
+
+            return new OrganizerOverviewResponse
+            {
+                TotalEvents = totalEvents
+            };
+        }
+        public override async Task<GetEventIdsByOrganizerResponse> GetEventIdsByOrganizer(GetEventIdsByOrganizerRequest request, ServerCallContext context)
+        {
+            if (!Guid.TryParse(request.OrganizerId, out var organizerId))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid Organizer ID format"));
+            }
+
+            var eventIds = await _unitOfWork.Events.GetAllAsync()
+                .Where(e => e.OrganizerId == organizerId && !e.IsDeleted)
+                .Select(e => e.Id.ToString())
+                .ToListAsync();
+
+            var response = new GetEventIdsByOrganizerResponse();
+            response.EventIds.AddRange(eventIds);
+            return response;
         }
     }
 }

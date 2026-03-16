@@ -138,7 +138,8 @@ services:
       dockerfile: services/BookingService/src/BookingService.Api/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:80
+      # Expose both HTTP (80) and gRPC (81) inside the container
+      ASPNETCORE_URLS: http://+:80;http://+:81
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=BookingDb;Uid=root;Pwd=Password123!;
       ConnectionStrings__Redis: redis:6379
       RabbitMQ__Host: rabbitmq
@@ -147,8 +148,11 @@ services:
       JwtSettings__Issuer: https://localhost
       JwtSettings__Audience: https://localhost
       MomoAPI_ReturnUrl: https://booking-service:80/api/payments/callback/
+      # Ensure other services can find booking gRPC via GrpcSettings
+      GrpcSettings__BookingServiceUrl: http://booking-service:81
     ports:
       - "6300:80"
+      - "6302:81"
     depends_on:
       mysql:
         condition: service_healthy
@@ -165,12 +169,16 @@ services:
       context: .
       dockerfile: services/OperationService/src/OperationService.Api/Dockerfile
     environment:
+      # Allow unencrypted HTTP/2 for gRPC calls between containers
+      DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT: "true"
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:80;http://+:81
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=OperationDb;Uid=root;Pwd=Password123!;
       RabbitMQ__Host: rabbitmq
       GrpcSettings__AuthServiceUrl: http://auth-service:81
       GrpcSettings__EventServiceUrl: http://event-service:81
+      # Explicitly point to booking-service gRPC endpoint
+      GrpcSettings__BookingServiceUrl: http://booking-service:81
     ports:
       - "6500:80"
       - "6502:81"

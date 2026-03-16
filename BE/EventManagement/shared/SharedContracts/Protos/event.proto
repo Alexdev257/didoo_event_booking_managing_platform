@@ -9,6 +9,17 @@ import "google/protobuf/timestamp.proto";
 service EventGrpc {
   rpc GetEventDetail (EventRequest) returns (EventResponse);
   rpc GetOrganizerStatus (OrganizerStatusRequest) returns (OrganizerStatusResponse);
+  rpc GetAdminOverview (AdminOverviewRequest) returns (AdminOverviewResponse);
+  rpc GetOrganizerOverview (OrganizerOverviewRequest) returns (OrganizerOverviewResponse);
+  rpc GetEventIdsByOrganizer(GetEventIdsByOrganizerRequest) returns (GetEventIdsByOrganizerResponse);
+}
+
+message GetEventIdsByOrganizerRequest {
+  string organizer_id = 1;
+}
+
+message GetEventIdsByOrganizerResponse {
+  repeated string event_ids = 1;
 }
 
 message EventRequest {
@@ -46,4 +57,17 @@ message OrganizerStatusRequest {
 message OrganizerStatusResponse {
   bool is_verified = 1;
   int32 status = 2;
+}
+
+message AdminOverviewRequest {}
+message AdminOverviewResponse {
+  int32 total_events = 1;
+  int32 total_organizers = 2;
+}
+
+message OrganizerOverviewRequest {
+  string organizer_id = 1;
+}
+message OrganizerOverviewResponse {
+  int32 total_events = 1;
 }
