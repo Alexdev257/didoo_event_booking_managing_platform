@@ -1,4 +1,5 @@
-﻿using MediatR;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.Application.CQRS.Command.TicketType;
@@ -33,6 +34,7 @@ namespace TicketService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpPost]
         public async Task<IActionResult> CreateTicketTypeAsync([FromBody] TicketTypeCreateCommand request)
         {
@@ -41,6 +43,7 @@ namespace TicketService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpPost("array")]
         public async Task<IActionResult> CreateArrayTicketTypeAsync([FromBody] TicketTypeCreateArrayCommand request)
         {
@@ -49,6 +52,7 @@ namespace TicketService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTicketTypeAsync([FromRoute] Guid id, [FromBody] TicketTypeUpdateCommand request)
         {
@@ -58,6 +62,7 @@ namespace TicketService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTicketTypeAsync([FromRoute] Guid id)
         {
@@ -67,6 +72,7 @@ namespace TicketService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> RestoreTicketTypeAsync([FromRoute] Guid id)
         {

@@ -1,4 +1,4 @@
-﻿using AuthService.Application.CQRS.Command.Role;
+using AuthService.Application.CQRS.Command.Role;
 using AuthService.Application.CQRS.Query.Role;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +9,7 @@ namespace AuthService.Api.Controllers
 {
     [Route("api/roles")]
     [ApiController]
+    [Authorize(Policy = "AdminOnly")]
     public class RoleController : ControllerBase
     {
         private readonly IMediator _mediator;

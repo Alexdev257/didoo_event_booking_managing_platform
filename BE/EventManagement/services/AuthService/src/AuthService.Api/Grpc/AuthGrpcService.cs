@@ -1,4 +1,4 @@
-﻿using AuthService.Application.Interfaces;
+using AuthService.Application.Interfaces;
 using AuthService.Application.Interfaces.Repositories;
 using Grpc.Core;
 using Microsoft.AspNetCore.Http;
@@ -101,6 +101,11 @@ namespace AuthService.Api.Grpc
             }
 
             return response;
+        }
+        public override async Task<UserCountResponse> GetUserCount(UserCountRequest request, ServerCallContext context)
+        {
+            var count = await _unitOfWork.Users.GetAllAsync().CountAsync();
+            return new UserCountResponse { TotalUsers = count };
         }
     }
 }

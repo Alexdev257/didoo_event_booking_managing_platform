@@ -30,6 +30,7 @@
 	<ItemGroup>
 		<Protobuf Include="..\..\..\..\shared\SharedContracts\Protos\event.proto" GrpcServices="Client" Link="Protos\event.proto" />
 		<Protobuf Include="..\..\..\..\shared\SharedContracts\Protos\auth.proto" GrpcServices="Client" Link="Protos\auth.proto" />
+		<Protobuf Include="..\..\..\..\shared\SharedContracts\Protos\booking.proto" GrpcServices="Client" Link="Protos\booking.proto" />
 	</ItemGroup>
 
 

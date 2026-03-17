@@ -1,4 +1,4 @@
-﻿
+
 syntax = "proto3";
 
 option csharp_namespace = "SharedContracts.Protos";
@@ -11,7 +11,7 @@ service AuthGrpc {
   rpc GetUserProfile (UserRequest) returns (UserResponse);
   rpc GetUsersByIds (GetUsersRequest) returns (GetUsersResponse);
   rpc GetAdminEmails (GetAdminEmailsRequest) returns (GetAdminEmailsResponse);
-
+  rpc GetUserCount (UserCountRequest) returns (UserCountResponse);
 }
 
 // Input: Chỉ cần UserId
@@ -40,4 +40,9 @@ message GetAdminEmailsRequest {
 
 message GetAdminEmailsResponse {
   repeated string emails = 1;
+}
+
+message UserCountRequest {}
+message UserCountResponse {
+  int32 total_users = 1;
 }

@@ -1,6 +1,7 @@
-﻿using EventService.Application.CQRS.Command.EventReview;
+using EventService.Application.CQRS.Command.EventReview;
 using EventService.Application.CQRS.Query.EventReview;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +34,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateEventReviewAsync([FromBody] EventReviewCreateCommand request)
         {
@@ -41,6 +43,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEventReviewAsync([FromRoute] Guid id, [FromBody] EventReviewUpdateCommand request)
         {
@@ -50,6 +53,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEventReviewAsync([FromRoute] Guid id)
         {
@@ -59,6 +63,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> RestoreEventReviewAsync([FromRoute] Guid id)
         {

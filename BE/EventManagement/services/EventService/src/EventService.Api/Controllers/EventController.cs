@@ -1,6 +1,7 @@
-﻿using EventService.Application.CQRS.Command.Event;
+using EventService.Application.CQRS.Command.Event;
 using EventService.Application.CQRS.Query.Event;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +34,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpPost]
         public async Task<IActionResult> CreateEventAsync([FromBody] EventCreateCommand request)
         {
@@ -41,6 +43,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "OrganizerOnly")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEventAsync([FromRoute] Guid id, [FromBody] EventUpdateCommand request)
         {
@@ -50,6 +53,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEventAsync([FromRoute] Guid id)
         {
@@ -59,6 +63,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> RestoreEventAsync([FromRoute] Guid id)
         {
@@ -68,6 +73,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> VerifyEventAsync([FromRoute] Guid id, [FromBody] EventVerifyCommand request)
         {
