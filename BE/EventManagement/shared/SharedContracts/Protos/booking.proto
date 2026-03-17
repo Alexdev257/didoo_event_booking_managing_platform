@@ -10,9 +10,33 @@ service BookingGrpc {
 
 message BookingAnalyticsRequest {
   repeated string event_ids = 1;
+  string from_date = 2;  // ISO date (yyyy-MM-dd), optional
+  string to_date = 3;    // ISO date (yyyy-MM-dd), optional
 }
 
 message BookingAnalyticsResponse {
   int32 total_bookings = 1;
   double total_revenue = 2;
+  repeated RevenueTrendItem revenue_trend = 3;
+  repeated OrderStatusBreakdownItem order_status_breakdown = 4;
+  repeated EventStatsItem event_stats = 5;  // when event_ids provided: per-event revenue & tickets
+}
+
+message RevenueTrendItem {
+  string date = 1;   // yyyy-MM-dd
+  double revenue = 2;
+  int32 orders = 3;
+  int32 tickets_sold = 4;  // total Amount for that day
+}
+
+message OrderStatusBreakdownItem {
+  string status = 1;   // "Paid", "Pending", "Cancelled"
+  int32 count = 2;
+  double percent = 3;
+}
+
+message EventStatsItem {
+  string event_id = 1;
+  double revenue = 2;
+  int32 tickets_sold = 3;
 }

@@ -59,15 +59,37 @@ message OrganizerStatusResponse {
   int32 status = 2;
 }
 
-message AdminOverviewRequest {}
+message AdminOverviewRequest {
+  string from_date = 1;  // ISO date, optional
+  string to_date = 2;    // ISO date, optional
+  string period = 3;     // "7d" | "30d" | "90d", default "30d"
+}
 message AdminOverviewResponse {
   int32 total_events = 1;
   int32 total_organizers = 2;
+  int32 pending_organizers = 3;
+  int32 active_events = 4;
+  int32 pending_events = 5;
 }
 
 message OrganizerOverviewRequest {
   string organizer_id = 1;
+  string period = 2;  // "7d" | "30d", default "30d"
 }
 message OrganizerOverviewResponse {
-  int32 total_events = 1;
+  string organizer_id = 1;
+  int32 total_events = 2;
+  int32 opened_events_count = 3;
+  int32 upcoming_published_count = 4;
+  repeated OrganizerRecentEventItem recent_events = 5;
+}
+message OrganizerRecentEventItem {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp start_time = 3;
+  int32 status = 4;
+  double revenue = 5;
+  int32 sold_count = 6;
+  int32 total_capacity = 7;
+  double occupancy_percent = 8;
 }

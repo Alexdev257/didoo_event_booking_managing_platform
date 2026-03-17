@@ -95,11 +95,15 @@ namespace OperationService.Infrastructure.Services
             }
         }
 
-        public async Task<AdminOverviewResponse> GetAdminOverviewAsync()
+        public async Task<AdminOverviewResponse> GetAdminOverviewAsync(string? fromDate = null, string? toDate = null, string? period = null)
         {
             try
             {
-                return await _eventClient.GetAdminOverviewAsync(new AdminOverviewRequest());
+                var request = new AdminOverviewRequest();
+                if (!string.IsNullOrEmpty(fromDate)) request.FromDate = fromDate;
+                if (!string.IsNullOrEmpty(toDate)) request.ToDate = toDate;
+                if (!string.IsNullOrEmpty(period)) request.Period = period;
+                return await _eventClient.GetAdminOverviewAsync(request);
             }
             catch (RpcException ex)
             {
@@ -108,11 +112,12 @@ namespace OperationService.Infrastructure.Services
             }
         }
 
-        public async Task<OrganizerOverviewResponse> GetOrganizerOverviewAsync(string organizerId)
+        public async Task<OrganizerOverviewResponse> GetOrganizerOverviewAsync(string organizerId, string? period = null)
         {
             try
             {
                 var request = new OrganizerOverviewRequest { OrganizerId = organizerId };
+                if (!string.IsNullOrEmpty(period)) request.Period = period;
                 return await _eventClient.GetOrganizerOverviewAsync(request);
             }
             catch (RpcException ex)
@@ -136,12 +141,15 @@ namespace OperationService.Infrastructure.Services
             }
         }
 
-        public async Task<BookingAnalyticsResponse> GetBookingAnalyticsAsync(List<string> eventIds)
+        public async Task<BookingAnalyticsResponse> GetBookingAnalyticsAsync(List<string>? eventIds = null, string? fromDate = null, string? toDate = null)
         {
             try
             {
                 var request = new BookingAnalyticsRequest();
-                if (eventIds != null) request.EventIds.AddRange(eventIds);
+                if (eventIds != null && eventIds.Count > 0)
+                    request.EventIds.AddRange(eventIds);
+                if (!string.IsNullOrEmpty(fromDate)) request.FromDate = fromDate;
+                if (!string.IsNullOrEmpty(toDate)) request.ToDate = toDate;
                 return await _bookingClient.GetBookingAnalyticsAsync(request);
             }
             catch (RpcException ex)

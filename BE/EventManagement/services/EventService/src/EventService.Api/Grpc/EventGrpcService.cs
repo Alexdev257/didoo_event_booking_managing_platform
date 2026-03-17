@@ -97,13 +97,22 @@ namespace EventService.Api.Grpc
         }
         public override async Task<AdminOverviewResponse> GetAdminOverview(AdminOverviewRequest request, ServerCallContext context)
         {
-            var totalEvents = await _unitOfWork.Events.GetAllAsync().CountAsync();
-            var totalOrganizers = await _unitOfWork.Organizers.GetAllAsync().CountAsync();
-            
+            var eventsQuery = _unitOfWork.Events.GetAllAsync();
+            var organizersQuery = _unitOfWork.Organizers.GetAllAsync();
+
+            var totalEvents = await eventsQuery.CountAsync();
+            var totalOrganizers = await organizersQuery.CountAsync();
+            var pendingOrganizers = await organizersQuery.CountAsync(o => o.Status == OrganizerStatusEnum.Pending);
+            var activeEvents = await eventsQuery.CountAsync(e => e.Status == EventStatusEnum.Published || e.Status == EventStatusEnum.Opened);
+            var pendingEvents = await eventsQuery.CountAsync(e => e.Status == EventStatusEnum.Draft);
+
             return new AdminOverviewResponse
             {
                 TotalEvents = totalEvents,
-                TotalOrganizers = totalOrganizers
+                TotalOrganizers = totalOrganizers,
+                PendingOrganizers = pendingOrganizers,
+                ActiveEvents = activeEvents,
+                PendingEvents = pendingEvents
             };
         }
 
@@ -114,12 +123,42 @@ namespace EventService.Api.Grpc
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid Organizer ID format"));
             }
 
-            var totalEvents = await _unitOfWork.Events.FindAsync(e => e.OrganizerId == organizerId).CountAsync();
+            var eventsQuery = _unitOfWork.Events.GetAllAsync()
+                .Where(e => e.OrganizerId == organizerId && !e.IsDeleted);
 
-            return new OrganizerOverviewResponse
+            var totalEvents = await eventsQuery.CountAsync();
+            var openedEventsCount = await eventsQuery.CountAsync(e => e.Status == EventStatusEnum.Opened);
+            var now = DateTime.UtcNow;
+            var upcomingPublishedCount = await eventsQuery.CountAsync(e =>
+                e.Status == EventStatusEnum.Published && e.StartTime.HasValue && e.StartTime.Value > now);
+
+            var recentEventEntities = await eventsQuery
+                .OrderByDescending(e => e.StartTime)
+                .Take(10)
+                .ToListAsync();
+
+            var response = new OrganizerOverviewResponse
             {
-                TotalEvents = totalEvents
+                OrganizerId = request.OrganizerId,
+                TotalEvents = totalEvents,
+                OpenedEventsCount = openedEventsCount,
+                UpcomingPublishedCount = upcomingPublishedCount
             };
+            foreach (var e in recentEventEntities)
+            {
+                response.RecentEvents.Add(new OrganizerRecentEventItem
+                {
+                    Id = e.Id.ToString(),
+                    Name = e.Name ?? string.Empty,
+                    StartTime = e.StartTime.HasValue ? Timestamp.FromDateTime(e.StartTime.Value.ToUniversalTime()) : null,
+                    Status = (int)e.Status,
+                    Revenue = 0,
+                    SoldCount = 0,
+                    TotalCapacity = 0,
+                    OccupancyPercent = 0
+                });
+            }
+            return response;
         }
         public override async Task<GetEventIdsByOrganizerResponse> GetEventIdsByOrganizer(GetEventIdsByOrganizerRequest request, ServerCallContext context)
         {

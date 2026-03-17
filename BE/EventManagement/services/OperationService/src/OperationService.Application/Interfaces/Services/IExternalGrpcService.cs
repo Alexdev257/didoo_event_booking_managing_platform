@@ -15,11 +15,11 @@ namespace OperationService.Application.Interfaces.Services
 
         // Event gRPC
         Task<EventResponse> GetEventDetailAsync(string eventId);
-        Task<AdminOverviewResponse> GetAdminOverviewAsync();
-        Task<OrganizerOverviewResponse> GetOrganizerOverviewAsync(string organizerId);
+        Task<AdminOverviewResponse> GetAdminOverviewAsync(string? fromDate = null, string? toDate = null, string? period = null);
+        Task<OrganizerOverviewResponse> GetOrganizerOverviewAsync(string organizerId, string? period = null);
         Task<GetEventIdsByOrganizerResponse> GetEventIdsByOrganizerAsync(string organizerId);
 
         // Booking gRPC
-        Task<BookingAnalyticsResponse> GetBookingAnalyticsAsync(List<string> eventIds);
+        Task<BookingAnalyticsResponse> GetBookingAnalyticsAsync(List<string>? eventIds = null, string? fromDate = null, string? toDate = null);
     }
 }
