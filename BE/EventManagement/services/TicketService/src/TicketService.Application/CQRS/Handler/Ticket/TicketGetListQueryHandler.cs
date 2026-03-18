@@ -174,6 +174,9 @@ namespace TicketService.Application.CQRS.Handler.Ticket
         {
             if (eventResponse == null) return null;
 
+            //var thumbnailUrl = eventResponse.ThumbnailUrl ?? string.Empty;
+            //var bannerUrl = !string.IsNullOrEmpty(eventResponse.BannerUrl) ? eventResponse.BannerUrl : thumbnailUrl;
+
             return new TicketEventDTO
             {
                 Id = eventResponse.Id,
