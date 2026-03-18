@@ -28,6 +28,9 @@ namespace EventService.Application.CQRS.Query.Event
         public bool? IsDescending { get; set; }
         public bool? IsDeleted { get; set; }
         public string? Fields { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public double? Distance { get; set; }
         public bool? HasCategory { get; set; } = false!;
         public bool? HasOrganizer { get; set; } = false!;
         public bool? HasLocations { get; set; } = false!;

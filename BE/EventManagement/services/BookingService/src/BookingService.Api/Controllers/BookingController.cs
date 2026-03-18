@@ -1,6 +1,7 @@
-﻿using BookingService.Application.CQRS.Command.Booking;
+using BookingService.Application.CQRS.Command.Booking;
 using BookingService.Application.CQRS.Query.Booking;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace BookingService.Api.Controllers
 {
     [Route("api/bookings")]
     [ApiController]
+    [Authorize]
     public class BookingController : ControllerBase
     {
         private readonly IMediator _mediator;

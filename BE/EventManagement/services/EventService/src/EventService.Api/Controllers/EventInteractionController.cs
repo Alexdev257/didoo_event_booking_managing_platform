@@ -1,7 +1,8 @@
-﻿using EventService.Application.CQRS.Command.EventInteraction;
+using EventService.Application.CQRS.Command.EventInteraction;
 using EventService.Application.CQRS.Query.UserEventInteraction;
 using EventService.Domain.Enum;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +35,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateInteractionAsync([FromBody] InteractionCreateCommand request)
         {
@@ -42,6 +44,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpDelete("{userId}/{eventId}/{type}")]
         public async Task<IActionResult> DeleteInteractionAsync([FromRoute] Guid userId, [FromRoute] Guid eventId, [FromRoute] InteractionTypeEnum type)
         {
@@ -51,6 +54,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpDelete("{userId}/{eventId}/{type}/soft")]
         public async Task<IActionResult> SoftDeleteInteractionAsync([FromRoute] Guid userId, [FromRoute] Guid eventId, [FromRoute] InteractionTypeEnum type)
         {
@@ -60,6 +64,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPatch("{userId}/{eventId}/{type}")]
         public async Task<IActionResult> RestoreInteractionAsync([FromRoute] Guid userId, [FromRoute] Guid eventId, [FromRoute] InteractionTypeEnum type)
         {

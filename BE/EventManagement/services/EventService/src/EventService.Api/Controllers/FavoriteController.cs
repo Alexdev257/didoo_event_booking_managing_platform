@@ -1,6 +1,7 @@
-﻿using EventService.Application.CQRS.Command.FavoriteEvent;
+using EventService.Application.CQRS.Command.FavoriteEvent;
 using EventService.Application.CQRS.Query.FavoriteEvent;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +34,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateFavoriteAsync([FromBody] FavoriteCreateCommand request)
         {
@@ -41,6 +43,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpDelete("{userId}/{eventId}")]
         public async Task<IActionResult> DeleteFavoriteAsync([FromRoute] Guid userId, [FromRoute] Guid eventId)
         {
@@ -50,6 +53,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpDelete("{userId}/{eventId}/soft")]
         public async Task<IActionResult> SoftDeleteFavoriteAsync([FromRoute] Guid userId, [FromRoute] Guid eventId)
         {
@@ -59,6 +63,7 @@ namespace EventService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPatch("{userId}/{eventId}")]
         public async Task<IActionResult> RestoreFavoriteAsync([FromRoute] Guid userId, [FromRoute] Guid eventId)
         {

@@ -1,13 +1,15 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OperationService.Application.CQRS.Command.EventCheckIn;
 using OperationService.Application.CQRS.Query.EventCheckIn;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OperationService.Api.Controllers
 {
     [Route("api/checkins")]
     [ApiController]
+    [Authorize(Policy = "OrganizerOnly")]
     public class CheckInController : ControllerBase
     {
         private readonly IMediator _mediator;

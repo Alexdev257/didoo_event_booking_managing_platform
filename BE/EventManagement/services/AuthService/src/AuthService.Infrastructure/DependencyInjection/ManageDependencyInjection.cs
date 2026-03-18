@@ -32,7 +32,7 @@ namespace AuthService.Infrastructure.DependencyInjection
         public static IServiceCollection AddAuthServiceInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDatabase(configuration);
-            services.AddScopedInterface();
+            services.AddScopedInterface(configuration);
             services.AddMediatRInfrastructure(configuration);
             services.AddCorsExtentions();
             services.AddJwtAuthentication(configuration);
@@ -54,13 +54,26 @@ namespace AuthService.Infrastructure.DependencyInjection
             services.AddScoped<DbContext>(provider => provider.GetService<ApplicationDbContext>()!);
         }
 
-        private static void AddScopedInterface(this IServiceCollection service)
+        private static void AddScopedInterface(this IServiceCollection service, IConfiguration configuration)
         {
             service.AddScoped<IAuthUnitOfWork, UnitOfWork>();
             service.AddScoped<IJwtHelper, JwtHelper>();
             service.AddScoped<IBcryptHelper, BcryptHelper>();
             service.AddScoped<IGoolgeOAuthHelper, GoogleOAuthHelper>();
 
+            service.AddGrpcClient<SharedContracts.Protos.EventGrpc.EventGrpcClient>(o =>
+            {
+                var url = Environment.GetEnvironmentVariable("GrpcSettings__EventServiceUrl");
+                if (string.IsNullOrEmpty(url))
+                {
+                    url = configuration["GrpcSettings:EventServiceUrl"];
+                }
+                if (string.IsNullOrEmpty(url))
+                {
+                    url = "http://event-service:81";
+                }
+                o.Address = new Uri(url);
+            });
         }
 
         private static void AddMediatRInfrastructure(this IServiceCollection service, IConfiguration config)
@@ -186,49 +199,17 @@ namespace AuthService.Infrastructure.DependencyInjection
 
         private static void AddAuthorizationRole(this IServiceCollection service)
         {
-            ////1 admin
-            ////2 teacher
-            ////3 sttudent
-            //service.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("AdminOnly", policy => { policy.RequireClaim("RoleId", "1".ToLower()); });
-
-            //    options.AddPolicy("TeacherOnly", policy => { policy.RequireClaim("RoleId", "2".ToLower()); });
-
-            //    options.AddPolicy("StudentOnly", policy => { policy.RequireClaim("RoleId", "3".ToLower()); });
-
-            //    options.AddPolicy("AdminOrTeacher", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "1".ToLower() || roleClaim == "2".ToLower();
-            //        }));
-
-            //    options.AddPolicy("AdminOrStudent", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "1".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-
-            //    options.AddPolicy("TeacherOrStudent", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "2".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-
-            //    options.AddPolicy("AllRole", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "Admin";
-            //            return roleClaim == "1".ToLower() || roleClaim == "2".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-            //});
+            service.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Role", "1"));
+                options.AddPolicy("UserOnly", policy => policy.RequireClaim("Role", "2"));
+                options.AddPolicy("OrganizerOnly", policy => policy.RequireClaim("IsOrganizer", "true"));
+                options.AddPolicy("AdminOrOrganizer", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(c => c.Type == "Role" && c.Value == "1") ||
+                        context.User.HasClaim(c => c.Type == "IsOrganizer" && c.Value == "true")
+                    ));
+            });
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿﻿using BookingService.Application.CQRS.Query.Payment;
+using BookingService.Application.CQRS.Query.Payment;
 using BookingService.Application.Interfaces.Services;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace BookingService.Api.Controllers
             _mediator = mediator;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetListPaymentsAsync([FromQuery] PaymentGetListQuery request)
         {
@@ -27,6 +29,7 @@ namespace BookingService.Api.Controllers
             else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPaymentByIdAsync([FromRoute] Guid id, [FromQuery] PaymentGetByIdQuery request)
         {

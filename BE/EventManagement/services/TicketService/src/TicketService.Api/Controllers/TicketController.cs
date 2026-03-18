@@ -1,4 +1,5 @@
-﻿﻿using MediatR;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.Application.CQRS.Command.Ticket;
@@ -8,6 +9,7 @@ namespace TicketService.Api.Controllers
 {
     [Route("api/tickets")]
     [ApiController]
+    [Authorize]
     public class TicketController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -72,6 +74,7 @@ namespace TicketService.Api.Controllers
         /// Internal endpoint called by BookingService after a normal (non-trade) payment is confirmed.
         /// Creates <c>Quantity</c> Ticket records under the given TicketType, assigning OwnerId to the buyer.
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("internal/bulk-create")]
         public async Task<IActionResult> BulkCreateAsync([FromBody] TicketBulkCreateCommand request)
         {

@@ -89,6 +89,28 @@ namespace EventService.Application.CQRS.Handler.Event
             {
                 currentEvent = currentEvent.Where(x => x.AgeRestriction == request.AgeRestriction);
             }
+
+            if (request.Latitude.HasValue && request.Longitude.HasValue && request.Distance.HasValue)
+            {
+                var lat = (double)request.Latitude.Value;
+                var lon = (double)request.Longitude.Value;
+                var dist = request.Distance.Value;
+
+                // Bounding box calculation
+                // 1 degree of latitude is approximately 111 km
+                double latDelta = dist / 111.0;
+                // 1 degree of longitude is approximately 111 * cos(latitude) km
+                double lonDelta = dist / (111.0 * Math.Cos(lat * Math.PI / 180.0));
+
+                decimal minLat = (decimal)(lat - latDelta);
+                decimal maxLat = (decimal)(lat + latDelta);
+                decimal minLon = (decimal)(lon - lonDelta);
+                decimal maxLon = (decimal)(lon + lonDelta);
+
+                currentEvent = currentEvent.Where(x => x.EventLocations.Any(l =>
+                    l.Latitude >= minLat && l.Latitude <= maxLat &&
+                    l.Longitude >= minLon && l.Longitude <= maxLon));
+            }
             if (request.IsDescending.HasValue && request.IsDescending == true)
             {
                 currentEvent = currentEvent.OrderByDescending(x => x.CreatedAt); // Hoặc StartTime

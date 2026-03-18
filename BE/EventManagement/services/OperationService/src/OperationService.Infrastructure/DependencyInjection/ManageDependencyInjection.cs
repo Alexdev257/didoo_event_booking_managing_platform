@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using OperationService.Application.Interfaces.Repositories;
 using OperationService.Infrastructure.Implements.Repositories;
-using OperationService.Infrastructure.MessageConsumers;
+//using OperationService.Infrastructure.Consumers;
 using OperationService.Infrastructure.Persistence;
 using SharedContracts.Common.Wrappers;
 using SharedInfrastructure.Bus;
@@ -19,6 +19,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using SharedContracts.Protos;
+using OperationService.Infrastructure.MessageConsumers;
 
 namespace OperationService.Infrastructure.DependencyInjection
 {
@@ -35,8 +37,42 @@ namespace OperationService.Infrastructure.DependencyInjection
             services.AddSharedSwaggerGen("Operation Service API");
 
             services.AddMessageBus(configuration, typeof(BookingSuccessEventConsumer).Assembly);
+
+            services.AddGrpcClient<global::SharedContracts.Protos.AuthGrpc.AuthGrpcClient>(o =>
+            {
+                var url = GetServiceUrl(configuration, "AuthServiceUrl", "http://auth-service:81");
+                o.Address = new Uri(url);
+            });
+            services.AddGrpcClient<global::SharedContracts.Protos.EventGrpc.EventGrpcClient>(o =>
+            {
+                var url = GetServiceUrl(configuration, "EventServiceUrl", "http://event-service:81");
+                o.Address = new Uri(url);
+            });
+            services.AddGrpcClient<global::SharedContracts.Protos.BookingGrpc.BookingGrpcClient>(o =>
+            {
+                var url = GetServiceUrl(configuration, "BookingServiceUrl", "http://booking-service:81");
+                o.Address = new Uri(url);
+            });
             
             return services;
+        }
+
+        private static string GetServiceUrl(IConfiguration configuration, string serviceKey, string defaultUrl)
+        {
+            // Check multiple possible config keys / env var patterns used across compose files
+            var envHttpClient = Environment.GetEnvironmentVariable($"HttpClientSettings__{serviceKey}");
+            if (!string.IsNullOrEmpty(envHttpClient)) return envHttpClient;
+
+            var envGrpc = Environment.GetEnvironmentVariable($"GrpcSettings__{serviceKey}");
+            if (!string.IsNullOrEmpty(envGrpc)) return envGrpc;
+
+            var cfgHttpClient = configuration[$"HttpClientSettings:{serviceKey}"];
+            if (!string.IsNullOrEmpty(cfgHttpClient)) return cfgHttpClient;
+
+            var cfgGrpc = configuration[$"GrpcSettings:{serviceKey}"];
+            if (!string.IsNullOrEmpty(cfgGrpc)) return cfgGrpc;
+
+            return defaultUrl;
         }
 
         private static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
@@ -162,49 +198,17 @@ namespace OperationService.Infrastructure.DependencyInjection
 
         private static void AddAuthorizationRole(this IServiceCollection service)
         {
-            ////1 admin
-            ////2 teacher
-            ////3 sttudent
-            //service.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("AdminOnly", policy => { policy.RequireClaim("RoleId", "1".ToLower()); });
-
-            //    options.AddPolicy("TeacherOnly", policy => { policy.RequireClaim("RoleId", "2".ToLower()); });
-
-            //    options.AddPolicy("StudentOnly", policy => { policy.RequireClaim("RoleId", "3".ToLower()); });
-
-            //    options.AddPolicy("AdminOrTeacher", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "1".ToLower() || roleClaim == "2".ToLower();
-            //        }));
-
-            //    options.AddPolicy("AdminOrStudent", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "1".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-
-            //    options.AddPolicy("TeacherOrStudent", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "2".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-
-            //    options.AddPolicy("AllRole", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "Admin";
-            //            return roleClaim == "1".ToLower() || roleClaim == "2".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-            //});
+            service.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Role", "1"));
+                options.AddPolicy("UserOnly", policy => policy.RequireClaim("Role", "2"));
+                options.AddPolicy("OrganizerOnly", policy => policy.RequireClaim("IsOrganizer", "true"));
+                options.AddPolicy("AdminOrOrganizer", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(c => c.Type == "Role" && c.Value == "1") ||
+                        context.User.HasClaim(c => c.Type == "IsOrganizer" && c.Value == "true")
+                    ));
+            });
         }
     }
 }

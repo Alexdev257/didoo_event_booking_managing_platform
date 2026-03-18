@@ -19,6 +19,7 @@ namespace AuthService.Api.Controllers
             _mediator = mediator;
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UserCreateCommand request)
         {
@@ -27,6 +28,7 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateCommand request)
         {
@@ -36,6 +38,7 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
@@ -45,6 +48,7 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Restore([FromRoute] Guid id)
         {
@@ -53,6 +57,7 @@ namespace AuthService.Api.Controllers
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id, [FromQuery] UserGetByIdQuery request)
         {
@@ -62,11 +67,10 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        //[Authorize]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] UserGetListQuery request)
         {
-            var response = await _mediator.Send(request);
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
             return StatusCode(StatusCodes.Status400BadRequest, result);
