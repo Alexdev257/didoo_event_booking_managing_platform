@@ -148,6 +148,8 @@ services:
       JwtSettings__Issuer: https://localhost
       JwtSettings__Audience: https://localhost
       MomoAPI_ReturnUrl: https://booking-service:80/api/payments/callback/
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
+      GrpcSettings__EventServiceUrl: http://event-service:81
       # Ensure other services can find booking gRPC via GrpcSettings
       GrpcSettings__BookingServiceUrl: http://booking-service:81
     ports:

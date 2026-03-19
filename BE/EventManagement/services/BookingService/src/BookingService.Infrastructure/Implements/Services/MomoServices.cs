@@ -1,9 +1,10 @@
-﻿using BookingService.Application.DTOs.Request;
+using BookingService.Application.DTOs.Request;
 using BookingService.Application.DTOs.Response.Payment;
 using BookingService.Application.Interfaces.Repositories;
 using BookingService.Application.Interfaces.Services;
 using BookingService.Domain.Enum;
 using BookingService.Infrastructure.DependencyInjection.Options;
+using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using SharedContracts.Events;
 using SharedContracts.Interfaces;
+using SharedContracts.Protos;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -23,13 +25,22 @@ namespace BookingService.Infrastructure.Implements.Services
         private readonly ITicketServiceClient _ticketServiceClient;
         private readonly IMessageProducer _messageProducer;
         private readonly AuthGrpc.AuthGrpcClient _authClient;
+        private readonly EventGrpc.EventGrpcClient _eventClient;
 
-        public MomoServices(IOptions<MomoConfig> momoConfig, IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMessageProducer messageProducer)
+        public MomoServices(
+            IOptions<MomoConfig> momoConfig,
+            IManageUnitOfWork unitOfWork,
+            ITicketServiceClient ticketServiceClient,
+            IMessageProducer messageProducer,
+            AuthGrpc.AuthGrpcClient authClient,
+            EventGrpc.EventGrpcClient eventClient)
         {
             _momoConfig = momoConfig;
             _unitOfWork = unitOfWork;
             _ticketServiceClient = ticketServiceClient;
             _messageProducer = messageProducer;
+            _authClient = authClient;
+            _eventClient = eventClient;
         }
 
         public async Task<string> CreatePaymentURL(OrderInfoModel orderInfo, HttpContext context)
@@ -193,15 +204,40 @@ namespace BookingService.Infrastructure.Implements.Services
                         
                     });
 
-                    var buyerUserId = booking.UserId;
-                    var eventId = booking.EventId;
                     bool isTrade = booking.BookingType == BookingTypeEnum.TradePurchase;
 
-                    string buyerEmail = "hungptse183180@fpt.edu.vn"; // Retrieve buyer email from UserService if needed
-                    string buyerName = "Pham Tien Hung"; // Retrieve buyer name from UserService if needed
-                    string sellerEmail = "hungphamtien43@gmail.com"; // Retrieve seller email from UserService if needed
-                    string sellerName = "Park Tae Hyun"; // Retrieve seller name from UserService if needed
-                    string eventName = "Hackathon"; // Retrieve event name from EventService if needed
+                    string buyerEmail = string.Empty;
+                    string buyerName = string.Empty;
+                    try
+                    {
+                        var buyerInfo = await _authClient.GetUserProfileAsync(new UserRequest
+                        {
+                            UserId = booking.UserId.ToString()
+                        });
+                        buyerEmail = buyerInfo.Email ?? string.Empty;
+                        buyerName = buyerInfo.FullName ?? string.Empty;
+                    }
+                    catch (RpcException)
+                    {
+                        // Keep email/name empty if AuthService is unavailable or user is not found.
+                    }
+
+                    string sellerEmail = string.Empty;
+                    string sellerName = string.Empty;
+                    string eventName = string.Empty;
+                    try
+                    {
+                        var eventInfo = await _eventClient.GetEventDetailAsync(new EventRequest
+                        {
+                            EventId = booking.EventId.ToString()
+                        });
+                        eventName = eventInfo.Name ?? string.Empty;
+                    }
+                    catch (RpcException)
+                    {
+                        // Keep event name empty if EventService is unavailable or event is not found.
+                    }
+
                     string[] ticketIds = ( _unitOfWork.BookingDetails
                             .FindAsync(x => x.BookingId == booking.Id))
                         .Select(x =>

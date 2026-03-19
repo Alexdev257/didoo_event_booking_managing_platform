@@ -25,6 +25,7 @@ message UserResponse {
   string full_name = 2;
   string avatar_url = 3;
   string gender = 4;
+  string email = 5;
 }
 
 message GetUsersRequest{

@@ -28,19 +28,19 @@ namespace EmailService.Infrastructure.Consumers
                 var sellerSubject = $"[Event Management] Giao dich ve thanh cong - {msg.EventName}";
                 var sellerBody = BuildSellerEmailBody(msg);
 
-                if (!string.IsNullOrWhiteSpace(msg.SellerEmail))
+                if (!string.IsNullOrWhiteSpace(msg.BuyerEmail))
                 {
-                    await _emailSender.SendAsync(msg.SellerEmail, sellerSubject, sellerBody);
-                    Console.WriteLine($"[Success] Seller email sent to {msg.SellerEmail}");
+                    await _emailSender.SendAsync(msg.BuyerEmail, sellerSubject, sellerBody);
+                    Console.WriteLine($"[Success] Seller email sent to {msg.BuyerEmail}");
                 }
 
-                if (msg.IsTrade && !string.IsNullOrWhiteSpace(msg.BuyerEmail))
+                if (msg.IsTrade && !string.IsNullOrWhiteSpace(msg.SellerEmail))
                 {
                     var buyerSubject = $"[Event Management] Ban da mua ve thanh cong - {msg.EventName}";
                     var buyerBody = BuildBuyerEmailBody(msg);
 
-                    await _emailSender.SendAsync(msg.BuyerEmail, buyerSubject, buyerBody);
-                    Console.WriteLine($"[Success] Buyer email sent to {msg.BuyerEmail}");
+                    await _emailSender.SendAsync(msg.SellerEmail, buyerSubject, buyerBody);
+                    Console.WriteLine($"[Success] Buyer email sent to {msg.SellerEmail}");
                 }
             }
             catch (Exception ex)

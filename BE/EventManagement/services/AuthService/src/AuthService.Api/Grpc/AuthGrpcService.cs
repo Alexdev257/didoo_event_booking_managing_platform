@@ -39,7 +39,8 @@ namespace AuthService.Api.Grpc
                 Id = user.Id.ToString(),
                 FullName = user.FullName,
                 AvatarUrl = user.AvatarUrl,
-                Gender = user.Gender.ToString() ?? "" // Proto không chịu null, phải để chuỗi rỗng
+                Gender = user.Gender.ToString() ?? "", // Proto không chịu null, phải để chuỗi rỗng
+                Email = user.Email ?? ""
             };
         }
 

@@ -4,10 +4,12 @@ using BookingService.Application.DTOs.Response.Booking;
 using BookingService.Application.Interfaces.Repositories;
 using BookingService.Application.Interfaces.Services;
 using BookingService.Domain.Enum;
+using Grpc.Core;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using SharedContracts.Events;
 using SharedContracts.Interfaces;
+using SharedContracts.Protos;
 using BookingDetailEntity = BookingService.Domain.Entities.BookingDetail;
 using BookingEntity = BookingService.Domain.Entities.Booking;
 
@@ -19,13 +21,17 @@ namespace BookingService.Application.CQRS.Handler.Booking
         private readonly ITicketServiceClient _ticketServiceClient;
         private readonly IMomoService _momoService;
         private readonly IMessageProducer _messageProducer;
+        private readonly AuthGrpc.AuthGrpcClient _authGrpcClient;
+        private readonly EventGrpc.EventGrpcClient _eventGrpcClient;
 
-        public BookingCreateCommandHandler(IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMomoService momoService, IMessageProducer messageProducer)
+        public BookingCreateCommandHandler(IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMomoService momoService, IMessageProducer messageProducer, AuthGrpc.AuthGrpcClient authGrpcClient, EventGrpc.EventGrpcClient eventGrpcClient)
         {
             _unitOfWork = unitOfWork;
             _ticketServiceClient = ticketServiceClient;
             _momoService = momoService;
             _messageProducer = messageProducer;
+            _authGrpcClient = authGrpcClient;
+            _eventGrpcClient = eventGrpcClient;
         }
 
         public async Task<CreateBookingResponse> Handle(BookingCreateCommand request, CancellationToken cancellationToken)
@@ -138,6 +144,74 @@ namespace BookingService.Application.CQRS.Handler.Booking
                 else
                 {
                     paymentUrl = string.Empty;
+                    bool isTrade = booking.BookingType == BookingTypeEnum.TradePurchase;
+
+                    string buyerEmail = string.Empty;
+                    string buyerName = string.Empty;
+                    try
+                    {
+                        var buyerInfo = await _authGrpcClient.GetUserProfileAsync(new UserRequest
+                        {
+                            UserId = request.UserId.ToString()
+                        });
+                        buyerEmail = buyerInfo.Email ?? string.Empty;
+                        buyerName = buyerInfo.FullName ?? string.Empty;
+                        Console.WriteLine($"-------------------------Buyer info - Email: {buyerEmail}, Name: {buyerName}-----------------------------");
+                    }
+                    catch (RpcException ex)
+                    {
+                        // Keep email/name empty if AuthService is unavailable or user is not found.
+                        Console.WriteLine(ex.Message + "----------------------------------------------------------------");
+                    }
+
+                    string sellerEmail = string.Empty;
+                    string sellerName = string.Empty;
+                    string eventName = string.Empty;
+                    try
+                    {
+                        var eventInfo = await _eventGrpcClient.GetEventDetailAsync(new EventRequest
+                        {
+                            EventId = request.EventId.ToString()
+                        });
+                        eventName = eventInfo.Name ?? string.Empty;
+                        Console.WriteLine($"-------------------------Event info - Name: {eventName}-----------------------------");
+                    }
+                    catch (RpcException ex)
+                    {
+                        // Keep event name empty if EventService is unavailable or event is not found.
+                        Console.WriteLine(ex.Message +"----------------------------------------------------------------");
+                    }
+
+                    string[] ticketIds = (_unitOfWork.BookingDetails
+                            .FindAsync(x => x.BookingId == booking.Id))
+                        .Select(x =>
+                            booking.BookingType == BookingTypeEnum.TradePurchase
+                                ? (x.TicketListingId.HasValue ? x.TicketListingId.Value.ToString() : "")
+                                : (x.TicketTypeId.HasValue ? x.TicketTypeId.Value.ToString() : "")
+                        )
+                        .Where(x => !string.IsNullOrEmpty(x))
+                        .ToArray();
+
+
+                    //Guid sellerId = Guid.Empty; // Seller info not available here
+                    //if ( booking.BookingType == BookingTypeEnum.TradePurchase)
+                    //{
+                    //    sellerId = await _unitOfWork.TicketListing
+                    //        .FindAsync(x => x.Id == booking.Id)
+                    //        .Select(x => x.SellerUserId)
+                    //        .FirstOrDefaultAsync();
+                    //}
+
+
+                    await _messageProducer.PublishAsync(new SendingEmailWhenEventSuccess(
+                        BuyerEmail: buyerEmail,
+                        BuyerName: buyerName,
+                        SellerEmail: sellerEmail,
+                        SellerName: sellerName,
+                        TicketIds: ticketIds,
+                        EventName: eventName,
+                        IsTrade: isTrade
+                        ));
                 }
             }
             catch (Exception ex)
