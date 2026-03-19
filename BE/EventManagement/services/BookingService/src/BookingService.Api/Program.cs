@@ -40,6 +40,24 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddBookingServiceInfrastructure(builder.Configuration);
 
+builder.Services.AddGrpcClient<SharedContracts.Protos.AuthGrpc.AuthGrpcClient>(o =>
+{
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__AuthServiceUrl")
+              ?? builder.Configuration["GrpcSettings:AuthServiceUrl"]
+              ?? "http://auth-service:80";
+    Console.WriteLine($"--> OperationService connecting to AuthGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
+builder.Services.AddGrpcClient<SharedContracts.Protos.EventGrpc.EventGrpcClient>(o =>
+{
+var url = Environment.GetEnvironmentVariable("GrpcSettings__EventServiceUrl")
+          ?? builder.Configuration["GrpcSettings__EventServiceUrl"]
+          ?? "http://event-service:81";
+    Console.WriteLine($"--> BookingService connecting to EventGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

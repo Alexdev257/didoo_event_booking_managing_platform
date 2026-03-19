@@ -22,6 +22,7 @@ namespace BookingService.Infrastructure.Implements.Services
         private readonly IManageUnitOfWork _unitOfWork;
         private readonly ITicketServiceClient _ticketServiceClient;
         private readonly IMessageProducer _messageProducer;
+        private readonly AuthGrpc.AuthGrpcClient _authClient;
 
         public MomoServices(IOptions<MomoConfig> momoConfig, IManageUnitOfWork unitOfWork, ITicketServiceClient ticketServiceClient, IMessageProducer messageProducer)
         {
@@ -87,7 +88,7 @@ namespace BookingService.Infrastructure.Implements.Services
             var message = collection.FirstOrDefault(s => s.Key == "message").Value;
             var trancasionID = collection.FirstOrDefault(s => s.Key == "transId").Value;
             // extraData can be "eventId" or "eventId|resaleId"
-            var extraData = collection.FirstOrDefault(s => s.Key == "extraData").Value.ToString();
+            var extraData = collection.FirstOrDefault(predicate: s => s.Key == "extraData").Value.ToString();
 
             var booking = await _unitOfWork.Bookings.GetByIdAsync(Guid.Parse(orderId!));
             var payment = _unitOfWork.Payments.FindAsync(x => x.BookingId == Guid.Parse(orderId!)).FirstOrDefault();
@@ -182,6 +183,43 @@ namespace BookingService.Infrastructure.Implements.Services
                         EventId = booking.EventId,
                         EventName = ""
                     });
+
+
+                    await _messageProducer.PublishAsync(new BookingSuccessNotificationEvent
+                    {
+                        UserId = booking.UserId,
+                        BookingId = booking.Id,
+                        EventId = booking.EventId,
+                        
+                    });
+
+                    string buyerEmail = "hungptse183180@fpt.edu.vn"; // Retrieve buyer email from UserService if needed
+                    string buyerName = "Pham Tien Hung"; // Retrieve buyer name from UserService if needed
+                    string sellerEmail = "hungphamtien43@gmail.com"; // Retrieve seller email from UserService if needed
+                    string sellerName = "Park Tae Hyun"; // Retrieve seller name from UserService if needed
+                    string eventName = "Hackathon"; // Retrieve event name from EventService if needed
+                    string[] ticketIds = ( _unitOfWork.BookingDetails
+                            .FindAsync(x => x.BookingId == booking.Id))
+                        .Select(x =>
+                            booking.BookingType == BookingTypeEnum.TradePurchase
+                                ? (x.TicketListingId.HasValue ? x.TicketListingId.Value.ToString() : "")
+                                : (x.TicketTypeId.HasValue ? x.TicketTypeId.Value.ToString() : "")
+                        )
+                        .Where(x => !string.IsNullOrEmpty(x))
+                        .ToArray();
+                    bool isTrade = booking.BookingType == BookingTypeEnum.TradePurchase;
+
+
+
+                    await _messageProducer.PublishAsync(new SendingEmailWhenEventSuccess(
+                        BuyerEmail: buyerEmail,
+                        BuyerName: buyerName,
+                        SellerEmail: sellerEmail,
+                        SellerName: sellerName,
+                        TicketIds: ticketIds,
+                        EventName: eventName,
+                        IsTrade: isTrade
+                        ));
                 }
             }
 
