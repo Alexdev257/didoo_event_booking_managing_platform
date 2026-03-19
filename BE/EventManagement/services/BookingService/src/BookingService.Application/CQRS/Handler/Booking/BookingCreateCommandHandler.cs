@@ -57,13 +57,17 @@ namespace BookingService.Application.CQRS.Handler.Booking
             // 1b. Check per-user ticket limit
             if (ticketResult.MaxTicketsPerUser.HasValue)
             {
-                var existingBookings = _unitOfWork.Bookings
-                    .FindAsync(b => b.UserId == request.UserId
-                                 && b.EventId == request.EventId
-                                 && b.Status != BookingStatusEnum.Canceled
-                                 && !b.IsDeleted);
+                // MaxTicketsPerUser được áp dụng theo từng TicketType riêng,
+                // nên chỉ cộng các bookingdetail thuộc đúng TicketTypeId của request.
+                var existingBookingDetails = _unitOfWork.BookingDetails
+                    .FindAsync(d =>
+                        d.TicketTypeId == request.TicketTypeId
+                        && d.Booking.UserId == request.UserId
+                        && d.Booking.EventId == request.EventId
+                        && d.Booking.Status != BookingStatusEnum.Canceled
+                        && !d.Booking.IsDeleted);
 
-                int totalBooked = existingBookings.Sum(b => b.Amount);
+                int totalBooked = existingBookingDetails.Sum(d => d.Quantity);
                 int maxAllowed = ticketResult.MaxTicketsPerUser.Value;
 
                 if (totalBooked + request.Quantity > maxAllowed)
