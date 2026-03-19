@@ -193,6 +193,10 @@ namespace BookingService.Infrastructure.Implements.Services
                         
                     });
 
+                    var buyerUserId = booking.UserId;
+                    var eventId = booking.EventId;
+                    bool isTrade = booking.BookingType == BookingTypeEnum.TradePurchase;
+
                     string buyerEmail = "hungptse183180@fpt.edu.vn"; // Retrieve buyer email from UserService if needed
                     string buyerName = "Pham Tien Hung"; // Retrieve buyer name from UserService if needed
                     string sellerEmail = "hungphamtien43@gmail.com"; // Retrieve seller email from UserService if needed
@@ -207,8 +211,16 @@ namespace BookingService.Infrastructure.Implements.Services
                         )
                         .Where(x => !string.IsNullOrEmpty(x))
                         .ToArray();
-                    bool isTrade = booking.BookingType == BookingTypeEnum.TradePurchase;
+                    
 
+                    //Guid sellerId = Guid.Empty; // Seller info not available here
+                    //if ( booking.BookingType == BookingTypeEnum.TradePurchase)
+                    //{
+                    //    sellerId = await _unitOfWork.TicketListing
+                    //        .FindAsync(x => x.Id == booking.Id)
+                    //        .Select(x => x.SellerUserId)
+                    //        .FirstOrDefaultAsync();
+                    //}
 
 
                     await _messageProducer.PublishAsync(new SendingEmailWhenEventSuccess(
