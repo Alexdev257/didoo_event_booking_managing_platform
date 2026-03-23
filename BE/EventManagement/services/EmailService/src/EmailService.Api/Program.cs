@@ -1,12 +1,12 @@
-﻿using EmailService.Infrastructure.Consumers;
+using EmailService.Infrastructure.Consumers;
 using EmailService.Infrastructure.Services;
 using MassTransit;
 using SharedInfrastructure.Bus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Register EmailSender
-builder.Services.AddScoped<EmailSender>();
+// 1. Register EmailSender (MailJet via HttpClient)
+builder.Services.AddHttpClient<EmailSender>();
 
 // 2. Register MassTransit (RabbitMQ) with Consumer Assembly
 builder.Services.AddMessageBus(builder.Configuration, typeof(SendOtpRegisterConsumer).Assembly);
