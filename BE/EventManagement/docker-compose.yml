@@ -200,6 +200,11 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       RabbitMQ__Host: rabbitmq
+      MailJet__ApiKey: 543fc8e07f5bf283ada4f85f07c64e42
+      MailJet__ApiSecret: 313ed871936ffdb0fa3f705e8219ac72
+      MailJet__FromEmail: thangbpse180445@fpt.edu.vn
+      MailJet__DisplayName: Event Ticketing Support
+      MailJet__SendEndpoint: https://api.mailjet.com/v3.1/send
     depends_on:
       rabbitmq:
         condition: service_healthy
