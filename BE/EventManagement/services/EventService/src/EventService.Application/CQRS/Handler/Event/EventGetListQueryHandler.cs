@@ -76,6 +76,10 @@ namespace EventService.Application.CQRS.Handler.Event
             {
                 currentEvent = currentEvent.Where(x => x.Status == request.Status);
             }
+            if (!request.Status.HasValue)
+            {
+                currentEvent = currentEvent.Where(x => x.Status == Domain.Enum.EventStatusEnum.Published);
+            }
             if (request.CategoryId != null && request.CategoryId != Guid.Empty)
             {
                 currentEvent = currentEvent.Where(x => x.CategoryId == request.CategoryId);

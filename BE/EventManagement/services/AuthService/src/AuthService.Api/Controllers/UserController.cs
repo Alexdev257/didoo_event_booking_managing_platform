@@ -28,7 +28,7 @@ namespace AuthService.Api.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize] 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateCommand request)
         {
