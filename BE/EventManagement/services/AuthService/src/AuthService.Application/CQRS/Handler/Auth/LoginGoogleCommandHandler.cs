@@ -71,7 +71,8 @@ namespace AuthService.Application.CQRS.Handler.Auth
                     Address = null,
                     RoleId = role.Id,
                     OrganizerId = null,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    Status = Domain.Enum.StatusEnum.Active,
                 };
 
                 var location = new AuthService.Domain.Entities.UserLocation
