@@ -1,0 +1,38 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath('com.android.tools.build:gradle')
+        classpath('com.facebook.react:react-native-gradle-plugin')
+        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+    }
+}
+
+allprojects {
+    // 1. Force Use of Public Mapbox Variant (Bypasses 403 for ndk27)
+    // We keep this to avoid build failures on API 35 with default Mapbox Maven settings
+    project.ext.set("RNMapboxMapsLibs", {
+        implementation "com.mapbox.maps:android:${rootProject.ext.has("RNMapboxMapsVersion") ? rootProject.ext.get("RNMapboxMapsVersion") : "11.16.2"}"
+        implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:6.11.0'
+        implementation 'androidx.asynclayoutinflater:asynclayoutinflater:1.0.0'
+    })
+
+    // 2. Mapbox Repository (Public Access for standard variants)
+    repositories {
+        google()
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+        }
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
+
+apply plugin: "expo-root-project"
+apply plugin: "com.facebook.react.rootproject"
+
+// XÓA BỎ TOÀN BỘ CÁC KHỐI allprojects PHÍA DƯỚI NẾU CÒN DƯ THỪA
