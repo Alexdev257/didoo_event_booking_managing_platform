@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿﻿using Microsoft.EntityFrameworkCore.Storage;
 using SharedInfrastructure.Persistence.Repositories;
 using SharedKernel.Interfaces;
 using StackExchange.Redis;
@@ -25,6 +25,7 @@ namespace TicketService.Infrastructure.Implements.Repositories
         public IGenericRepository<TicketType> TicketTypes => new GenericRepository<TicketType>(_context);
         public IGenericRepository<Ticket> Tickets => new GenericRepository<Ticket>(_context);
         public IGenericRepository<Seat> Seats => new GenericRepository<Seat>(_context);
+        public IGenericRepository<TicketListing> TicketListings => new GenericRepository<TicketListing>(_context);
 
         public async Task BeginTransactionAsync()
         {

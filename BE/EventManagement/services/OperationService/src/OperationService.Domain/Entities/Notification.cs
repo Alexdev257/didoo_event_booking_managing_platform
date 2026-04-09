@@ -1,9 +1,6 @@
-﻿using SharedKernel.Domain;
+﻿using OperationService.Domain.Enum;
+using SharedKernel.Domain;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OperationService.Domain.Entities
 {
@@ -11,8 +8,10 @@ namespace OperationService.Domain.Entities
     {
         public Guid UserId { get; set; }
         public Guid? EventId { get; set; }
-        public string Title { get; set; }
-        public string Message { get; set; }
-        public bool? IsRead { get; set; }
+        public Guid? RelatedId { get; set; } // BookingId, ResaleId, OrganizerId
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public bool? IsRead { get; set; } = false;
+        public NotificationTypeEnum Type { get; set; } = NotificationTypeEnum.System;
     }
 }

@@ -1,8 +1,10 @@
-﻿using AuthService.Application.CQRS.Command.Auth;
+using AuthService.Application.CQRS.Command.Auth;
 using AuthService.Application.DTOs.Response.Auth;
 using AuthService.Application.Interfaces.Helpers;
 using AuthService.Application.Interfaces.Repositories;
+using AuthService.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SharedContracts.Interfaces;
 using SharedKernel.Interfaces;
 using System;
@@ -28,7 +30,7 @@ namespace AuthService.Application.CQRS.Handler.Auth
         }
         public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = _unitOfWork.Users.GetAllAsync()
+            var user = _unitOfWork.Users.GetAllAsync().Include(x => x.Role).Include(x => x.Locations)
                 .FirstOrDefault(u => u.Email == request.Email);
             if (user == null)
             {
@@ -48,19 +50,43 @@ namespace AuthService.Application.CQRS.Handler.Auth
                 };
             }
 
-            var accessToken = _jwtHelper.GenerateAccessToken(user);
+            var accessToken = await _jwtHelper.GenerateAccessToken(user);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
-            await _cacheService.SetAsync($"RT_{user.Id}", refreshToken, TimeSpan.FromDays(7), cancellationToken);
-            return new LoginResponse
+            await _cacheService.SetAsync<string>($"RT_{user.Id}", refreshToken, TimeSpan.FromDays(7), cancellationToken);
+            var location = new UserLocation
             {
-                IsSuccess = true,
-                Message = "Login successfully",
-                Data = new TokenDTO
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken
-                }
+                Id = Guid.NewGuid(),
+                Longitude = request.Location.Longitude,
+                Latitude = request.Location.Latitude,
+                UserId = user.Id,
+                CreatedAt = DateTime.UtcNow,
             };
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                await _unitOfWork.UserLocations.AddAsync(location);
+                await _unitOfWork.CommitTransactionAsync();
+                return new LoginResponse
+                {
+                    IsSuccess = true,
+                    Message = "Login successfully",
+                    Data = new TokenDTO
+                    {
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    }
+                };
+            }
+            catch(Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                return new LoginResponse
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+            
         }
     }
 }

@@ -123,10 +123,16 @@ namespace OperationService.Infrastructure.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("message");
 
+                    b.Property<Guid?>("RelatedId")
+                        .HasColumnType("char(36)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("title");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")

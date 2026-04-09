@@ -11,5 +11,6 @@ namespace TicketService.Domain.Enum
         Available = 1,
         Full = 2,
         Unavailable = 3,
+        Locked = 4,
     }
 }

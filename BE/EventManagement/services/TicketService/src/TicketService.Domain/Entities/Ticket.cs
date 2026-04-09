@@ -15,5 +15,8 @@ namespace TicketService.Domain.Entities
         public string? Zone { get; set; }
         public TicketStatusEnum Status { get; set; }
         public virtual TicketType TicketType { get; set; }
+        public Guid? OwnerId { get; set; }
+        public DateTime? LockExpiration { get; set; }
+        public virtual ICollection<TicketListing> Listings { get; set; } = new List<TicketListing>();
     }
 }

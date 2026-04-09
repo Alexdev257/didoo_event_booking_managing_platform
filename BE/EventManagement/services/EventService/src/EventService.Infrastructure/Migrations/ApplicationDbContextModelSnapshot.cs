@@ -175,6 +175,10 @@ namespace EventService.Infrastructure.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("thumbnail_url");
 
+                    b.Property<string>("TicketMapUrl")
+                        .HasColumnType("longtext")
+                        .HasColumnName("ticket_map_url");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -485,7 +489,8 @@ namespace EventService.Infrastructure.Migrations
                         .HasColumnName("tiktok_url");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("UpdatedAt");
 
                     b.Property<string>("WebsiteUrl")
                         .HasMaxLength(255)

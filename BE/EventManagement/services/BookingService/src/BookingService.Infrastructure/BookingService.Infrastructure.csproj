@@ -32,13 +32,14 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\shared\SharedContracts\SharedContracts.csproj" />
     <ProjectReference Include="..\..\..\..\shared\SharedInfrastructure\SharedInfrastructure.csproj" />
     <ProjectReference Include="..\BookingService.Application\BookingService.Application.csproj" />
     <ProjectReference Include="..\BookingService.Domain\BookingService.Domain.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Implements\Repositories\" />
+		<Folder Include="Database\" />
 		<Folder Include="Persistence\Configurations\" />
 	</ItemGroup>
 

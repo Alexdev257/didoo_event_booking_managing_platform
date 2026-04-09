@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿﻿using Microsoft.EntityFrameworkCore;
 using SharedInfrastructure.Persistence.Interceptors;
 using StackExchange.Redis;
 using System;
@@ -26,6 +26,7 @@ namespace TicketService.Infrastructure.Persistence
         public virtual DbSet<TicketType> TicketTypes { get; set; }
         public virtual DbSet<Ticket> Tickets { get; set; }
         public virtual DbSet<Seat> Seats { get; set; }
+        public virtual DbSet<TicketListing> TicketListings { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.AddInterceptors(_auditableEntityInterceptor);

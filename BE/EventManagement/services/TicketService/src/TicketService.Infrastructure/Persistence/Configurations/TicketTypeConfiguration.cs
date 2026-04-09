@@ -43,6 +43,9 @@ namespace TicketService.Infrastructure.Persistence.Configurations
                 .HasColumnName("description")
                 .HasMaxLength(500);
 
+            builder.Property(x => x.MaxTicketsPerUser)
+                .HasColumnName("max_tickets_per_user");
+
             // Relationships
             builder.HasMany(x => x.Seats)
                 .WithOne(s => s.TicketType)

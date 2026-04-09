@@ -1,4 +1,4 @@
-﻿using SharedKernel.Interfaces;
+﻿﻿using SharedKernel.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +13,6 @@ namespace TicketService.Application.Interfaces.Repositories
         IGenericRepository<TicketType> TicketTypes { get; }
         IGenericRepository<Ticket> Tickets { get; }
         IGenericRepository<Seat> Seats { get; }
+        IGenericRepository<TicketListing> TicketListings { get; }
     }
 }

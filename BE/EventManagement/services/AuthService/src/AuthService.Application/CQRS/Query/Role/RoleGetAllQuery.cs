@@ -1,4 +1,4 @@
-﻿using AuthService.Application.DTOs.Response;
+﻿using AuthService.Application.DTOs.Response.Role;
 using MediatR;
 using System;
 using System.Collections.Generic;

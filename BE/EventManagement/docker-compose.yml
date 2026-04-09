@@ -1,0 +1,236 @@
+networks:
+  event-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: event_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Password123!
+      MYSQL_DATABASE: AuthDb
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - event-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: event_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - event-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: event_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - event-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: services/AuthService/src/AuthService.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80;http://+:81
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=AuthDb;Uid=root;Pwd=Password123!;
+      ConnectionStrings__Redis: redis:6379
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+      Jwt__Key: xynbqiydczvhbcomoewzcldjrqnwrwii
+      Jwt__Issuer: https://localhost
+      Jwt__Audience: https://localhost
+      GrpcSettings__EventServiceUrl: http://event-service:81
+    ports:
+      - "6002:80"
+      - "6004:81"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  event-service:
+    container_name: event-service
+    build:
+      context: .
+      dockerfile: services/EventService/src/EventService.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80;http://+:81
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=EventDb;Uid=root;Pwd=Password123!;
+      ConnectionStrings__Redis: redis:6379
+      RabbitMQ__Host: rabbitmq
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
+    ports:
+      - "6100:80"
+      - "6102:81"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  ticket-service:
+    container_name: ticket-service
+    build:
+      context: .
+      dockerfile: services/TicketService/src/TicketService.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80;http://+:81
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=TicketDb;Uid=root;Pwd=Password123!;
+      ConnectionStrings__Redis: redis:6379
+      RabbitMQ__Host: rabbitmq
+      GrpcSettings__EventServiceUrl: http://event-service:81
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
+    ports:
+      - "6200:80"
+      - "6202:81"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  booking-service:
+    container_name: booking-service
+    build:
+      context: .
+      dockerfile: services/BookingService/src/BookingService.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # Expose both HTTP (80) and gRPC (81) inside the container
+      ASPNETCORE_URLS: http://+:80;http://+:81
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=BookingDb;Uid=root;Pwd=Password123!;
+      ConnectionStrings__Redis: redis:6379
+      RabbitMQ__Host: rabbitmq
+      HttpClientSettings__TicketServiceUrl: http://ticket-service:80
+      JwtSettings__SecretKey: xynbqiydczvhbcomoewzcldjrqnwrwii
+      JwtSettings__Issuer: https://localhost
+      JwtSettings__Audience: https://localhost
+      MomoAPI_ReturnUrl: https://booking-service:80/api/payments/callback/
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
+      GrpcSettings__EventServiceUrl: http://event-service:81
+      # Ensure other services can find booking gRPC via GrpcSettings
+      GrpcSettings__BookingServiceUrl: http://booking-service:81
+    ports:
+      - "6300:80"
+      - "6302:81"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ticket-service:
+        condition: service_started
+    networks:
+      - event-network
+
+  operation-service:
+    container_name: operation-service
+    build:
+      context: .
+      dockerfile: services/OperationService/src/OperationService.Api/Dockerfile
+    environment:
+      # Allow unencrypted HTTP/2 for gRPC calls between containers
+      DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT: "true"
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80;http://+:81
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=OperationDb;Uid=root;Pwd=Password123!;
+      RabbitMQ__Host: rabbitmq
+      GrpcSettings__AuthServiceUrl: http://auth-service:81
+      GrpcSettings__EventServiceUrl: http://event-service:81
+      # Explicitly point to booking-service gRPC endpoint
+      GrpcSettings__BookingServiceUrl: http://booking-service:81
+    ports:
+      - "6500:80"
+      - "6502:81"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  email-service:
+    container_name: email-service
+    build:
+      context: .
+      dockerfile: services/EmailService/src/EmailService.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      RabbitMQ__Host: rabbitmq
+      MailJet__ApiKey: 543fc8e07f5bf283ada4f85f07c64e42
+      MailJet__ApiSecret: 82c02193bf115923b50df41fab902081
+      MailJet__FromEmail: thangbpse180445@fpt.edu.vn
+      MailJet__DisplayName: Event Ticketing Support
+      MailJet__SendEndpoint: https://api.mailjet.com/v3.1/send
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: services/ApiGatewayYarp/src/ApiGatewayYarp/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ReverseProxy__Clusters__auth-cluster__Destinations__destination1__Address: http://auth-service:80
+      ReverseProxy__Clusters__event-cluster__Destinations__destination1__Address: http://event-service:80
+      ReverseProxy__Clusters__ticket-cluster__Destinations__destination1__Address: http://ticket-service:80
+      ReverseProxy__Clusters__booking-cluster__Destinations__destination1__Address: http://booking-service:80
+      ReverseProxy__Clusters__operation-cluster__Destinations__destination1__Address: http://operation-service:80
+    ports:
+      - "5000:80"
+    depends_on:
+      - auth-service
+      - event-service
+      - ticket-service
+      - booking-service
+      - operation-service
+    networks:
+      - event-network
