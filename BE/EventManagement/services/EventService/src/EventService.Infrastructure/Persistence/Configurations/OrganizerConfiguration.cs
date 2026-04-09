@@ -39,8 +39,10 @@ namespace EventService.Infrastructure.Persistence.Configurations
                 .HasColumnName("created_by_user_id")
                 .HasConversion<string>();
 
-            builder.Property(x => x.CreatedAt).HasColumnName("created_at");
+            // The migration 'InitEvent.cs' defines 'updated_at' as required, but missing 'created_at'.
+            // Map CreatedAt to 'updated_at' to avoid database errors, and map UpdatedAt to its own column.
             builder.Property(x => x.CreatedAt).HasColumnName("updated_at");
+            builder.Property(x => x.UpdatedAt).HasColumnName("UpdatedAt");
             builder.Property(x => x.IsDeleted).HasColumnName("is_deleted");
             builder.Property(x => x.DeletedAt).HasColumnName("deleted_at");
             builder.Ignore(x => x.DomainEvents);

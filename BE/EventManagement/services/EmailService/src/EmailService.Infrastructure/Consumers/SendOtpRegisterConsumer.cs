@@ -1,4 +1,4 @@
-﻿using EmailService.Infrastructure.Services;
+using EmailService.Infrastructure.Services;
 using MassTransit;
 using MassTransit.Internals;
 using SharedContracts.Events;

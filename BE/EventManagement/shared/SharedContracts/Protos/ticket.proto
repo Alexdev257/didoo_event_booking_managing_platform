@@ -1,0 +1,53 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "SharedContracts.Protos";
+
+package ticket;
+
+service TicketGrpc {
+  // Lấy chi tiết vé
+  rpc GetTicketDetail (GetTicketDetailRequest) returns (GetTicketDetailResponse);
+
+  // Kiểm tra TicketType còn available không, nếu còn thì giảm AvailableQuantity
+  rpc CheckAndDecrementAvailability (CheckAvailabilityRequest) returns (CheckAvailabilityResponse);
+}
+
+// ===== GetTicketDetail =====
+message GetTicketDetailRequest {
+  string ticket_id = 1;
+}
+
+message GetTicketDetailResponse {
+  bool is_success = 1;
+  string message = 2;
+  TicketModel ticket_data = 3;
+}
+
+message TicketModel {
+  string id = 1;
+  string event_id = 2;
+  string zone = 3;
+  string status = 4;
+  string owner_id = 5;
+  TicketTypeModel ticket_type = 6;
+}
+
+message TicketTypeModel {
+  string id = 1;
+  string name = 2;
+  double price = 3;
+  string description = 4;
+}
+
+// ===== CheckAndDecrementAvailability =====
+message CheckAvailabilityRequest {
+  string ticket_type_id = 1;
+  int32 quantity = 2;
+}
+
+message CheckAvailabilityResponse {
+  bool is_available = 1;
+  string message = 2;
+  int32 remaining_quantity = 3;
+  double price_per_ticket = 4;
+}

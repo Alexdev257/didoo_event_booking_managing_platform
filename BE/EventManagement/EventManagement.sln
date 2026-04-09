@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -65,16 +65,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingService.Domain", "se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingService.Infrastructure", "services\BookingService\src\BookingService.Infrastructure\BookingService.Infrastructure.csproj", "{88FCAA33-AD73-353C-CCF4-BDDAE48D14BC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PaymentService", "PaymentService", "{8B79D516-40F5-4231-ADB5-081F2E277F31}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService.Api", "services\PaymentService\src\PaymentService.Api\PaymentService.Api.csproj", "{E62BE06E-D54F-054C-C665-259ED73669AC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService.Application", "services\PaymentService\src\PaymentService.Application\PaymentService.Application.csproj", "{D0C94E8A-4386-4448-57FD-A9BDE44779E0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService.Domain", "services\PaymentService\src\PaymentService.Domain\PaymentService.Domain.csproj", "{1A43EE15-95E0-11C2-64A1-683821577F9E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService.Infrastructure", "services\PaymentService\src\PaymentService.Infrastructure\PaymentService.Infrastructure.csproj", "{02301420-AC72-68A5-5E87-9907B56B791C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OperationService", "OperationService", "{E24A660F-CEC8-43B1-B331-8E964BFAB511}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationService.Api", "services\OperationService\src\OperationService.Api\OperationService.Api.csproj", "{39E718DC-1876-7F87-AD59-96D99B60F4E2}"
@@ -84,6 +74,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationService.Domain", "services\OperationService\src\OperationService.Domain\OperationService.Domain.csproj", "{67C1ACE2-73CB-8078-4F89-DC1ADA782BA5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationService.Infrastructure", "services\OperationService\src\OperationService.Infrastructure\OperationService.Infrastructure.csproj", "{7474C6D6-B957-F500-E949-08019D500A08}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C9D09FDC-094E-4620-B438-A5091D509670}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		instruction.md = instruction.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -183,22 +179,6 @@ Global
 		{88FCAA33-AD73-353C-CCF4-BDDAE48D14BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88FCAA33-AD73-353C-CCF4-BDDAE48D14BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88FCAA33-AD73-353C-CCF4-BDDAE48D14BC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E62BE06E-D54F-054C-C665-259ED73669AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E62BE06E-D54F-054C-C665-259ED73669AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E62BE06E-D54F-054C-C665-259ED73669AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E62BE06E-D54F-054C-C665-259ED73669AC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D0C94E8A-4386-4448-57FD-A9BDE44779E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0C94E8A-4386-4448-57FD-A9BDE44779E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D0C94E8A-4386-4448-57FD-A9BDE44779E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D0C94E8A-4386-4448-57FD-A9BDE44779E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A43EE15-95E0-11C2-64A1-683821577F9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A43EE15-95E0-11C2-64A1-683821577F9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A43EE15-95E0-11C2-64A1-683821577F9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A43EE15-95E0-11C2-64A1-683821577F9E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{02301420-AC72-68A5-5E87-9907B56B791C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{02301420-AC72-68A5-5E87-9907B56B791C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{02301420-AC72-68A5-5E87-9907B56B791C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{02301420-AC72-68A5-5E87-9907B56B791C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{39E718DC-1876-7F87-AD59-96D99B60F4E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{39E718DC-1876-7F87-AD59-96D99B60F4E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39E718DC-1876-7F87-AD59-96D99B60F4E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -249,11 +229,6 @@ Global
 		{6EE605A0-4126-9791-1D93-B300E8FBEEA6} = {3AFB4190-39D1-4129-BC76-4EC33CED8FA5}
 		{F7957DF7-25B3-C7BF-19BA-B76EAF6BCECE} = {3AFB4190-39D1-4129-BC76-4EC33CED8FA5}
 		{88FCAA33-AD73-353C-CCF4-BDDAE48D14BC} = {3AFB4190-39D1-4129-BC76-4EC33CED8FA5}
-		{8B79D516-40F5-4231-ADB5-081F2E277F31} = {3502CA89-F14B-49B3-B7D7-6230070674E8}
-		{E62BE06E-D54F-054C-C665-259ED73669AC} = {8B79D516-40F5-4231-ADB5-081F2E277F31}
-		{D0C94E8A-4386-4448-57FD-A9BDE44779E0} = {8B79D516-40F5-4231-ADB5-081F2E277F31}
-		{1A43EE15-95E0-11C2-64A1-683821577F9E} = {8B79D516-40F5-4231-ADB5-081F2E277F31}
-		{02301420-AC72-68A5-5E87-9907B56B791C} = {8B79D516-40F5-4231-ADB5-081F2E277F31}
 		{E24A660F-CEC8-43B1-B331-8E964BFAB511} = {3502CA89-F14B-49B3-B7D7-6230070674E8}
 		{39E718DC-1876-7F87-AD59-96D99B60F4E2} = {E24A660F-CEC8-43B1-B331-8E964BFAB511}
 		{0E813AA3-146D-D7AC-246F-8E472D5F1451} = {E24A660F-CEC8-43B1-B331-8E964BFAB511}

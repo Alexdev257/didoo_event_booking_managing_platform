@@ -22,6 +22,7 @@ namespace AuthService.Infrastructure.Implements.Repositories
         }
 
         public IGenericRepository<User> Users => new GenericRepository<User>(_context);
+        public IGenericRepository<UserLocation> UserLocations => new GenericRepository<UserLocation>(_context);
 
         public IGenericRepository<Role> Roles => new GenericRepository<Role>(_context);
 

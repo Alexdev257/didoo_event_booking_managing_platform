@@ -2,7 +2,7 @@ using SharedKernel.Domain;
 
 namespace EventService.Domain.Entities
 {
-    public class FavoriteEvent : AuditableEntity
+    public class FavoriteEvent : AuditableEntity, IHardDelete
     {
         public Guid EventId { get; set; }
         public Guid UserId { get; set; }

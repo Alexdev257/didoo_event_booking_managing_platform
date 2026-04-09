@@ -1,9 +1,48 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using SharedContracts.Protos;
 using SharedInfrastructure;
+using TicketService.Api.Grpc;
+using TicketService.Api.Hubs;
+using TicketService.Api.SignalRServices;
+using TicketService.Application.Interfaces.SignalRServices;
 using TicketService.Infrastructure.DependencyInjection;
 using TicketService.Infrastructure.Persistence;
 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    bool isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    if (isRunningInDocker)
+    {
+        // Port 80: REST API (HTTP 1.1)
+        options.ListenAnyIP(80, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 81: gRPC (HTTP 2)
+        options.ListenAnyIP(81, o => o.Protocols = HttpProtocols.Http2);
+    }
+    else
+    {
+        // Port 6201: REST API / SignalR
+        options.ListenLocalhost(6201, o => o.Protocols = HttpProtocols.Http1);
+
+        // Port 6202: gRPC Server
+        options.ListenLocalhost(6202, o => o.Protocols = HttpProtocols.Http2);
+    }
+});
+
+builder.Services.AddCors(options =>
+{
+    
+});
+
+var redisConnection = builder.Configuration.GetConnectionString("Redis");
+builder.Services.AddSignalR()
+    .AddStackExchangeRedis(redisConnection, options =>
+    {
+        options.Configuration.ChannelPrefix = "TicketService_SignalR";
+    });
 
 // Add services to the container.
 
@@ -12,8 +51,51 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddGrpc();
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddTicketServiceInfrastructure(builder.Configuration);
+builder.Services.AddScoped<ITicketHubService, TicketHubService>();
+builder.Services.AddGrpcClient<EventGrpc.EventGrpcClient>(o =>
+{
+    // L?y URL t? bi?n m�i tr??ng (Docker)
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__EventServiceUrl");
+
+    // N?u kh�ng c�, l?y t? appsettings.json (Local)
+    if (string.IsNullOrEmpty(url))
+    {
+        url = builder.Configuration["GrpcSettings:EventServiceUrl"];
+    }
+
+    // Fallback n?u v?n null (M?c ??nh Docker)
+    if (string.IsNullOrEmpty(url))
+    {
+        url = "http://event-service:80";
+    }
+
+    Console.WriteLine($"--> TicketService connecting to EventGrpc at: {url}");
+    o.Address = new Uri(url);
+});
+
+builder.Services.AddGrpcClient<AuthGrpc.AuthGrpcClient>(o =>
+{
+    // L?y URL t? bi?n m�i tr??ng (Docker)
+    var url = Environment.GetEnvironmentVariable("GrpcSettings__AuthServiceUrl");
+
+    // N?u kh�ng c�, l?y t? appsettings.json (Local)
+    if (string.IsNullOrEmpty(url))
+    {
+        url = builder.Configuration["GrpcSettings:AuthServiceUrl"];
+    }
+
+    // Fallback n?u v?n null (M?c ??nh Docker)
+    if (string.IsNullOrEmpty(url))
+    {
+        url = "http://auth-service:80";
+    }
+
+    Console.WriteLine($"--> TicketService connecting to EventGrpc at: {url}");
+    o.Address = new Uri(url);
+});
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -45,14 +127,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
 
 app.UseCors("AllowAll");
+
+app.MapHub<TicketHub>("/hubs/ticket");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 
+app.MapGrpcService<TicketGrpcService>();
 app.MapControllers();
 
 app.Run();

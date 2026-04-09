@@ -1,4 +1,4 @@
-﻿using BookingService.Domain.Entities;
+﻿﻿using BookingService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -56,6 +56,12 @@ namespace BookingService.Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.PaidAt)
                 .HasColumnName("paid_at");
+
+            builder.Property(x => x.BookingType)
+                .HasColumnName("booking_type")
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .HasDefaultValue(BookingService.Domain.Enum.BookingTypeEnum.Normal);
 
             // Relationships
             builder.HasMany(x => x.BookingDetails)

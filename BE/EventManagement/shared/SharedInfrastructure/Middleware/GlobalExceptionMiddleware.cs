@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SharedContracts.Common.Wrappers;
 using System;
@@ -39,11 +39,12 @@ namespace SharedInfrastructure.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = new CommonResponse<string>
+            var response = new
             {
-                IsSuccess = false,
-                Message = "An error was caught in global exception middleware.",
-                Data = ex.Message,
+                isSuccess = false,
+                message = "An error was caught in global exception middleware.",
+                data = ex.Message,
+                listErrors = Array.Empty<object>()
             };
 
             var json = JsonSerializer.Serialize(response);

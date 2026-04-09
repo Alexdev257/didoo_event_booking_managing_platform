@@ -12,16 +12,21 @@ namespace SharedInfrastructure.Bus
 {
     public static class MassTransitExtensions
     {
-        public static IServiceCollection AddMessageBus(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMessageBus(this IServiceCollection services, IConfiguration configuration, params System.Reflection.Assembly[] consumerAssemblies)
         {
             services.AddMassTransit(x =>
             {
+                if (consumerAssemblies != null && consumerAssemblies.Length > 0)
+                {
+                    x.AddConsumers(consumerAssemblies);
+                }
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(configuration["MessageBroker:Host"], "/", h =>
+                    cfg.Host(configuration["RabbitMQ:Host"], "/", h =>
                     {
-                        h.Username(configuration["MessageBroker:Username"]!);
-                        h.Password(configuration["MessageBroker:Password"]!);
+                        h.Username(configuration["RabbitMQ:Username"]!);
+                        h.Password(configuration["RabbitMQ:Password"]!);
                     });
 
                     cfg.ConfigureEndpoints(context);

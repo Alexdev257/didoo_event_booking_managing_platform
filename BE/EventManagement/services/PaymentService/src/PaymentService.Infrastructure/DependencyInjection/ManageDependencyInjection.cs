@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,13 +7,16 @@ using Microsoft.IdentityModel.Tokens;
 using PaymentService.Application.Interfaces.Repositories;
 using PaymentService.Infrastructure.Implements.Repositories;
 using PaymentService.Infrastructure.Persistence;
+using SharedContracts.Common.Wrappers;
 using SharedInfrastructure.Bus;
+using SharedInfrastructure.Swagger;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PaymentService.Infrastructure.DependencyInjection
@@ -27,6 +31,7 @@ namespace PaymentService.Infrastructure.DependencyInjection
             services.AddCorsExtentions();
             services.AddJwtAuthentication(configuration);
             services.AddAuthorizationRole();
+            services.AddSharedSwaggerGen("Payment Service API");
 
             //services.AddMessageBus(configuration);
             return services;
@@ -64,9 +69,10 @@ namespace PaymentService.Infrastructure.DependencyInjection
             service.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
-                    policy => policy.AllowAnyOrigin()
+                    policy => policy.SetIsOriginAllowed(origin => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
             });
         }
 
@@ -100,6 +106,42 @@ namespace PaymentService.Infrastructure.DependencyInjection
                             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                                 context.Response.Headers.Add("Token-Expired", "true");
                             return Task.CompletedTask;
+                        },
+                        // 1. Xử lý khi chưa đăng nhập hoặc Token sai (401 Unauthorized)
+                        OnChallenge = context =>
+                        {
+                            // Ngăn chặn hành vi mặc định (trả về rỗng)
+                            context.HandleResponse();
+
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+
+                            var response = new
+                            {
+                                isSuccess = false,
+                                message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại hoặc làm mới Token.",
+                                data = (object?)null,
+                                listErrors = Array.Empty<object>()
+                            };
+
+                            return context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                        },
+
+                        // 2. Xử lý khi đã đăng nhập nhưng không đủ quyền (403 Forbidden)
+                        OnForbidden = context =>
+                        {
+                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            context.Response.ContentType = "application/json";
+
+                            var response = new
+                            {
+                                isSuccess = false,
+                                message = "You are not allowed to access this endpoint.",
+                                data = (object?)null,
+                                listErrors = Array.Empty<object>()
+                            };
+
+                            return context.Response.WriteAsync(JsonSerializer.Serialize(response));
                         }
                     };
                 });
@@ -107,49 +149,17 @@ namespace PaymentService.Infrastructure.DependencyInjection
 
         private static void AddAuthorizationRole(this IServiceCollection service)
         {
-            ////1 admin
-            ////2 teacher
-            ////3 sttudent
-            //service.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("AdminOnly", policy => { policy.RequireClaim("RoleId", "1".ToLower()); });
-
-            //    options.AddPolicy("TeacherOnly", policy => { policy.RequireClaim("RoleId", "2".ToLower()); });
-
-            //    options.AddPolicy("StudentOnly", policy => { policy.RequireClaim("RoleId", "3".ToLower()); });
-
-            //    options.AddPolicy("AdminOrTeacher", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "1".ToLower() || roleClaim == "2".ToLower();
-            //        }));
-
-            //    options.AddPolicy("AdminOrStudent", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "1".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-
-            //    options.AddPolicy("TeacherOrStudent", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "User";
-            //            return roleClaim == "2".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-
-            //    options.AddPolicy("AllRole", policy =>
-            //        policy.RequireAssertion(context =>
-            //        {
-            //            var roleClaim = context.User.FindFirst(c => c.Type == "RoleId")?.Value;
-            //            //return roleClaim != "Admin";
-            //            return roleClaim == "1".ToLower() || roleClaim == "2".ToLower() || roleClaim == "3".ToLower();
-            //        }));
-            //});
+            service.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Role", "1"));
+                options.AddPolicy("UserOnly", policy => policy.RequireClaim("Role", "2"));
+                options.AddPolicy("OrganizerOnly", policy => policy.RequireClaim("IsOrganizer", "true"));
+                options.AddPolicy("AdminOrOrganizer", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(c => c.Type == "Role" && c.Value == "1") ||
+                        context.User.HasClaim(c => c.Type == "IsOrganizer" && c.Value == "true")
+                    ));
+            });
         }
     }
 }

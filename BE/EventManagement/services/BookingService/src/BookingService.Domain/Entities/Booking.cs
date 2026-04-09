@@ -1,4 +1,4 @@
-﻿using BookingService.Domain.Enum;
+﻿﻿using BookingService.Domain.Enum;
 using SharedKernel.Domain;
 using System;
 using System.Collections.Generic;
@@ -18,6 +18,7 @@ namespace BookingService.Domain.Entities
         public int Amount { get; set; }
         public decimal TotalPrice { get; set; }
         public BookingStatusEnum Status { get; set; } = BookingStatusEnum.Pending;
+        public BookingTypeEnum BookingType { get; set; } = BookingTypeEnum.Normal;
         public DateTime? PaidAt { get; set; }
         public virtual ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
     }

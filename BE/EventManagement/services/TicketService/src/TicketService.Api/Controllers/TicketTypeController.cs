@@ -1,6 +1,8 @@
-﻿using MediatR;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TicketService.Application.CQRS.Command.TicketType;
 using TicketService.Application.CQRS.Query.TicketType;
 
 namespace TicketService.Api.Controllers
@@ -16,12 +18,86 @@ namespace TicketService.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllTicketTypeAsync()
+        public async Task<IActionResult> GetListTicketTypesAsync([FromQuery] TicketTypeGetListQuery request)
         {
-            TicketTypeGetAllQuery request = new TicketTypeGetAllQuery();
             var result = await _mediator.Send(request);
             if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
-            return StatusCode(StatusCodes.Status400BadRequest, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTicketTypeByIdAsync([FromRoute] Guid id, [FromQuery] TicketTypeGetByIdQuery request)
+        {
+            request.Id = id;
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [Authorize(Policy = "OrganizerOnly")]
+        [HttpPost]
+        public async Task<IActionResult> CreateTicketTypeAsync([FromBody] TicketTypeCreateCommand request)
+        {
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [Authorize(Policy = "OrganizerOnly")]
+        [HttpPost("array")]
+        public async Task<IActionResult> CreateArrayTicketTypeAsync([FromBody] TicketTypeCreateArrayCommand request)
+        {
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status201Created, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [Authorize(Policy = "OrganizerOnly")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTicketTypeAsync([FromRoute] Guid id, [FromBody] TicketTypeUpdateCommand request)
+        {
+            request.Id = id;
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [Authorize(Policy = "OrganizerOnly")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTicketTypeAsync([FromRoute] Guid id)
+        {
+            var request = new TicketTypeDeleteCommand { Id = id };
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [Authorize(Policy = "OrganizerOnly")]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> RestoreTicketTypeAsync([FromRoute] Guid id)
+        {
+            var request = new TicketTypeRestoreCommand { Id = id };
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [HttpPatch("{id}/decrement")]
+        public async Task<IActionResult> DecrementAvailabilityAsync([FromRoute] Guid id, [FromBody] TicketTypeDecrementCommand request)
+        {
+            request.Id = id;
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [HttpPatch("{id}/increment")]
+        public async Task<IActionResult> IncrementAvailabilityAsync([FromRoute] Guid id, [FromBody] TicketTypeIncrementCommand request)
+        {
+            request.Id = id;
+            var result = await _mediator.Send(request);
+            if (result.IsSuccess) return StatusCode(StatusCodes.Status200OK, result);
+            else return StatusCode(StatusCodes.Status400BadRequest, result);
         }
     }
 }

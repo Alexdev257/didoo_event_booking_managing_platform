@@ -1,0 +1,56 @@
+networks:
+  event-network:
+    driver: bridge
+
+volumes:
+  npm_db_data:
+  npm_config_data:
+  npm_letsencrypt:
+
+services:
+  # MariaDB database for Nginx Proxy Manager
+  npm-db:
+    image: 'mysql:8.0'
+    container_name: npm_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 'npm_root_secret_123'
+      MYSQL_DATABASE: 'npm_db'
+      MYSQL_USER: 'npm_user'
+      MYSQL_PASSWORD: 'npm_user_secret_123'
+      MYSQL_INITDB_SKIP_TZINFO: 'yes'
+    volumes:
+      - npm_db_data:/var/lib/mysql
+    networks:
+      - event-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+
+  # Nginx Proxy Manager
+  api-gateway-nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: api-gateway-nginx
+    restart: unless-stopped
+    ports:
+      - '5001:80'      # HTTP proxy (redirects to HTTPS)
+      - '5443:443'     # HTTPS proxy
+      - '81:81'        # Admin UI (http://localhost:81)
+    environment:
+      DB_MYSQL_HOST: npm-db
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: npm_user
+      DB_MYSQL_PASSWORD: npm_user_secret_123
+      DB_MYSQL_NAME: npm_db
+    volumes:
+      - npm_config_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    depends_on:
+      npm-db:
+        condition: service_healthy
+    networks:
+      - event-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

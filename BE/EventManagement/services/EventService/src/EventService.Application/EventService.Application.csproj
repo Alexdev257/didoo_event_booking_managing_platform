@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\shared\SharedContracts\SharedContracts.csproj" />
+	<ProjectReference Include="..\..\..\..\shared\SharedInfrastructure\SharedInfrastructure.csproj" />
     <ProjectReference Include="..\EventService.Domain\EventService.Domain.csproj" />
   </ItemGroup>
 
@@ -17,10 +18,19 @@
 		<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+		<PackageReference Include="Google.Protobuf" Version="3.25.2" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.60.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.60.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="CQRS\Command\" />
+		<Protobuf Include="..\..\..\..\shared\SharedContracts\Protos\auth.proto" GrpcServices="Client" Link="Protos\auth.proto" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Folder Include="Interfaces\Helpers\" />
 	</ItemGroup>
 

@@ -40,6 +40,6 @@ namespace SharedInfrastructure.Caching
             await _cache.RemoveAsync(key, cancellationToken);
         }
 
-        
+
     }
 }
